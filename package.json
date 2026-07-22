@@ -2,7 +2,7 @@
   "type": "module",
   "scripts": {
     "build": "tsc -p tsconfig.json",
-    "start": "node --env-file=.env dist/index.js"
+    "start": "node --env-file=.env dist/server.js"
   },
   "dependencies": {
     "@fastify/postgres": "^6.1.0",
