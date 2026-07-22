@@ -1,5 +1,5 @@
 import Fastify from 'fastify';
-import dbConnector from './plugins/database.js'
+import dbConnector from './plugins/database.js';
 import routes from './route.js';
 
 export function buildApp() {

@@ -13,5 +13,5 @@ const run = async () => {
         app.log.error(err);
         process.exit(1);
     }
-}
-run();
+};
+await run();

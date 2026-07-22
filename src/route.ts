@@ -1,13 +1,17 @@
-import type { FastifyPluginAsync } from 'fastify';
+import type { FastifyPluginCallback } from 'fastify';
 
-const routes: FastifyPluginAsync = async (fastify, _options) => {
-    fastify.get('/', async (_request, _reply) => {
-        return { hello: "world" }
+const routes: FastifyPluginCallback = (fastify, options, done) => {
+    void options;
+
+    fastify.get('/', () => {
+        return { hello: 'world' };
     });
 
-    fastify.get('/ping', async (_request, _reply) => {
-        return 'pong\n'
-    })
-}
+    fastify.get('/ping', () => {
+        return 'pong\n';
+    });
+
+    done();
+};
 
 export default routes;
