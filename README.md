@@ -18,7 +18,9 @@ Le périmètre actuellement implémenté est limité à la validation du socle b
 
 - démarrage d'un serveur HTTP Fastify sur le port `3000` ;
 - écoute sur toutes les interfaces réseau (`0.0.0.0`) ;
+- configuration de l'adresse et du port du serveur par variables d'environnement ;
 - journalisation native de Fastify ;
+- connexion à PostgreSQL au moyen d'un pool partagé par les plugins Fastify ;
 - route `GET /`, qui retourne `{ "hello": "world" }` ;
 - route `GET /ping`, qui retourne `pong`.
 
@@ -31,7 +33,7 @@ Les fonctionnalités métier suivantes constituent des orientations envisagées.
 - représentation et navigation dans l'arbre familial ;
 - ajout de photos, documents, anecdotes et événements familiaux ;
 - organisation de ces contenus sous la forme d'un album interactif ;
-- persistance des données ;
+- définition du schéma PostgreSQL et persistance des données métier ;
 - authentification et gestion des droits d'accès familiaux.
 
 ## Stack technique
@@ -39,29 +41,39 @@ Les fonctionnalités métier suivantes constituent des orientations envisagées.
 - [Node.js](https://nodejs.org/) comme environnement d'exécution ;
 - [TypeScript](https://www.typescriptlang.org/) avec une configuration stricte ;
 - [Fastify](https://fastify.dev/) comme bibliothèque backend ;
+- [PostgreSQL](https://www.postgresql.org/) comme base de données principale ;
+- [`@fastify/postgres`](https://github.com/fastify/fastify-postgres) pour partager le pool de connexions dans l'application ;
 - npm pour la gestion des dépendances et des scripts.
 
 Le choix de Fastify et sa comparaison avec NestJS sont détaillés dans l'[ADR 0001](docs/adr/0001-use-fastify-as-backend-framework.md).
+Le choix de PostgreSQL est détaillé dans l'[ADR 0002](docs/adr/0002-use-postgresql-as-primary-database.md).
 
 ## Structure du projet
 
 ```text
 .
+├── src/
+│   ├── config/
+│   │   └── db.ts      # Configuration du pool de connexions PostgreSQL
+│   ├── index.ts       # Création et démarrage du serveur Fastify
+│   └── route.ts       # Routes HTTP actuellement disponibles
 ├── docs/
 │   └── adr/          # Décisions d'architecture
-├── index.ts          # Création et démarrage du serveur Fastify
-├── route.ts          # Routes HTTP actuellement disponibles
+├── .env.example      # Exemple de configuration locale
 ├── package.json      # Dépendances et scripts npm
 ├── package-lock.json # Verrouillage des versions des dépendances
 └── tsconfig.json     # Configuration TypeScript
 ```
 
+La compilation génère le JavaScript dans `dist/`. Ce dossier n'est pas versionné.
+
 ## Installation
 
 ### Prérequis
 
-- Node.js ;
-- npm.
+- une version récente de Node.js prenant en charge l'option `--env-file` ;
+- npm ;
+- une instance PostgreSQL accessible localement.
 
 Clonez le dépôt, puis installez les dépendances :
 
@@ -69,9 +81,25 @@ Clonez le dépôt, puis installez les dépendances :
 npm ci
 ```
 
+Créez ensuite votre configuration locale à partir du fichier d'exemple :
+
+```bash
+cp .env.example .env
+```
+
+Adaptez la variable `DATABASE_URL` dans `.env` à votre instance PostgreSQL :
+
+```dotenv
+DATABASE_URL=postgresql://username:password@localhost:5432/database_name
+PORT=3000
+HOST=0.0.0.0
+```
+
+Le fichier `.env` peut contenir des informations sensibles et ne doit pas être versionné. Seul `.env.example`, qui contient des valeurs fictives, est conservé dans le dépôt.
+
 ## Compilation et lancement
 
-Le workflow prévu par les scripts du projet est le suivant :
+Compilez le TypeScript dans `dist/`, puis lancez l'API en chargeant la configuration depuis `.env` :
 
 ```bash
 npm run build
@@ -89,16 +117,15 @@ curl http://localhost:3000/ping
 
 ## État du développement
 
-Kinfolio API est en phase d'initialisation. Le serveur, le routage minimal et la configuration TypeScript sont présents. En revanche, aucun modèle de domaine généalogique, stockage de données, mécanisme d'authentification, test automatisé ou contrat d'API n'existe encore.
+Kinfolio API est en phase d'initialisation. Le serveur, le routage minimal, la configuration TypeScript et le connecteur PostgreSQL sont présents. En revanche, aucun schéma de données, modèle de domaine généalogique, accès métier à la base, mécanisme d'authentification, test automatisé ou contrat d'API n'existe encore.
 
 La priorité immédiate est de stabiliser ce socle avant de commencer l'implémentation du domaine métier.
 
 ## Prochaines étapes envisagées
 
-- fiabiliser les scripts de lancement ;
-- structurer le code par responsabilités ;
+- valider la configuration au démarrage et vérifier la disponibilité de PostgreSQL ;
 - définir le modèle de données généalogique ;
-- choisir et intégrer une solution de persistance ;
+- créer le schéma PostgreSQL et mettre en place les migrations ;
 - concevoir les premières routes métier ;
 - ajouter la validation des entrées, la gestion des erreurs et des tests automatisés ;
 - documenter le contrat de l'API ;
