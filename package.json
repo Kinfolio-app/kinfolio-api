@@ -2,7 +2,7 @@
   "type": "module",
   "scripts": {
     "build": "tsc -p tsconfig.json",
-    "start": "node index.js"
+    "start": "node dist/index.js"
   },
   "dependencies": {
     "fastify": "^5.10.0"

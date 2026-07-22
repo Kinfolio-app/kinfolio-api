@@ -1,5 +1,5 @@
-import Fastify from "fastify";
-import routes from "./route.js"
+import Fastify from 'fastify';
+import routes from './route.js';
 
 const server = Fastify({
     logger: true,
