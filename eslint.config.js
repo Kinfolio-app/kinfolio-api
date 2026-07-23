@@ -9,11 +9,11 @@ export default defineConfig([
     },
     {
         files: ['**/*.ts'],
-        extends: [
-            js.configs.recommended,
-            tseslint.configs.recommended,
-            tseslint.configs.recommendedTypeChecked,
-        ],
+        extends: [js.configs.recommended, tseslint.configs.recommended],
+    },
+    {
+        files: ['src/**/*.ts'],
+        extends: [tseslint.configs.recommendedTypeChecked],
         languageOptions: {
             parserOptions: {
                 projectService: true,

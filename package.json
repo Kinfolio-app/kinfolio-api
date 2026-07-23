@@ -3,6 +3,9 @@
     "scripts": {
         "build": "tsc -p tsconfig.json",
         "start": "node --env-file=.env dist/server.js",
+        "migrate": "node-pg-migrate --envPath .env -j ts",
+        "test": "vitest run",
+        "test:watch": "vitest",
         "lint": "eslint .",
         "lint:fix": "eslint . --fix",
         "format": "prettier . --write",
@@ -21,8 +24,13 @@
         "@types/pg": "^8.20.0",
         "eslint": "^10.7.0",
         "eslint-config-prettier": "^10.1.8",
+        "node-pg-migrate": "^9.0.0",
         "prettier": "^3.9.6",
         "typescript": "^6.0.3",
-        "typescript-eslint": "^8.65.0"
+        "typescript-eslint": "^8.65.0",
+        "vitest": "^4.1.10"
+    },
+    "allowScripts": {
+        "fsevents": false
     }
 }
