@@ -21,8 +21,10 @@ Le périmètre actuellement implémenté est limité à la validation du socle b
 - configuration de l'adresse et du port du serveur par variables d'environnement ;
 - journalisation native de Fastify ;
 - connexion à PostgreSQL au moyen d'un pool partagé par les plugins Fastify ;
-- route `GET /`, qui retourne `{ "hello": "world" }` ;
-- route `GET /ping`, qui retourne `pong`.
+- vérification de la disponibilité de PostgreSQL au démarrage ;
+- infrastructure de migrations avec `node-pg-migrate` ;
+- tests automatisés avec Vitest et l'injection HTTP de Fastify ;
+- route de santé `GET /health`, qui retourne `{ "status": "ok" }`.
 
 ### Prévues
 
@@ -43,6 +45,8 @@ Les fonctionnalités métier suivantes constituent des orientations envisagées.
 - [Fastify](https://fastify.dev/) comme bibliothèque backend ;
 - [PostgreSQL](https://www.postgresql.org/) comme base de données principale ;
 - [`@fastify/postgres`](https://github.com/fastify/fastify-postgres) pour partager le pool de connexions dans l'application ;
+- [`node-pg-migrate`](https://salsita.github.io/node-pg-migrate/) pour gérer les migrations PostgreSQL ;
+- [Vitest](https://vitest.dev/) pour les tests automatisés ;
 - npm pour la gestion des dépendances et des scripts.
 
 Le choix de Fastify et sa comparaison avec NestJS sont détaillés dans l'[ADR 0001](docs/adr/0001-use-fastify-as-backend-framework.md).
@@ -53,16 +57,21 @@ Le choix de PostgreSQL est détaillé dans l'[ADR 0002](docs/adr/0002-use-postgr
 ```text
 .
 ├── src/
-│   ├── config/
-│   │   └── db.ts      # Configuration du pool de connexions PostgreSQL
-│   ├── index.ts       # Création et démarrage du serveur Fastify
-│   └── route.ts       # Routes HTTP actuellement disponibles
+│   ├── plugins/
+│   │   └── database.ts # Connexion et vérification de PostgreSQL
+│   ├── app.ts          # Construction de l'application Fastify
+│   ├── route.ts        # Routes HTTP actuellement disponibles
+│   └── server.ts       # Démarrage du serveur HTTP
+├── migrations/         # Migrations PostgreSQL
+├── test/
+│   └── app.test.ts     # Tests de l'application
 ├── docs/
-│   └── adr/          # Décisions d'architecture
-├── .env.example      # Exemple de configuration locale
-├── package.json      # Dépendances et scripts npm
-├── package-lock.json # Verrouillage des versions des dépendances
-└── tsconfig.json     # Configuration TypeScript
+│   ├── adr/            # Décisions d'architecture
+│   └── roadmap.md      # Roadmap du projet
+├── .env.example        # Exemple de configuration locale
+├── package.json        # Dépendances et scripts npm
+├── package-lock.json   # Verrouillage des versions des dépendances
+└── tsconfig.json       # Configuration TypeScript
 ```
 
 La compilation génère le JavaScript dans `dist/`. Ce dossier n'est pas versionné.
@@ -108,28 +117,50 @@ npm start
 
 Après compilation, l'API doit être accessible à l'adresse `http://localhost:3000`.
 
-Une fois le serveur lancé, les routes de démonstration peuvent être appelées ainsi :
+Une fois le serveur lancé, son état peut être vérifié avec :
 
 ```bash
-curl http://localhost:3000/
-curl http://localhost:3000/ping
+curl http://localhost:3000/health
+```
+
+L'API doit répondre avec un statut HTTP `200` et le contenu suivant :
+
+```json
+{
+    "status": "ok"
+}
+```
+
+## Tests et vérifications
+
+Lancez les tests automatisés :
+
+```bash
+npm test
+```
+
+Vérifiez ensuite la compilation, le lint et le formatage :
+
+```bash
+npm run check
 ```
 
 ## État du développement
 
-Kinfolio API est en phase d'initialisation. Le serveur, le routage minimal, la configuration TypeScript et le connecteur PostgreSQL sont présents. En revanche, aucun schéma de données, modèle de domaine généalogique, accès métier à la base, mécanisme d'authentification, test automatisé ou contrat d'API n'existe encore.
+Kinfolio API est en phase d'initialisation. Le serveur, le routage minimal, la configuration TypeScript, le connecteur PostgreSQL, l'infrastructure de migrations et les premiers tests automatisés sont présents. En revanche, aucun schéma de données métier, modèle de domaine généalogique, accès métier à la base, mécanisme d'authentification ou contrat d'API n'existe encore.
 
 La priorité immédiate est de stabiliser ce socle avant de commencer l'implémentation du domaine métier.
 
 ## Prochaines étapes envisagées
 
-- valider la configuration au démarrage et vérifier la disponibilité de PostgreSQL ;
 - définir le modèle de données généalogique ;
-- créer le schéma PostgreSQL et mettre en place les migrations ;
+- créer le schéma PostgreSQL au moyen des migrations ;
 - concevoir les premières routes métier ;
-- ajouter la validation des entrées, la gestion des erreurs et des tests automatisés ;
+- ajouter la validation des entrées, la gestion des erreurs et les tests métier ;
 - documenter le contrat de l'API ;
 - mettre en place l'authentification et les autorisations avant la gestion de données familiales privées.
+
+Le détail et l'ordre envisagé de ces étapes sont disponibles dans la [roadmap](docs/roadmap.md).
 
 ## Licence
 
