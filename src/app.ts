@@ -1,13 +1,23 @@
-import Fastify from 'fastify';
-import dbConnector from './plugins/database.js';
+import Fastify, { type FastifyPluginAsync } from 'fastify';
+import dbConnector, { type DatabasePluginOptions } from './plugins/database.js';
+import errorHandlerPlugin from './plugins/error-handler.js';
 import routes from './route.js';
+import type { AppConfig } from './config/env.js';
 
-export function buildApp() {
+type BuildAppOptions = {
+    config: AppConfig;
+    databasePlugin?: FastifyPluginAsync<DatabasePluginOptions>;
+};
+
+export function buildApp({ config, databasePlugin = dbConnector }: BuildAppOptions) {
     const app = Fastify({
         logger: true,
     });
 
-    app.register(dbConnector);
+    app.register(databasePlugin, {
+        databaseUrl: config.databaseUrl,
+    });
+    app.register(errorHandlerPlugin);
     app.register(routes);
 
     return app;

@@ -1,15 +1,20 @@
 import fastifyPlugin from 'fastify-plugin';
-import type { FastifyPluginCallback } from 'fastify';
+import type { FastifyPluginAsync } from 'fastify';
 import fastifyPostgres from '@fastify/postgres';
 
-const dbConnector: FastifyPluginCallback = (fastify, options, done) => {
-    void options;
+export type DatabasePluginOptions = {
+    databaseUrl: string;
+};
 
-    fastify.register(fastifyPostgres, {
-        connectionString: process.env.DATABASE_URL,
+const dbConnector: FastifyPluginAsync<DatabasePluginOptions> = async (fastify, options) => {
+    await fastify.register(fastifyPostgres, {
+        connectionString: options.databaseUrl,
+        connectionTimeoutMillis: 5_000,
     });
 
-    done();
+    await fastify.pg.query('SELECT 1');
+
+    fastify.log.info('PostgreSQL connection established');
 };
 
 export default fastifyPlugin(dbConnector);
