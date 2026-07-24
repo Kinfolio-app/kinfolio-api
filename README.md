@@ -51,6 +51,7 @@ Les fonctionnalités métier suivantes constituent des orientations envisagées.
 
 Le choix de Fastify et sa comparaison avec NestJS sont détaillés dans l'[ADR 0001](docs/adr/0001-use-fastify-as-backend-framework.md).
 Le choix de PostgreSQL est détaillé dans l'[ADR 0002](docs/adr/0002-use-postgresql-as-primary-database.md).
+Le format standard des erreurs HTTP est détaillé dans l'[ADR 0003](docs/adr/0003-use-rfc-9457-for-api-errors.md).
 
 ## Structure du projet
 
