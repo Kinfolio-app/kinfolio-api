@@ -1,14 +1,9 @@
 import type { FastifyPluginCallback } from 'fastify';
-import { AppError } from '../errors/app-error.js';
-import {
-    BadRequestError,
-    INTERNAL_SERVER_STATUS,
-    InternalServerError,
-    NOT_FOUND_STATUS,
-} from '../errors/http-error.js';
+import { AppError } from '../shared/errors/app-error.js';
+import { BadRequestError, InternalServerError } from '../shared/errors/http-error.js';
+import { HttpStatus } from '../shared/http/http-status.js';
+import { MediaType } from '../shared/http/media-type.js';
 import fastifyPlugin from 'fastify-plugin';
-
-const APPLICATION_PROBLEM: string = 'application/problem+json';
 
 type FastifyValidationError = Error & {
     validation: unknown;
@@ -37,7 +32,7 @@ const errorHandlerPlugin: FastifyPluginCallback = (fastify, _options, done) => {
     fastify.setErrorHandler((error, request, reply) => {
         const appError = normalizeError(error);
 
-        if (appError.status >= INTERNAL_SERVER_STATUS) {
+        if (appError.status >= HttpStatus.InternalServerError) {
             request.log.error(
                 {
                     err: appError,
@@ -46,7 +41,7 @@ const errorHandlerPlugin: FastifyPluginCallback = (fastify, _options, done) => {
             );
         }
 
-        return reply.status(appError.status).type(APPLICATION_PROBLEM).send({
+        return reply.status(appError.status).type(MediaType.ProblemJson).send({
             type: appError.type,
             title: appError.title,
             status: appError.status,
@@ -56,10 +51,10 @@ const errorHandlerPlugin: FastifyPluginCallback = (fastify, _options, done) => {
     });
 
     fastify.setNotFoundHandler((request, reply) => {
-        return reply.status(NOT_FOUND_STATUS).type(APPLICATION_PROBLEM).send({
+        return reply.status(HttpStatus.NotFound).type(MediaType.ProblemJson).send({
             type: 'about:blank',
             title: 'Not Found',
-            status: NOT_FOUND_STATUS,
+            status: HttpStatus.NotFound,
             detail: 'The requested route does not exist.',
             requestId: request.id,
         });

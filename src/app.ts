@@ -1,7 +1,7 @@
 import Fastify, { type FastifyPluginAsync } from 'fastify';
 import dbConnector, { type DatabasePluginOptions } from './plugins/database.js';
 import errorHandlerPlugin from './plugins/error-handler.js';
-import routes from './route.js';
+import healthRoutes from './modules/health/health.routes.js';
 import type { AppConfig } from './config/env.js';
 
 type BuildAppOptions = {
@@ -18,7 +18,7 @@ export function buildApp({ config, databasePlugin = dbConnector }: BuildAppOptio
         databaseUrl: config.databaseUrl,
     });
     app.register(errorHandlerPlugin);
-    app.register(routes);
+    app.register(healthRoutes);
 
     return app;
 }

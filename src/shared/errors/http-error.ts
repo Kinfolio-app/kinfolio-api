@@ -1,10 +1,5 @@
+import { HttpStatus } from '../http/http-status.js';
 import { AppError } from './app-error.js';
-
-export const BAD_REQUEST_STATUS = 400;
-export const NOT_FOUND_STATUS = 404;
-export const CONFLICT_STATUS = 409;
-
-export const INTERNAL_SERVER_STATUS = 500;
 
 export type HttpError = {
     detail: string;
@@ -16,7 +11,7 @@ export class BadRequestError extends AppError {
         super({
             type: 'about:blank',
             title: 'Bad Request',
-            status: BAD_REQUEST_STATUS,
+            status: HttpStatus.BadRequest,
             detail,
             cause,
         });
@@ -30,7 +25,7 @@ export class NotFoundError extends AppError {
         super({
             type: 'about:blank',
             title: 'Not Found',
-            status: NOT_FOUND_STATUS,
+            status: HttpStatus.NotFound,
             detail,
             cause,
         });
@@ -44,7 +39,7 @@ export class ConflictError extends AppError {
         super({
             type: 'about:blank',
             title: 'Conflict',
-            status: CONFLICT_STATUS,
+            status: HttpStatus.Conflict,
             detail,
             cause,
         });
@@ -58,7 +53,7 @@ export class InternalServerError extends AppError {
         super({
             type: 'about:blank',
             title: 'Internal Server Error',
-            status: INTERNAL_SERVER_STATUS,
+            status: HttpStatus.InternalServerError,
             detail: 'An unexpected error occurred.',
             cause,
         });

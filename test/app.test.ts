@@ -1,7 +1,7 @@
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import { buildApp } from '../src/app.js';
 import type { AppConfig } from '../src/config/env.js';
-import { BadRequestError } from '../src/errors/http-error.js';
+import { BadRequestError } from '../src/shared/errors/http-error.js';
 import type { FastifyInstance } from 'fastify';
 
 const TEST_CONFIG: AppConfig = {
