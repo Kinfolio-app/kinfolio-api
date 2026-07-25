@@ -17,6 +17,7 @@ describe('app', () => {
         app = buildApp({
             config: TEST_CONFIG,
             databasePlugin: async () => {},
+            peoplePlugin: async () => {},
         });
 
         app.get('/test/expected-error', () => {
