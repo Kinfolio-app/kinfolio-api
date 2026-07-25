@@ -40,7 +40,7 @@ Par exemple :
 ```text
 src/
 ├── modules/
-│   └── persons/
+│   └── people/
 │       ├── person.types.ts
 │       ├── person.repository.ts
 │       ├── person.service.ts

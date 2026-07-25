@@ -46,17 +46,17 @@ de la migration.
 
 ### Implémentation
 
-- [ ] Créer la migration initiale de la table `persons`.
-- [ ] Créer la couche d'accès aux données des personnes.
-- [ ] Ajouter la logique métier associée.
+- [x] Créer la migration initiale de la table `persons`.
+- [x] Créer la couche d'accès aux données des personnes.
+- [x] Ajouter la logique métier associée.
 - [ ] Définir les schémas de validation des entrées et des réponses.
-- [ ] Implémenter `POST /persons`.
-- [ ] Implémenter `GET /persons/:id`.
-- [ ] Ajouter les tests d'intégration de ces deux routes.
-- [ ] Implémenter `GET /persons`.
-- [ ] Implémenter `PATCH /persons/:id`.
+- [x] Implémenter `POST /people`.
+- [x] Implémenter `GET /people/:id`.
+- [x] Ajouter les tests d'intégration de ces deux routes.
+- [ ] Implémenter `GET /people`.
+- [ ] Implémenter `PATCH /people/:id`.
 - [ ] Décider de la stratégie de suppression avant d'ajouter
-      `DELETE /persons/:id`.
+      `DELETE /people/:id`.
 
 La suppression devra notamment prendre en compte les futures relations, photos,
 documents et souvenirs associés à une personne.
@@ -119,8 +119,8 @@ Kinfolio avec de véritables données familiales privées.
 3. Infrastructure minimale de tests.
 4. Endpoint `GET /health`.
 5. Migration `create_persons`.
-6. Route `POST /persons` avec validation.
-7. Route `GET /persons/:id`.
+6. Route `POST /people` avec validation.
+7. Route `GET /people/:id`.
 8. Tests d'intégration des premières routes métier.
 9. Liste et modification des personnes.
 10. Relations parent-enfant.

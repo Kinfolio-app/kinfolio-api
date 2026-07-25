@@ -23,6 +23,9 @@ Le périmètre actuellement implémenté est limité à la validation du socle b
 - connexion à PostgreSQL au moyen d'un pool partagé par les plugins Fastify ;
 - vérification de la disponibilité de PostgreSQL au démarrage ;
 - infrastructure de migrations avec `node-pg-migrate` ;
+- migration initiale de la table `persons` ;
+- repository PostgreSQL et service métier initial du module `people` ;
+- création et consultation des personnes avec `POST /people` et `GET /people/:id` ;
 - tests automatisés avec Vitest et l'injection HTTP de Fastify ;
 - route de santé `GET /health`, qui retourne `{ "status": "ok" }`.
 
@@ -30,12 +33,12 @@ Le périmètre actuellement implémenté est limité à la validation du socle b
 
 Les fonctionnalités métier suivantes constituent des orientations envisagées. Elles ne sont pas encore implémentées :
 
-- gestion des personnes et de leurs informations biographiques ;
+- complément de la gestion des personnes avec la liste, la modification et la suppression ;
 - création et consultation des liens de parenté ;
 - représentation et navigation dans l'arbre familial ;
 - ajout de photos, documents, anecdotes et événements familiaux ;
 - organisation de ces contenus sous la forme d'un album interactif ;
-- définition du schéma PostgreSQL et persistance des données métier ;
+- évolution du schéma PostgreSQL avec les futurs domaines métier ;
 - authentification et gestion des droits d'accès familiaux.
 
 ## Stack technique
@@ -52,28 +55,53 @@ Les fonctionnalités métier suivantes constituent des orientations envisagées.
 Le choix de Fastify et sa comparaison avec NestJS sont détaillés dans l'[ADR 0001](docs/adr/0001-use-fastify-as-backend-framework.md).
 Le choix de PostgreSQL est détaillé dans l'[ADR 0002](docs/adr/0002-use-postgresql-as-primary-database.md).
 Le format standard des erreurs HTTP est détaillé dans l'[ADR 0003](docs/adr/0003-use-rfc-9457-for-api-errors.md).
+Le choix initial du SQL direct dans les repositories, ainsi que les outils qui
+pourront être réévalués plus tard, sont détaillés dans
+l'[ADR 0004](docs/adr/0004-use-direct-sql-for-data-access.md).
+L'organisation du code par modules métier est détaillée dans
+l'[ADR 0005](docs/adr/0005-organize-code-by-business-modules.md).
 
 ## Structure du projet
 
 ```text
 .
 ├── src/
+│   ├── config/
+│   │   └── env.ts                  # Lecture et validation de l'environnement
+│   ├── modules/
+│   │   ├── health/
+│   │   │   └── health.routes.ts    # Route de santé
+│   │   └── people/
+│   │       ├── person.module.ts     # Assemblage du module Fastify
+│   │       ├── person.repository.ts # Accès PostgreSQL
+│   │       ├── person.routes.ts     # Routes HTTP des personnes
+│   │       ├── person.service.ts    # Logique métier
+│   │       └── person.types.ts      # Types du domaine
 │   ├── plugins/
-│   │   └── database.ts # Connexion et vérification de PostgreSQL
-│   ├── app.ts          # Construction de l'application Fastify
-│   ├── route.ts        # Routes HTTP actuellement disponibles
-│   └── server.ts       # Démarrage du serveur HTTP
-├── migrations/         # Migrations PostgreSQL
+│   │   ├── database.ts             # Connexion et vérification de PostgreSQL
+│   │   └── error-handler.ts        # Erreurs HTTP au format RFC 9457
+│   ├── shared/
+│   │   └── errors/                 # Erreurs partagées entre les modules
+│   ├── app.ts                      # Construction de l'application Fastify
+│   └── server.ts                   # Démarrage du serveur HTTP
+├── migrations/                     # Migrations PostgreSQL
 ├── test/
-│   └── app.test.ts     # Tests de l'application
+│   ├── integration/
+│   │   └── modules/                # Tests avec PostgreSQL
+│   └── app.test.ts                 # Tests HTTP de l'application
 ├── docs/
-│   ├── adr/            # Décisions d'architecture
-│   └── roadmap.md      # Roadmap du projet
-├── .env.example        # Exemple de configuration locale
-├── package.json        # Dépendances et scripts npm
-├── package-lock.json   # Verrouillage des versions des dépendances
-└── tsconfig.json       # Configuration TypeScript
+│   ├── adr/                        # Décisions d'architecture
+│   └── roadmap.md                  # Roadmap du projet
+├── .env.example                    # Exemple de configuration locale
+├── package.json                    # Dépendances et scripts npm
+├── package-lock.json               # Verrouillage des versions
+└── tsconfig.json                   # Configuration TypeScript
 ```
+
+Le code métier est organisé par modules fonctionnels. Chaque module regroupe
+ses types, sa logique métier, son accès aux données et, lorsqu'elles existent,
+ses routes HTTP. Le dossier `plugins/` contient uniquement les fonctionnalités
+techniques partagées par l'ensemble de l'application.
 
 La compilation génère le JavaScript dans `dist/`. Ce dossier n'est pas versionné.
 
@@ -148,7 +176,7 @@ npm run check
 
 ## État du développement
 
-Kinfolio API est en phase d'initialisation. Le serveur, le routage minimal, la configuration TypeScript, le connecteur PostgreSQL, l'infrastructure de migrations et les premiers tests automatisés sont présents. En revanche, aucun schéma de données métier, modèle de domaine généalogique, accès métier à la base, mécanisme d'authentification ou contrat d'API n'existe encore.
+Kinfolio API est en phase d'initialisation. Le serveur, la configuration TypeScript, le connecteur PostgreSQL, l'infrastructure de migrations, la table `persons`, son repository, les premières routes métier et leurs tests d'intégration sont présents. En revanche, la validation complète du contrat HTTP, les liens familiaux, les souvenirs, les médias et le mécanisme d'authentification restent à implémenter.
 
 La priorité immédiate est de stabiliser ce socle avant de commencer l'implémentation du domaine métier.
 
@@ -156,8 +184,8 @@ La priorité immédiate est de stabiliser ce socle avant de commencer l'impléme
 
 - définir le modèle de données généalogique ;
 - créer le schéma PostgreSQL au moyen des migrations ;
-- concevoir les premières routes métier ;
-- ajouter la validation des entrées, la gestion des erreurs et les tests métier ;
+- compléter les routes métier des personnes ;
+- ajouter la validation des entrées et les tests métier ;
 - documenter le contrat de l'API ;
 - mettre en place l'authentification et les autorisations avant la gestion de données familiales privées.
 
