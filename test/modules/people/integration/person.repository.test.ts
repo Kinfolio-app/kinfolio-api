@@ -103,4 +103,21 @@ describe('PersonRepository integration', () => {
 
         expect(person).toBeNull();
     });
+
+    it('returns a sorted page and the total number of people', async () => {
+        await repository.create({ firstName: 'Charlie' });
+        await repository.create({ firstName: 'Alice' });
+        await repository.create({ firstName: 'Bob' });
+
+        const result = await repository.findBy(2, 2, [
+            {
+                field: 'firstName',
+                direction: 'ASC',
+            },
+        ]);
+
+        expect(result.totalItems).toBe(3);
+        expect(result.data).toHaveLength(1);
+        expect(result.data[0]?.firstName).toBe('Charlie');
+    });
 });

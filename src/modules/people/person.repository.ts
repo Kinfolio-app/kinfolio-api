@@ -20,6 +20,22 @@ type PersonRow = {
     updated_at: Date;
 };
 
+const SORT_COLUMNS = {
+    firstName: 'first_name',
+    birthDate: 'birth_date',
+} as const;
+export type PersonOrderBy = {
+    field: keyof typeof SORT_COLUMNS;
+    direction: 'ASC' | 'DESC';
+};
+
+type ParamValues = (string | number)[];
+
+export type PersonPage = {
+    data: Person[];
+    totalItems: number;
+};
+
 function formatDateOnly(date: Date | null): string | null {
     if (date === null) {
         return null;
@@ -105,5 +121,43 @@ export class PersonRepository {
         }
 
         return mapPersonRow(row);
+    }
+
+    async findBy(limit: number, page: number, orderBy: PersonOrderBy[]): Promise<PersonPage> {
+        let query = 'SELECT * FROM persons';
+        let nbParams = 1;
+        const values: ParamValues = [];
+
+        const orderByClause = orderBy.map(({ field, direction }) => {
+            return `${SORT_COLUMNS[field]} ${direction}`;
+        });
+
+        orderByClause.push('id ASC');
+        query += ` ORDER BY ${orderByClause.join(', ')}`;
+
+        if (limit > 0) {
+            query += ` LIMIT $${nbParams++}`;
+            values.push(limit);
+        }
+
+        if (page > 1) {
+            query += ` OFFSET $${nbParams}`;
+            values.push((page - 1) * limit);
+        }
+
+        const { rows } = await this.database.query<PersonRow>(query, values);
+        const { rows: countRows } = await this.database.query<{ total_items: string }>(
+            'SELECT COUNT(*) AS total_items FROM persons',
+        );
+        const countRow = countRows[0];
+
+        if (countRow === undefined) {
+            throw new Error('PostgreSQL did not return the persons count.');
+        }
+
+        return {
+            data: rows.map(mapPersonRow),
+            totalItems: Number(countRow.total_items),
+        };
     }
 }

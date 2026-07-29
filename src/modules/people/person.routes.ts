@@ -3,9 +3,12 @@ import { HttpStatus } from '../../shared/http/http-status.js';
 import type { PersonService } from './person.service.js';
 import {
     CreatePersonDtoSchema,
+    PeopleCollectionResponseDtoSchema,
+    PeopleQuerystringSchema,
     PersonIdParamsSchema,
     PersonResponseDtoSchema,
     type CreatePersonDto,
+    type PeopleQuerystringDto,
     type PersonIdParamsDto,
 } from './person.schema.js';
 
@@ -45,6 +48,27 @@ const personRoutes: FastifyPluginCallback<PersonRoutesOptions> = (app, { personS
             const person = await personService.findById(request.params.id);
 
             return reply.code(HttpStatus.Ok).send(person);
+        },
+    );
+
+    app.get<{ Querystring: PeopleQuerystringDto }>(
+        '/',
+        {
+            schema: {
+                querystring: PeopleQuerystringSchema,
+                response: {
+                    [HttpStatus.Ok]: PeopleCollectionResponseDtoSchema,
+                },
+            },
+        },
+        async (request, reply) => {
+            const people = await personService.findBy(
+                request.query.limit,
+                request.query.page,
+                request.query.sort,
+            );
+
+            return reply.code(HttpStatus.Ok).send(people);
         },
     );
 };
