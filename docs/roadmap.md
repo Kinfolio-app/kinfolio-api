@@ -49,17 +49,18 @@ de la migration.
 - [x] Créer la migration initiale de la table `persons`.
 - [x] Créer la couche d'accès aux données des personnes.
 - [x] Ajouter la logique métier associée.
-- [ ] Définir les schémas de validation des entrées et des réponses.
+- [x] Définir les schémas de validation des entrées et des réponses.
 - [x] Implémenter `POST /people`.
 - [x] Implémenter `GET /people/:id`.
 - [x] Ajouter les tests d'intégration de ces deux routes.
-- [ ] Implémenter `GET /people`.
-- [ ] Implémenter `PATCH /people/:id`.
-- [ ] Décider de la stratégie de suppression avant d'ajouter
-      `DELETE /people/:id`.
+- [x] Implémenter `GET /people`.
+- [x] Implémenter `PATCH /people/:id`.
+- [x] Implémenter la suppression logique avec `DELETE /people/:id`.
 
-La suppression devra notamment prendre en compte les futures relations, photos,
-documents et souvenirs associés à une personne.
+La stratégie de suppression logique et ses implications sont décrites dans
+l'[ADR 0007](adr/0007-use-soft-deletion-for-people.md). Les règles de purge
+définitive devront prendre en compte les futures relations, photos, documents
+et souvenirs associés à une personne.
 
 ## Phase 3 — Liens de parenté
 
@@ -136,6 +137,6 @@ Les sujets suivants restent volontairement ouverts :
 - champs définitifs du modèle `persons` ;
 - représentation des noms, lieux et dates incertaines ;
 - types de liens familiaux pris en charge ;
-- stratégie de suppression et d'archivage ;
+- stratégie de restauration et de purge définitive ;
 - structure des espaces familiaux et modèle d'autorisation ;
 - stockage des photos et documents.

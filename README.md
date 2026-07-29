@@ -25,7 +25,7 @@ Le périmètre actuellement implémenté est limité à la validation du socle b
 - infrastructure de migrations avec `node-pg-migrate` ;
 - migration initiale de la table `persons` ;
 - repository PostgreSQL et service métier initial du module `people` ;
-- création et consultation des personnes avec `POST /people` et `GET /people/:id` ;
+- création, consultation, modification et suppression logique des personnes ;
 - tests automatisés avec Vitest et l'injection HTTP de Fastify ;
 - route de santé `GET /health`, qui retourne `{ "status": "ok" }`.
 
@@ -60,6 +60,12 @@ pourront être réévalués plus tard, sont détaillés dans
 l'[ADR 0004](docs/adr/0004-use-direct-sql-for-data-access.md).
 L'organisation du code par modules métier est détaillée dans
 l'[ADR 0005](docs/adr/0005-organize-code-by-business-modules.md).
+Le format commun des réponses de collection est détaillé dans
+l'[ADR 0006](docs/adr/0006-use-an-envelope-for-collection-responses.md).
+La stratégie de suppression logique des personnes est détaillée dans
+l'[ADR 0007](docs/adr/0007-use-soft-deletion-for-people.md).
+Les règles pratiques de conception des routes, schémas et DTO sont regroupées
+dans les [conventions de l'API HTTP](docs/api-conventions.md).
 
 ## Structure du projet
 
@@ -72,9 +78,11 @@ l'[ADR 0005](docs/adr/0005-organize-code-by-business-modules.md).
 │   │   ├── health/
 │   │   │   └── health.routes.ts    # Route de santé
 │   │   └── people/
+│   │       ├── person.entity.ts     # Invariants et normalisation
 │   │       ├── person.module.ts     # Assemblage du module Fastify
 │   │       ├── person.repository.ts # Accès PostgreSQL
 │   │       ├── person.routes.ts     # Routes HTTP des personnes
+│   │       ├── person.schema.ts     # Schémas et DTO HTTP
 │   │       ├── person.service.ts    # Logique métier
 │   │       └── person.types.ts      # Types du domaine
 │   ├── plugins/
@@ -86,11 +94,14 @@ l'[ADR 0005](docs/adr/0005-organize-code-by-business-modules.md).
 │   └── server.ts                   # Démarrage du serveur HTTP
 ├── migrations/                     # Migrations PostgreSQL
 ├── test/
-│   ├── integration/
-│   │   └── modules/                # Tests avec PostgreSQL
-│   └── app.test.ts                 # Tests HTTP de l'application
+│   ├── modules/
+│   │   └── people/
+│   │       ├── integration/        # Tests HTTP et PostgreSQL
+│   │       └── unit/               # Tests du domaine
+│   └── app.test.ts                 # Tests transversaux de l'application
 ├── docs/
 │   ├── adr/                        # Décisions d'architecture
+│   ├── api-conventions.md          # Conventions du contrat HTTP
 │   └── roadmap.md                  # Roadmap du projet
 ├── .env.example                    # Exemple de configuration locale
 ├── package.json                    # Dépendances et scripts npm
