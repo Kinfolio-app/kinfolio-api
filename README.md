@@ -2,7 +2,9 @@
 
 Kinfolio API est le backend d'une application de généalogie pensée comme un **album familial interactif**. Le projet vise à réunir les personnes, les liens de parenté, les souvenirs et les documents d'une famille dans une expérience plus vivante qu'un arbre généalogique traditionnel.
 
-Le dépôt est actuellement au stade de prototype technique. Il contient le socle minimal d'une API Fastify, mais ne propose pas encore de fonctionnalités métier liées à la généalogie.
+Le dépôt est actuellement au stade de prototype fonctionnel. Le socle technique
+de l'API Fastify et la première tranche métier consacrée à la gestion des
+personnes sont terminés. La prochaine étape porte sur les liens de parenté.
 
 ## Vision du projet
 
@@ -25,7 +27,8 @@ Le périmètre actuellement implémenté est limité à la validation du socle b
 - infrastructure de migrations avec `node-pg-migrate` ;
 - migration initiale de la table `persons` ;
 - repository PostgreSQL et service métier initial du module `people` ;
-- création, consultation, modification et suppression logique des personnes ;
+- création, consultation, modification et suppression logique des personnes,
+  avec prise en charge de leur genre ;
 - tests automatisés avec Vitest et l'injection HTTP de Fastify ;
 - route de santé `GET /health`, qui retourne `{ "status": "ok" }`.
 
@@ -33,7 +36,6 @@ Le périmètre actuellement implémenté est limité à la validation du socle b
 
 Les fonctionnalités métier suivantes constituent des orientations envisagées. Elles ne sont pas encore implémentées :
 
-- complément de la gestion des personnes avec la liste, la modification et la suppression ;
 - création et consultation des liens de parenté ;
 - représentation et navigation dans l'arbre familial ;
 - ajout de photos, documents, anecdotes et événements familiaux ;
@@ -187,17 +189,22 @@ npm run check
 
 ## État du développement
 
-Kinfolio API est en phase d'initialisation. Le serveur, la configuration TypeScript, le connecteur PostgreSQL, l'infrastructure de migrations, la table `persons`, son repository, les premières routes métier et leurs tests d'intégration sont présents. En revanche, la validation complète du contrat HTTP, les liens familiaux, les souvenirs, les médias et le mécanisme d'authentification restent à implémenter.
+Le socle technique et la première tranche métier sont terminés. L'API permet de
+créer, consulter, lister, modifier et supprimer logiquement des personnes. Ces
+comportements sont couverts par des tests unitaires et des tests d'intégration
+avec PostgreSQL. Les liens familiaux, la navigation dans l'arbre, les souvenirs,
+les médias et le mécanisme d'authentification restent à implémenter.
 
-La priorité immédiate est de stabiliser ce socle avant de commencer l'implémentation du domaine métier.
+La priorité immédiate est de concevoir puis d'implémenter les liens de parenté.
 
 ## Prochaines étapes envisagées
 
-- définir le modèle de données généalogique ;
-- créer le schéma PostgreSQL au moyen des migrations ;
-- compléter les routes métier des personnes ;
-- ajouter la validation des entrées et les tests métier ;
-- documenter le contrat de l'API ;
+- préciser les types de liens de parenté pris en charge ;
+- définir les contraintes et les règles métier associées ;
+- créer la migration PostgreSQL des relations parent-enfant ;
+- ajouter les routes de création et de consultation des relations ;
+- empêcher les relations incohérentes ou cycliques ;
+- couvrir ces comportements par des tests métier et d'intégration ;
 - mettre en place l'authentification et les autorisations avant la gestion de données familiales privées.
 
 Le détail et l'ordre envisagé de ces étapes sont disponibles dans la [roadmap](docs/roadmap.md).

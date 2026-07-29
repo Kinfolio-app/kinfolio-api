@@ -34,6 +34,7 @@ Créer une table `persons` contenant au minimum :
 - `first_name` ;
 - `middle_names` ;
 - `last_name` ;
+- `gender` ;
 - `birth_date` ;
 - `death_date` ;
 - `birth_place` ;

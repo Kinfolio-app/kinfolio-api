@@ -1,5 +1,5 @@
 import type { Pool } from 'pg';
-import { LivingStatus, type Person } from './person.types.js';
+import { Gender, LivingStatus, type Person } from './person.types.js';
 import type { CreatePersonDto } from './person.schema.js';
 
 type Database = Pick<Pool, 'query'>;
@@ -10,6 +10,7 @@ type PersonRow = {
     middle_names: string | null;
     last_name: string | null;
     birth_name: string | null;
+    gender: Gender;
     birth_date: Date | null;
     birth_place: string | null;
     death_date: Date | null;
@@ -55,6 +56,7 @@ function mapPersonRow(row: PersonRow): Person {
         middleNames: row.middle_names,
         lastName: row.last_name,
         birthName: row.birth_name,
+        gender: row.gender,
         birthDate: formatDateOnly(row.birth_date),
         birthPlace: row.birth_place,
         deathDate: formatDateOnly(row.death_date),
@@ -76,6 +78,7 @@ export class PersonRepository {
                 middle_names,
                 last_name,
                 birth_name,
+                gender,
                 birth_date,
                 birth_place,
                 death_date,
@@ -83,13 +86,14 @@ export class PersonRepository {
                 living_status,
                 biography
             )
-            VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
+            VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
             RETURNING *`,
             [
                 person.firstName ?? null,
                 person.middleNames ?? null,
                 person.lastName ?? null,
                 person.birthName ?? null,
+                person.gender ?? Gender.Unspecified,
                 person.birthDate ?? null,
                 person.birthPlace ?? null,
                 person.deathDate ?? null,
@@ -172,12 +176,13 @@ export class PersonRepository {
                 middle_names = $3,
                 last_name = $4,
                 birth_name = $5,
-                birth_date = $6,
-                birth_place = $7,
-                death_date = $8,
-                death_place = $9,
-                living_status = $10,
-                biography = $11,
+                gender = $6,
+                birth_date = $7,
+                birth_place = $8,
+                death_date = $9,
+                death_place = $10,
+                living_status = $11,
+                biography = $12,
                 updated_at = NOW()
             WHERE id = $1
                 AND deleted_at IS NULL
@@ -188,6 +193,7 @@ export class PersonRepository {
                 person.middleNames,
                 person.lastName,
                 person.birthName,
+                person.gender,
                 person.birthDate,
                 person.birthPlace,
                 person.deathDate,

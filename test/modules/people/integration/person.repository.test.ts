@@ -2,7 +2,7 @@ import { randomUUID } from 'node:crypto';
 import { Pool, type PoolClient } from 'pg';
 import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, it } from 'vitest';
 import { PersonRepository } from '../../../../src/modules/people/person.repository.js';
-import { LivingStatus } from '../../../../src/modules/people/person.types.js';
+import { Gender, LivingStatus } from '../../../../src/modules/people/person.types.js';
 
 const TEST_DATABASE_NAME = 'kinfolio_test';
 
@@ -68,6 +68,7 @@ describe('PersonRepository integration', () => {
             middleNames: null,
             lastName: null,
             birthName: null,
+            gender: Gender.Unspecified,
             birthDate: null,
             birthPlace: null,
             deathDate: null,
@@ -85,6 +86,7 @@ describe('PersonRepository integration', () => {
             middleNames: 'Louise',
             lastName: 'Martin',
             birthName: 'Durand',
+            gender: Gender.Female,
             birthDate: '1985-03-12',
             birthPlace: 'Lyon',
             deathDate: '2025-06-18',

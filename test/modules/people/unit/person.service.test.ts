@@ -2,7 +2,7 @@ import { describe, expect, it, vi } from 'vitest';
 import { BadRequestError, NotFoundError } from '../../../../src/shared/errors/http-error.js';
 import { InvalidPersonError } from '../../../../src/modules/people/person.entity.js';
 import { PersonService } from '../../../../src/modules/people/person.service.js';
-import { LivingStatus, type Person } from '../../../../src/modules/people/person.types.js';
+import { Gender, LivingStatus, type Person } from '../../../../src/modules/people/person.types.js';
 
 describe('PersonService', () => {
     it('translates an invalid person error into a bad request error', async () => {
@@ -31,6 +31,7 @@ describe('PersonService', () => {
             middleNames: null,
             lastName: null,
             birthName: null,
+            gender: Gender.Unspecified,
             birthDate: null,
             birthPlace: null,
             deathDate: null,
@@ -125,6 +126,7 @@ describe('PersonService', () => {
             middleNames: null,
             lastName: null,
             birthName: null,
+            gender: Gender.Unspecified,
             birthDate: null,
             birthPlace: null,
             deathDate: null,

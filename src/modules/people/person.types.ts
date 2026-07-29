@@ -6,12 +6,22 @@ export const LivingStatus = {
 
 export type LivingStatus = (typeof LivingStatus)[keyof typeof LivingStatus];
 
+export const Gender = {
+    Male: 'male',
+    Female: 'female',
+    NonBinary: 'non_binary',
+    Unspecified: 'unspecified',
+} as const;
+
+export type Gender = (typeof Gender)[keyof typeof Gender];
+
 export type Person = {
     id: string;
     firstName: string | null;
     middleNames: string | null;
     lastName: string | null;
     birthName: string | null;
+    gender: Gender;
     birthDate: string | null;
     birthPlace: string | null;
     deathDate: string | null;

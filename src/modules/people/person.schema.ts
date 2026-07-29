@@ -1,6 +1,13 @@
 import Type from 'typebox';
 import { createCollectionResponseSchema } from '../../shared/http/collection-response.js';
-import { LivingStatus } from './person.types.js';
+import { Gender, LivingStatus } from './person.types.js';
+
+const GenderSchema = Type.Union([
+    Type.Literal(Gender.Male),
+    Type.Literal(Gender.Female),
+    Type.Literal(Gender.NonBinary),
+    Type.Literal(Gender.Unspecified),
+]);
 
 export const CreatePersonDtoSchema = Type.Object(
     {
@@ -8,6 +15,7 @@ export const CreatePersonDtoSchema = Type.Object(
         middleNames: Type.Optional(Type.String({ minLength: 1 })),
         lastName: Type.Optional(Type.String({ minLength: 1 })),
         birthName: Type.Optional(Type.String({ minLength: 1 })),
+        gender: Type.Optional(GenderSchema),
         birthDate: Type.Optional(Type.String({ format: 'date' })),
         birthPlace: Type.Optional(Type.String({ minLength: 1 })),
         deathDate: Type.Optional(Type.String({ format: 'date' })),
@@ -34,6 +42,7 @@ export const UpdatePersonDtoSchema = Type.Object(
         middleNames: Type.Optional(Type.Union([Type.Null(), Type.String({ minLength: 1 })])),
         lastName: Type.Optional(Type.Union([Type.Null(), Type.String({ minLength: 1 })])),
         birthName: Type.Optional(Type.Union([Type.Null(), Type.String({ minLength: 1 })])),
+        gender: Type.Optional(GenderSchema),
         birthDate: Type.Optional(Type.Union([Type.Null(), Type.String({ format: 'date' })])),
         birthPlace: Type.Optional(Type.Union([Type.Null(), Type.String({ minLength: 1 })])),
         deathDate: Type.Optional(Type.Union([Type.Null(), Type.String({ format: 'date' })])),
@@ -100,6 +109,7 @@ export const PersonResponseDtoSchema = Type.Object(
         middleNames: Type.Union([Type.String(), Type.Null()]),
         lastName: Type.Union([Type.String(), Type.Null()]),
         birthName: Type.Union([Type.String(), Type.Null()]),
+        gender: GenderSchema,
         birthDate: Type.Union([Type.String({ format: 'date' }), Type.Null()]),
         birthPlace: Type.Union([Type.String(), Type.Null()]),
         deathDate: Type.Union([Type.String({ format: 'date' }), Type.Null()]),

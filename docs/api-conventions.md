@@ -139,6 +139,7 @@ sans enveloppe `data` :
     "middleNames": null,
     "lastName": "Martin",
     "birthName": null,
+    "gender": "female",
     "birthDate": null,
     "birthPlace": null,
     "deathDate": null,

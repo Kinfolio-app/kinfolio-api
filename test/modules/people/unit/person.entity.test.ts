@@ -3,7 +3,7 @@ import createPerson, {
     InvalidPersonError,
     updatePerson,
 } from '../../../../src/modules/people/person.entity.js';
-import { LivingStatus, type Person } from '../../../../src/modules/people/person.types.js';
+import { Gender, LivingStatus, type Person } from '../../../../src/modules/people/person.types.js';
 
 const person: Person = {
     id: '4cf44241-0f1b-4e69-b070-d47ee66b7203',
@@ -11,6 +11,7 @@ const person: Person = {
     middleNames: null,
     lastName: null,
     birthName: null,
+    gender: Gender.Female,
     birthDate: '1980-01-01',
     birthPlace: null,
     deathDate: null,
@@ -28,6 +29,7 @@ describe('createPerson', () => {
             middleNames: ' Louise ',
             lastName: ' Martin ',
             birthName: ' Durand ',
+            gender: Gender.Female,
             birthDate: '1985-03-12',
             birthPlace: ' Lyon ',
             deathDate: '2025-06-18',
@@ -43,6 +45,7 @@ describe('createPerson', () => {
             middleNames: 'Louise',
             lastName: 'Martin',
             birthName: 'Durand',
+            gender: Gender.Female,
             birthDate: '1985-03-12',
             birthPlace: 'Lyon',
             deathDate: '2025-06-18',

@@ -4,7 +4,7 @@ import { buildApp } from '../../../../src/app.js';
 import { loadConfig } from '../../../../src/config/env.js';
 import type { FastifyInstance } from 'fastify';
 import type { CreatePersonDto } from '../../../../src/modules/people/person.schema.js';
-import { LivingStatus } from '../../../../src/modules/people/person.types.js';
+import { Gender, LivingStatus } from '../../../../src/modules/people/person.types.js';
 import { HttpStatus } from '../../../../src/shared/http/http-status.js';
 import { MediaType } from '../../../../src/shared/http/media-type.js';
 
@@ -62,6 +62,7 @@ describe('PersonRoute integration', () => {
             middleNames: 'Louise',
             lastName: 'Martin',
             birthName: 'Durand',
+            gender: Gender.Female,
             birthDate: '1985-03-12',
             birthPlace: 'Lyon',
             deathDate: '2025-06-18',
@@ -101,6 +102,7 @@ describe('PersonRoute integration', () => {
             middleNames: null,
             lastName: null,
             birthName: null,
+            gender: Gender.Unspecified,
             birthDate: null,
             birthPlace: null,
             deathDate: null,
@@ -187,6 +189,13 @@ describe('PersonRoute integration', () => {
             payload: {
                 firstName: 'Alice',
                 livingStatus: 'missing',
+            },
+        },
+        {
+            name: 'an invalid gender',
+            payload: {
+                firstName: 'Alice',
+                gender: 'missing',
             },
         },
     ])('rejects $name', async ({ payload }) => {
@@ -328,6 +337,7 @@ describe('PersonRoute integration', () => {
             payload: {
                 firstName: 'Alice',
                 biography: 'Biography',
+                gender: Gender.Unspecified,
             },
         });
         const createdPerson = createResponse.json();
@@ -338,6 +348,7 @@ describe('PersonRoute integration', () => {
             payload: {
                 firstName: ' Alicia ',
                 biography: null,
+                gender: Gender.Female,
             },
         });
 
@@ -346,6 +357,7 @@ describe('PersonRoute integration', () => {
             ...createdPerson,
             firstName: 'Alicia',
             biography: null,
+            gender: Gender.Female,
             updatedAt: expect.any(String),
         });
     });
