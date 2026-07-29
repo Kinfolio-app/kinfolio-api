@@ -7,7 +7,7 @@ import { MAX_PAGE_LIMIT, type CollectionResponse } from '../../shared/http/colle
 
 type PersonRepositoryContract = Pick<
     PersonRepository,
-    'create' | 'findById' | 'findBy' | 'update'
+    'create' | 'findById' | 'findBy' | 'update' | 'deleteById'
 >;
 
 export class PersonService {
@@ -101,4 +101,13 @@ export class PersonService {
         }
     }
 
+    async delete(id: string): Promise<void> {
+        const deleted = await this.repository.deleteById(id);
+
+        if (!deleted) {
+            throw new NotFoundError({
+                detail: 'The requested person does not exist.',
+            });
+        }
+    }
 }

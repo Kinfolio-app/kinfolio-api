@@ -90,6 +90,19 @@ const personRoutes: FastifyPluginCallback<PersonRoutesOptions> = (app, { personS
         },
     );
 
+    app.delete<{ Params: PersonIdParamsDto }>(
+        '/:id',
+        {
+            schema: {
+                params: PersonIdParamsSchema,
+            },
+        },
+        async (request, reply) => {
+            await personService.delete(request.params.id);
+
+            return reply.code(HttpStatus.NoContent).send();
+        },
+    );
 };
 
 export default personRoutes;

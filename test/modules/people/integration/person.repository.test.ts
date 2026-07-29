@@ -141,4 +141,40 @@ describe('PersonRepository integration', () => {
         });
     });
 
+    it('soft deletes a person and excludes it from reads', async () => {
+        const person = await repository.create({
+            firstName: 'Alice',
+        });
+
+        const deleted = await repository.deleteById(person.id);
+        const foundPerson = await repository.findById(person.id);
+        const page = await repository.findBy(20, 1, [
+            {
+                field: 'firstName',
+                direction: 'ASC',
+            },
+        ]);
+        const { rows } = await client.query<{ deleted_at: Date | null }>(
+            'SELECT deleted_at FROM persons WHERE id = $1',
+            [person.id],
+        );
+
+        expect(deleted).toBe(true);
+        expect(foundPerson).toBeNull();
+        expect(page).toEqual({
+            data: [],
+            totalItems: 0,
+        });
+        expect(rows[0]?.deleted_at).toBeInstanceOf(Date);
+    });
+
+    it('returns false when a person is already soft deleted', async () => {
+        const person = await repository.create({
+            firstName: 'Alice',
+        });
+
+        await repository.deleteById(person.id);
+
+        await expect(repository.deleteById(person.id)).resolves.toBe(false);
+    });
 });

@@ -110,7 +110,10 @@ export class PersonRepository {
 
     async findById(id: string): Promise<Person | null> {
         const { rows } = await this.database.query<PersonRow>(
-            `SELECT * FROM persons WHERE id = $1`,
+            `SELECT *
+            FROM persons
+            WHERE id = $1
+                AND deleted_at IS NULL`,
             [id],
         );
 
@@ -124,7 +127,7 @@ export class PersonRepository {
     }
 
     async findBy(limit: number, page: number, orderBy: PersonOrderBy[]): Promise<PersonPage> {
-        let query = 'SELECT * FROM persons';
+        let query = 'SELECT * FROM persons WHERE deleted_at IS NULL';
         let nbParams = 1;
         const values: ParamValues = [];
 
@@ -147,7 +150,7 @@ export class PersonRepository {
 
         const { rows } = await this.database.query<PersonRow>(query, values);
         const { rows: countRows } = await this.database.query<{ total_items: string }>(
-            'SELECT COUNT(*) AS total_items FROM persons',
+            'SELECT COUNT(*) AS total_items FROM persons WHERE deleted_at IS NULL',
         );
         const countRow = countRows[0];
 
@@ -177,6 +180,7 @@ export class PersonRepository {
                 biography = $11,
                 updated_at = NOW()
             WHERE id = $1
+                AND deleted_at IS NULL
             RETURNING *`,
             [
                 person.id,
@@ -200,5 +204,20 @@ export class PersonRepository {
         }
 
         return mapPersonRow(row);
+    }
+
+    async deleteById(id: string): Promise<boolean> {
+        const { rows } = await this.database.query<{ id: string }>(
+            `UPDATE persons
+            SET
+                deleted_at = NOW(),
+                updated_at = NOW()
+            WHERE id = $1
+                AND deleted_at IS NULL
+            RETURNING id`,
+            [id],
+        );
+
+        return rows[0] !== undefined;
     }
 }

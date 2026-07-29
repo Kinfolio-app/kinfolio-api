@@ -401,6 +401,82 @@ describe('PersonRoute integration', () => {
         });
     });
 
+    it('soft deletes a person and excludes it from the API', async () => {
+        const createResponse = await app.inject({
+            method: 'POST',
+            url: '/people',
+            payload: {
+                firstName: 'Alice',
+            },
+        });
+        const createdPerson = createResponse.json();
+
+        const deleteResponse = await app.inject({
+            method: 'DELETE',
+            url: `/people/${createdPerson.id}`,
+        });
+        const getResponse = await app.inject({
+            method: 'GET',
+            url: `/people/${createdPerson.id}`,
+        });
+        const listResponse = await app.inject({
+            method: 'GET',
+            url: '/people',
+        });
+
+        expect(deleteResponse.statusCode).toBe(HttpStatus.NoContent);
+        expect(deleteResponse.body).toBe('');
+        expect(getResponse.statusCode).toBe(HttpStatus.NotFound);
+        expect(listResponse.statusCode).toBe(HttpStatus.Ok);
+        expect(listResponse.json()).toEqual({
+            data: [],
+            pagination: {
+                page: 1,
+                limit: 20,
+                totalItems: 0,
+                totalPages: 0,
+            },
+        });
+    });
+
+    it('returns not found when a person is already soft deleted', async () => {
+        const createResponse = await app.inject({
+            method: 'POST',
+            url: '/people',
+            payload: {
+                firstName: 'Alice',
+            },
+        });
+        const createdPerson = createResponse.json();
+
+        await app.inject({
+            method: 'DELETE',
+            url: `/people/${createdPerson.id}`,
+        });
+        const response = await app.inject({
+            method: 'DELETE',
+            url: `/people/${createdPerson.id}`,
+        });
+
+        expect(response.statusCode).toBe(HttpStatus.NotFound);
+        expect(response.headers['content-type']).toContain(MediaType.ProblemJson);
+        expect(response.json()).toMatchObject({
+            type: 'about:blank',
+            title: 'Not Found',
+            status: HttpStatus.NotFound,
+            detail: 'The requested person does not exist.',
+            requestId: expect.any(String),
+        });
+    });
+
+    it('rejects an invalid person id when deleting', async () => {
+        const response = await app.inject({
+            method: 'DELETE',
+            url: '/people/not-a-uuid',
+        });
+
+        expectBadRequest(response, 'The request is invalid.');
+    });
 
     it('rejects an invalid person id', async () => {
         const response = await app.inject({

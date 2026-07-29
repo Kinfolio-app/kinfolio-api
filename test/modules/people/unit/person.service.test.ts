@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from 'vitest';
-import { BadRequestError } from '../../../../src/shared/errors/http-error.js';
+import { BadRequestError, NotFoundError } from '../../../../src/shared/errors/http-error.js';
 import { InvalidPersonError } from '../../../../src/modules/people/person.entity.js';
 import { PersonService } from '../../../../src/modules/people/person.service.js';
 import { LivingStatus, type Person } from '../../../../src/modules/people/person.types.js';
@@ -143,6 +143,7 @@ describe('PersonService', () => {
             findById: vi.fn().mockResolvedValue(person),
             findBy: vi.fn(),
             update: vi.fn().mockResolvedValue(updatedPerson),
+            deleteById: vi.fn(),
         };
         const service = new PersonService(repository);
 
@@ -154,4 +155,35 @@ describe('PersonService', () => {
         expect(result).toEqual(updatedPerson);
     });
 
+    it('soft deletes an existing person', async () => {
+        const repository = {
+            create: vi.fn(),
+            findById: vi.fn(),
+            findBy: vi.fn(),
+            update: vi.fn(),
+            deleteById: vi.fn().mockResolvedValue(true),
+        };
+        const service = new PersonService(repository);
+        const id = '4cf44241-0f1b-4e69-b070-d47ee66b7203';
+
+        await expect(service.delete(id)).resolves.toBeUndefined();
+        expect(repository.deleteById).toHaveBeenCalledWith(id);
+    });
+
+    it('returns not found when soft deleting an unavailable person', async () => {
+        const repository = {
+            create: vi.fn(),
+            findById: vi.fn(),
+            findBy: vi.fn(),
+            update: vi.fn(),
+            deleteById: vi.fn().mockResolvedValue(false),
+        };
+        const service = new PersonService(repository);
+
+        await expect(service.delete('4cf44241-0f1b-4e69-b070-d47ee66b7203')).rejects.toEqual(
+            new NotFoundError({
+                detail: 'The requested person does not exist.',
+            }),
+        );
+    });
 });
