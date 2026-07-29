@@ -1,11 +1,14 @@
 import { BadRequestError, NotFoundError } from '../../shared/errors/http-error.js';
-import createPerson, { InvalidPersonError } from './person.entity.js';
+import createPerson, { InvalidPersonError, updatePerson } from './person.entity.js';
 import type { PersonRepository } from './person.repository.js';
-import type { CreatePersonDto, PersonSortDto } from './person.schema.js';
+import type { CreatePersonDto, PersonSortDto, UpdatePersonDto } from './person.schema.js';
 import type { Person } from './person.types.js';
 import { MAX_PAGE_LIMIT, type CollectionResponse } from '../../shared/http/collection-response.js';
 
-type PersonRepositoryContract = Pick<PersonRepository, 'create' | 'findById' | 'findBy'>;
+type PersonRepositoryContract = Pick<
+    PersonRepository,
+    'create' | 'findById' | 'findBy' | 'update'
+>;
 
 export class PersonService {
     constructor(private readonly repository: PersonRepositoryContract) {}
@@ -80,4 +83,22 @@ export class PersonService {
             },
         };
     }
+
+    async update(id: string, input: UpdatePersonDto): Promise<Person> {
+        const person = await this.findById(id);
+
+        try {
+            return await this.repository.update(updatePerson(person, input));
+        } catch (error) {
+            if (error instanceof InvalidPersonError) {
+                throw new BadRequestError({
+                    detail: error.message,
+                    cause: error,
+                });
+            }
+
+            throw error;
+        }
+    }
+
 }

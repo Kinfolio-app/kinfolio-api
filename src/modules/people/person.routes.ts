@@ -7,9 +7,11 @@ import {
     PeopleQuerystringSchema,
     PersonIdParamsSchema,
     PersonResponseDtoSchema,
+    UpdatePersonDtoSchema,
     type CreatePersonDto,
     type PeopleQuerystringDto,
     type PersonIdParamsDto,
+    type UpdatePersonDto,
 } from './person.schema.js';
 
 type PersonRoutesOptions = {
@@ -71,6 +73,23 @@ const personRoutes: FastifyPluginCallback<PersonRoutesOptions> = (app, { personS
             return reply.code(HttpStatus.Ok).send(people);
         },
     );
+
+    app.patch<{ Params: PersonIdParamsDto; Body: UpdatePersonDto }>(
+        '/:id',
+        {
+            schema: {
+                params: PersonIdParamsSchema,
+                body: UpdatePersonDtoSchema,
+                response: { [HttpStatus.Ok]: PersonResponseDtoSchema },
+            },
+        },
+        async (request, reply) => {
+            const person = await personService.update(request.params.id, request.body);
+
+            return reply.code(HttpStatus.Ok).send(person);
+        },
+    );
+
 };
 
 export default personRoutes;

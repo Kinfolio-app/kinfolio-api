@@ -321,6 +321,87 @@ describe('PersonRoute integration', () => {
         expectBadRequest(response, 'The "firstName" field can only be sorted once.');
     });
 
+    it('partially updates a person', async () => {
+        const createResponse = await app.inject({
+            method: 'POST',
+            url: '/people',
+            payload: {
+                firstName: 'Alice',
+                biography: 'Biography',
+            },
+        });
+        const createdPerson = createResponse.json();
+
+        const response = await app.inject({
+            method: 'PATCH',
+            url: `/people/${createdPerson.id}`,
+            payload: {
+                firstName: ' Alicia ',
+                biography: null,
+            },
+        });
+
+        expect(response.statusCode).toBe(HttpStatus.Ok);
+        expect(response.json()).toEqual({
+            ...createdPerson,
+            firstName: 'Alicia',
+            biography: null,
+            updatedAt: expect.any(String),
+        });
+    });
+
+    it('rejects an empty person update', async () => {
+        const response = await app.inject({
+            method: 'PATCH',
+            url: `/people/${randomUUID()}`,
+            payload: {},
+        });
+
+        expectBadRequest(response, 'The request is invalid.');
+    });
+
+    it('rejects removing the last identifying name', async () => {
+        const createResponse = await app.inject({
+            method: 'POST',
+            url: '/people',
+            payload: {
+                firstName: 'Alice',
+            },
+        });
+        const createdPerson = createResponse.json();
+
+        const response = await app.inject({
+            method: 'PATCH',
+            url: `/people/${createdPerson.id}`,
+            payload: {
+                firstName: null,
+            },
+        });
+
+        expectBadRequest(response, 'At least one name is required.');
+    });
+
+    it('returns problem details when updating a person that does not exist', async () => {
+        const response = await app.inject({
+            method: 'PATCH',
+            url: `/people/${randomUUID()}`,
+            payload: {
+                firstName: 'Alice',
+            },
+        });
+
+        expect(response.statusCode).toBe(HttpStatus.NotFound);
+        expect(response.headers['content-type']).toContain(MediaType.ProblemJson);
+        expect(response.json()).toMatchObject({
+            type: 'about:blank',
+            title: 'Not Found',
+            status: HttpStatus.NotFound,
+            detail: 'The requested person does not exist.',
+            requestId: expect.any(String),
+        });
+    });
+
+
     it('rejects an invalid person id', async () => {
         const response = await app.inject({
             method: 'GET',

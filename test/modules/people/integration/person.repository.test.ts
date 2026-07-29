@@ -120,4 +120,25 @@ describe('PersonRepository integration', () => {
         expect(result.data).toHaveLength(1);
         expect(result.data[0]?.firstName).toBe('Charlie');
     });
+
+    it('updates a person', async () => {
+        const person = await repository.create({
+            firstName: 'Alice',
+            biography: 'Biography',
+        });
+
+        const updatedPerson = await repository.update({
+            ...person,
+            firstName: 'Alicia',
+            biography: null,
+        });
+
+        expect(updatedPerson).toEqual({
+            ...person,
+            firstName: 'Alicia',
+            biography: null,
+            updatedAt: expect.any(Date),
+        });
+    });
+
 });

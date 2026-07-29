@@ -160,4 +160,45 @@ export class PersonRepository {
             totalItems: Number(countRow.total_items),
         };
     }
+
+    async update(person: Person): Promise<Person> {
+        const { rows } = await this.database.query<PersonRow>(
+            `UPDATE persons
+            SET
+                first_name = $2,
+                middle_names = $3,
+                last_name = $4,
+                birth_name = $5,
+                birth_date = $6,
+                birth_place = $7,
+                death_date = $8,
+                death_place = $9,
+                living_status = $10,
+                biography = $11,
+                updated_at = NOW()
+            WHERE id = $1
+            RETURNING *`,
+            [
+                person.id,
+                person.firstName,
+                person.middleNames,
+                person.lastName,
+                person.birthName,
+                person.birthDate,
+                person.birthPlace,
+                person.deathDate,
+                person.deathPlace,
+                person.livingStatus,
+                person.biography,
+            ],
+        );
+
+        const row = rows[0];
+
+        if (row === undefined) {
+            throw new Error('PostgreSQL did not return the updated person.');
+        }
+
+        return mapPersonRow(row);
+    }
 }

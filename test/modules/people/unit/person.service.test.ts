@@ -118,4 +118,40 @@ describe('PersonService', () => {
         expect(repository.findBy).not.toHaveBeenCalled();
     });
 
+    it('updates an existing person', async () => {
+        const person: Person = {
+            id: '4cf44241-0f1b-4e69-b070-d47ee66b7203',
+            firstName: 'Alice',
+            middleNames: null,
+            lastName: null,
+            birthName: null,
+            birthDate: null,
+            birthPlace: null,
+            deathDate: null,
+            deathPlace: null,
+            livingStatus: LivingStatus.Unknown,
+            biography: null,
+            createdAt: new Date('2026-07-29T10:00:00.000Z'),
+            updatedAt: new Date('2026-07-29T10:00:00.000Z'),
+        };
+        const updatedPerson = {
+            ...person,
+            firstName: 'Alicia',
+        };
+        const repository = {
+            create: vi.fn(),
+            findById: vi.fn().mockResolvedValue(person),
+            findBy: vi.fn(),
+            update: vi.fn().mockResolvedValue(updatedPerson),
+        };
+        const service = new PersonService(repository);
+
+        const result = await service.update(person.id, {
+            firstName: ' Alicia ',
+        });
+
+        expect(repository.update).toHaveBeenCalledWith(updatedPerson);
+        expect(result).toEqual(updatedPerson);
+    });
+
 });
