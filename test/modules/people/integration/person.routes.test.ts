@@ -48,11 +48,11 @@ describe('PersonRoute integration', () => {
     });
 
     beforeEach(async () => {
-        await app.pg.query('TRUNCATE TABLE persons');
+        await app.pg.query('TRUNCATE TABLE parent_child_relationships, persons');
     });
 
     afterAll(async () => {
-        await app.pg.query('TRUNCATE TABLE persons');
+        await app.pg.query('TRUNCATE TABLE parent_child_relationships, persons');
         await app.close();
     });
 
