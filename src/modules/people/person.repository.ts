@@ -1,5 +1,6 @@
 import type { Pool } from 'pg';
-import { LivingStatus, type CreatePersonInput, type Person } from './person.types.js';
+import { LivingStatus, type Person } from './person.types.js';
+import type { CreatePersonDto } from './person.schema.js';
 
 type Database = Pick<Pool, 'query'>;
 
@@ -52,7 +53,7 @@ function mapPersonRow(row: PersonRow): Person {
 export class PersonRepository {
     constructor(private readonly database: Database) {}
 
-    async create(input: CreatePersonInput): Promise<Person> {
+    async create(person: CreatePersonDto): Promise<Person> {
         const { rows } = await this.database.query<PersonRow>(
             `INSERT INTO persons (
                 first_name,
@@ -69,16 +70,16 @@ export class PersonRepository {
             VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
             RETURNING *`,
             [
-                input.firstName ?? null,
-                input.middleNames ?? null,
-                input.lastName ?? null,
-                input.birthName ?? null,
-                input.birthDate ?? null,
-                input.birthPlace ?? null,
-                input.deathDate ?? null,
-                input.deathPlace ?? null,
-                input.livingStatus ?? LivingStatus.Unknown,
-                input.biography ?? null,
+                person.firstName ?? null,
+                person.middleNames ?? null,
+                person.lastName ?? null,
+                person.birthName ?? null,
+                person.birthDate ?? null,
+                person.birthPlace ?? null,
+                person.deathDate ?? null,
+                person.deathPlace ?? null,
+                person.livingStatus ?? LivingStatus.Unknown,
+                person.biography ?? null,
             ],
         );
 

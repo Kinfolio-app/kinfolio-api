@@ -1,8 +1,10 @@
-export enum LivingStatus {
-    Unknown = 'unknown',
-    Living = 'living',
-    Deceased = 'deceased',
-}
+export const LivingStatus = {
+    Unknown: 'unknown',
+    Living: 'living',
+    Deceased: 'deceased',
+} as const;
+
+export type LivingStatus = (typeof LivingStatus)[keyof typeof LivingStatus];
 
 export type Person = {
     id: string;
@@ -18,17 +20,4 @@ export type Person = {
     biography: string | null;
     createdAt: Date;
     updatedAt: Date;
-};
-
-export type CreatePersonInput = {
-    firstName?: string;
-    middleNames?: string;
-    lastName?: string;
-    birthName?: string;
-    birthDate?: string;
-    birthPlace?: string;
-    deathDate?: string;
-    deathPlace?: string;
-    livingStatus?: LivingStatus;
-    biography?: string;
 };

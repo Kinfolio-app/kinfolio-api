@@ -1,12 +1,31 @@
-import { NotFoundError } from '../../shared/errors/http-error.js';
+import { BadRequestError, NotFoundError } from '../../shared/errors/http-error.js';
+import createPerson, { InvalidPersonError } from './person.entity.js';
 import type { PersonRepository } from './person.repository.js';
-import type { CreatePersonInput, Person } from './person.types.js';
+import type { CreatePersonDto } from './person.schema.js';
+import type { Person } from './person.types.js';
+
+type PersonRepositoryContract = Pick<PersonRepository, 'create' | 'findById'>;
 
 export class PersonService {
-    constructor(private readonly repository: PersonRepository) {}
+    constructor(private readonly repository: PersonRepositoryContract) {}
 
-    async create(input: CreatePersonInput): Promise<Person> {
-        return this.repository.create(input);
+    async create(input: CreatePersonDto): Promise<Person> {
+        let person: CreatePersonDto;
+
+        try {
+            person = createPerson(input);
+        } catch (error) {
+            if (error instanceof InvalidPersonError) {
+                throw new BadRequestError({
+                    detail: error.message,
+                    cause: error,
+                });
+            }
+
+            throw error;
+        }
+
+        return this.repository.create(person);
     }
 
     async findById(id: string): Promise<Person> {

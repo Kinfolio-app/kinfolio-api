@@ -18,6 +18,11 @@ export function buildApp({
 }: BuildAppOptions) {
     const app = Fastify({
         logger: true,
+        ajv: {
+            customOptions: {
+                removeAdditional: false,
+            },
+        },
     });
 
     app.register(databasePlugin, {
