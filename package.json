@@ -6,7 +6,7 @@
         "migrate": "node --env-file=.env ./node_modules/node-pg-migrate/bin/node-pg-migrate.js -j ts",
         "migrate:test": "node --env-file=.env.test ./node_modules/node-pg-migrate/bin/node-pg-migrate.js -j ts",
         "test": "vitest run --exclude \"test/**/integration/**\"",
-        "test:integration": "node --env-file=.env.test ./node_modules/vitest/vitest.mjs run integration",
+        "test:integration": "node --env-file=.env.test ./node_modules/vitest/vitest.mjs run integration --no-file-parallelism",
         "test:watch": "vitest",
         "lint": "eslint .",
         "lint:fix": "eslint . --fix",

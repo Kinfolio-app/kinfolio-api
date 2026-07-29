@@ -78,13 +78,19 @@ Une table de relations distincte est préférée à des colonnes `father_id` et
 `mother_id` dans `persons`. Elle permet de représenter plus facilement les
 familles adoptives ou recomposées ainsi que les informations incomplètes.
 
-- [ ] Préciser les différents types de relations pris en charge.
-- [ ] Définir les contraintes et règles métier des liens de parenté.
-- [ ] Créer la migration correspondante.
-- [ ] Ajouter les opérations de création et de consultation des relations.
-- [ ] Empêcher les relations incohérentes ou cycliques lorsque cela est
+Les relations de couple seront également nécessaires pour représenter les
+conjoints, les mariages et les unions civiles. Elles utiliseront un modèle
+distinct, dont la conception est volontairement reportée après la première
+version des liens parent-enfant.
+
+- [x] Préciser les différents types de relations pris en charge dans le
+      [modèle métier des liens parent-enfant](domain/parent-child-relationships.md).
+- [x] Définir les contraintes et règles métier des liens de parenté.
+- [x] Créer la migration correspondante.
+- [x] Ajouter les opérations de création et de consultation des relations.
+- [x] Empêcher les relations incohérentes ou cycliques lorsque cela est
       nécessaire.
-- [ ] Ajouter les tests métier et les tests d'intégration.
+- [x] Ajouter les tests métier et les tests d'intégration.
 
 ## Phase 4 — Consultation de l'arbre familial
 

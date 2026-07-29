@@ -12,11 +12,15 @@ les règles métier de la généalogie.
 ## Routes et ressources
 
 Les chemins représentent des ressources et utilisent des noms anglais au
-pluriel :
+pluriel. Les routes suivantes sont des exemples représentatifs et ne
+constituent pas une liste exhaustive de l'API :
 
 ```text
 POST /people
+GET  /people
 GET  /people/:id
+PATCH /people/:id
+DELETE /people/:id
 ```
 
 Un verbe d'action n'est pas ajouté au chemin lorsque la méthode HTTP exprime
@@ -162,6 +166,31 @@ Les formats temporels sont :
   l'autorise.
 
 Les réponses JSON réussies utilisent le type de contenu `application/json`.
+
+### Relations parent-enfant
+
+Une relation parent-enfant est créée avec
+`POST /parent-child-relationships`. Sa représentation contient les
+identifiants des deux personnes, la nature du lien et les dates techniques :
+
+```json
+{
+    "id": "d0de00b2-d823-4fb7-8b03-8b8ca86c4c29",
+    "parentId": "9a802caf-c558-4451-8dc7-008a60d16a1d",
+    "childId": "9eebc9d9-5532-4e9f-9a05-ceca73c633ae",
+    "relationshipType": "biological",
+    "createdAt": "2026-07-29T15:00:00.000Z",
+    "updatedAt": "2026-07-29T15:00:00.000Z"
+}
+```
+
+`GET /parent-child-relationships/:id` consulte une relation précise.
+`GET /people/:id/parent-child-relationships` retourne une collection paginée
+des relations directes dans lesquelles la personne est parent ou enfant.
+
+Une auto-relation, un doublon ou une relation cyclique produit
+`409 Conflict`. Une personne supprimée logiquement ne peut pas recevoir de
+nouvelle relation, et ses relations existantes ne sont plus exposées.
 
 ### Suppression des personnes
 

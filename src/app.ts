@@ -3,18 +3,21 @@ import dbConnector, { type DatabasePluginOptions } from './plugins/database.js';
 import errorHandlerPlugin from './plugins/error-handler.js';
 import healthRoutes from './modules/health/health.routes.js';
 import peopleModule from './modules/people/person.module.js';
+import relationshipModule from './modules/relationships/relationship.module.js';
 import type { AppConfig } from './config/env.js';
 
 type BuildAppOptions = {
     config: AppConfig;
     databasePlugin?: FastifyPluginAsync<DatabasePluginOptions>;
     peoplePlugin?: FastifyPluginAsync;
+    relationshipPlugin?: FastifyPluginAsync;
 };
 
 export function buildApp({
     config,
     databasePlugin = dbConnector,
     peoplePlugin = peopleModule,
+    relationshipPlugin = relationshipModule,
 }: BuildAppOptions) {
     const app = Fastify({
         logger: true,
@@ -31,6 +34,7 @@ export function buildApp({
     app.register(errorHandlerPlugin);
     app.register(healthRoutes);
     app.register(peoplePlugin);
+    app.register(relationshipPlugin);
 
     return app;
 }

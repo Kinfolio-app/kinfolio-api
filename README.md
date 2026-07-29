@@ -4,7 +4,8 @@ Kinfolio API est le backend d'une application de généalogie pensée comme un *
 
 Le dépôt est actuellement au stade de prototype fonctionnel. Le socle technique
 de l'API Fastify et la première tranche métier consacrée à la gestion des
-personnes sont terminés. La prochaine étape porte sur les liens de parenté.
+personnes sont terminés. Les liens parent-enfant directs sont également pris en
+charge. La prochaine étape porte sur la consultation de l'arbre familial.
 
 ## Vision du projet
 
@@ -16,7 +17,7 @@ Kinfolio a pour ambition de centraliser cette histoire familiale et de permettre
 
 ### Déjà disponibles
 
-Le périmètre actuellement implémenté est limité à la validation du socle backend :
+Les fonctionnalités actuellement disponibles sont :
 
 - démarrage d'un serveur HTTP Fastify sur le port `3000` ;
 - écoute sur toutes les interfaces réseau (`0.0.0.0`) ;
@@ -29,6 +30,8 @@ Le périmètre actuellement implémenté est limité à la validation du socle b
 - repository PostgreSQL et service métier initial du module `people` ;
 - création, consultation, modification et suppression logique des personnes,
   avec prise en charge de leur genre ;
+- création et consultation des liens parent-enfant directs, avec détection des
+  doublons et des cycles ;
 - tests automatisés avec Vitest et l'injection HTTP de Fastify ;
 - route de santé `GET /health`, qui retourne `{ "status": "ok" }`.
 
@@ -36,7 +39,6 @@ Le périmètre actuellement implémenté est limité à la validation du socle b
 
 Les fonctionnalités métier suivantes constituent des orientations envisagées. Elles ne sont pas encore implémentées :
 
-- création et consultation des liens de parenté ;
 - représentation et navigation dans l'arbre familial ;
 - ajout de photos, documents, anecdotes et événements familiaux ;
 - organisation de ces contenus sous la forme d'un album interactif ;
@@ -79,14 +81,15 @@ dans les [conventions de l'API HTTP](docs/api-conventions.md).
 │   ├── modules/
 │   │   ├── health/
 │   │   │   └── health.routes.ts    # Route de santé
-│   │   └── people/
-│   │       ├── person.entity.ts     # Invariants et normalisation
-│   │       ├── person.module.ts     # Assemblage du module Fastify
-│   │       ├── person.repository.ts # Accès PostgreSQL
-│   │       ├── person.routes.ts     # Routes HTTP des personnes
-│   │       ├── person.schema.ts     # Schémas et DTO HTTP
-│   │       ├── person.service.ts    # Logique métier
-│   │       └── person.types.ts      # Types du domaine
+│   │   ├── people/
+│   │   │   ├── person.entity.ts     # Invariants et normalisation
+│   │   │   ├── person.module.ts     # Assemblage du module Fastify
+│   │   │   ├── person.repository.ts # Accès PostgreSQL
+│   │   │   ├── person.routes.ts     # Routes HTTP des personnes
+│   │   │   ├── person.schema.ts     # Schémas et DTO HTTP
+│   │   │   ├── person.service.ts    # Logique métier
+│   │   │   └── person.types.ts      # Types du domaine
+│   │   └── relationships/           # Liens parent-enfant
 │   ├── plugins/
 │   │   ├── database.ts             # Connexion et vérification de PostgreSQL
 │   │   └── error-handler.ts        # Erreurs HTTP au format RFC 9457
@@ -97,12 +100,16 @@ dans les [conventions de l'API HTTP](docs/api-conventions.md).
 ├── migrations/                     # Migrations PostgreSQL
 ├── test/
 │   ├── modules/
-│   │   └── people/
+│   │   ├── people/
+│   │   │   ├── integration/        # Tests HTTP et PostgreSQL
+│   │   │   └── unit/               # Tests du domaine
+│   │   └── relationships/
 │   │       ├── integration/        # Tests HTTP et PostgreSQL
-│   │       └── unit/               # Tests du domaine
+│   │       └── unit/               # Tests du service métier
 │   └── app.test.ts                 # Tests transversaux de l'application
 ├── docs/
 │   ├── adr/                        # Décisions d'architecture
+│   ├── domain/                     # Modèles et règles métier
 │   ├── api-conventions.md          # Conventions du contrat HTTP
 │   └── roadmap.md                  # Roadmap du projet
 ├── .env.example                    # Exemple de configuration locale
@@ -189,22 +196,22 @@ npm run check
 
 ## État du développement
 
-Le socle technique et la première tranche métier sont terminés. L'API permet de
-créer, consulter, lister, modifier et supprimer logiquement des personnes. Ces
+Le socle technique, la gestion des personnes et la première version des liens
+parent-enfant sont terminés. L'API permet de créer et consulter des relations
+directes tout en empêchant les doublons, les auto-relations et les cycles. Ces
 comportements sont couverts par des tests unitaires et des tests d'intégration
-avec PostgreSQL. Les liens familiaux, la navigation dans l'arbre, les souvenirs,
-les médias et le mécanisme d'authentification restent à implémenter.
+avec PostgreSQL. La navigation dans l'arbre, les relations de couple, les
+souvenirs, les médias et le mécanisme d'authentification restent à implémenter.
 
-La priorité immédiate est de concevoir puis d'implémenter les liens de parenté.
+La priorité immédiate est de concevoir la consultation de l'arbre familial.
 
 ## Prochaines étapes envisagées
 
-- préciser les types de liens de parenté pris en charge ;
-- définir les contraintes et les règles métier associées ;
-- créer la migration PostgreSQL des relations parent-enfant ;
-- ajouter les routes de création et de consultation des relations ;
-- empêcher les relations incohérentes ou cycliques ;
-- couvrir ces comportements par des tests métier et d'intégration ;
+- définir le format de représentation d'un arbre ou d'une branche familiale ;
+- ajouter une route de consultation des proches d'une personne ;
+- gérer la profondeur de parcours et la pagination ;
+- évaluer les performances sur des arbres de taille importante ;
+- concevoir ultérieurement les relations de couple ;
 - mettre en place l'authentification et les autorisations avant la gestion de données familiales privées.
 
 Le détail et l'ordre envisagé de ces étapes sont disponibles dans la [roadmap](docs/roadmap.md).

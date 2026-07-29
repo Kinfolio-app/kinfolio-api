@@ -18,6 +18,7 @@ describe('app', () => {
             config: TEST_CONFIG,
             databasePlugin: async () => {},
             peoplePlugin: async () => {},
+            relationshipPlugin: async () => {},
         });
 
         app.get('/test/expected-error', () => {
