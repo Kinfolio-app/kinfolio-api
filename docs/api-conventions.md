@@ -192,6 +192,39 @@ Une auto-relation, un doublon ou une relation cyclique produit
 `409 Conflict`. Une personne supprimée logiquement ne peut pas recevoir de
 nouvelle relation, et ses relations existantes ne sont plus exposées.
 
+### Consultation d'une branche familiale
+
+`GET /people/:id/family-tree` retourne une branche familiale sous la forme du
+graphe normalisé défini dans l'[ADR 0008](adr/0008-represent-family-branches-as-graphs.md).
+
+La query accepte :
+
+- `direction`, avec les valeurs `ancestors`, `descendants` ou `both` et
+  `ancestors` par défaut ;
+- `depth`, un entier compris entre `1` et `10`, avec `3` par défaut.
+
+La personne désignée par `:id` constitue la racine à la profondeur `0`. La
+réponse contient les personnes atteintes, les relations parent-enfant qui les
+relient et les métadonnées du parcours :
+
+```json
+{
+    "rootPersonId": "8debb53d-f592-4a2f-8a9d-adc91263ef10",
+    "people": [],
+    "relationships": [],
+    "traversal": {
+        "direction": "ancestors",
+        "requestedDepth": 3,
+        "reachedDepth": 0,
+        "truncated": false
+    }
+}
+```
+
+`truncated` vaut `true` lorsqu'au moins une personne existe au-delà de la
+profondeur demandée. Une personne racine inexistante ou supprimée produit
+`404 Not Found`. Les personnes supprimées ne sont ni retournées ni traversées.
+
 ### Suppression des personnes
 
 Les personnes utilisent une suppression logique. `DELETE /people/:id`

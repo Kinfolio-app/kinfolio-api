@@ -94,8 +94,9 @@ version des liens parent-enfant.
 
 ## Phase 4 — Consultation de l'arbre familial
 
-- [ ] Définir le format de représentation d'un arbre ou d'une branche familiale.
-- [ ] Ajouter une route permettant de consulter les proches d'une personne.
+- [x] Définir le format de représentation d'une branche familiale sous forme
+      de graphe normalisé, conformément à l'[ADR 0008](adr/0008-represent-family-branches-as-graphs.md).
+- [x] Ajouter une route permettant de consulter les proches d'une personne.
 - [ ] Gérer la profondeur de parcours et la pagination si nécessaire.
 - [ ] Évaluer les performances sur des arbres de taille importante.
 

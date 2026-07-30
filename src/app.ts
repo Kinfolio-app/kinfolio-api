@@ -5,10 +5,12 @@ import healthRoutes from './modules/health/health.routes.js';
 import peopleModule from './modules/people/person.module.js';
 import relationshipModule from './modules/relationships/relationship.module.js';
 import type { AppConfig } from './config/env.js';
+import familyTreeModule from './modules/family-tree/family-tree.module.js';
 
 type BuildAppOptions = {
     config: AppConfig;
     databasePlugin?: FastifyPluginAsync<DatabasePluginOptions>;
+    familyTreePlugin?: FastifyPluginAsync;
     peoplePlugin?: FastifyPluginAsync;
     relationshipPlugin?: FastifyPluginAsync;
 };
@@ -16,6 +18,7 @@ type BuildAppOptions = {
 export function buildApp({
     config,
     databasePlugin = dbConnector,
+    familyTreePlugin = familyTreeModule,
     peoplePlugin = peopleModule,
     relationshipPlugin = relationshipModule,
 }: BuildAppOptions) {
@@ -33,6 +36,7 @@ export function buildApp({
     });
     app.register(errorHandlerPlugin);
     app.register(healthRoutes);
+    app.register(familyTreePlugin);
     app.register(peoplePlugin);
     app.register(relationshipPlugin);
 

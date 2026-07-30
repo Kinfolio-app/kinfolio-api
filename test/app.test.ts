@@ -17,6 +17,7 @@ describe('app', () => {
         app = buildApp({
             config: TEST_CONFIG,
             databasePlugin: async () => {},
+            familyTreePlugin: async () => {},
             peoplePlugin: async () => {},
             relationshipPlugin: async () => {},
         });
