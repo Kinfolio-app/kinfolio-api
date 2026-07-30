@@ -147,3 +147,6 @@ vite.config.ts.timestamp-*
 
 # Visual Studio Code
 .vscode/
+
+# Private genealogy fixtures
+test/fixtures/private/
