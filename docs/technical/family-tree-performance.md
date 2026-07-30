@@ -137,8 +137,14 @@ profils sans conserver leur identifiant dans le rapport :
 4. le profil ayant la plus grande branche `both` à profondeur `10`.
 
 Chaque profil est testé aux profondeurs `1`, `3`, `5` et `10`. Le script
-exécute la méthode réelle du repository une première fois, puis cinq fois pour
-mesurer les appels à chaud. Il lance ensuite
+compare la requête actuelle, qui utilise `UNION`, avec l'ancienne version
+utilisant `UNION ALL` et un tableau `path`. L'ancienne requête est reconstruite
+uniquement dans le benchmark.
+
+Avant de mesurer un scénario, le script vérifie que les deux requêtes renvoient
+exactement les mêmes personnes, relations, profondeurs et causes de
+troncature. Il exécute ensuite chaque version une première fois, puis cinq fois
+pour mesurer les appels à chaud. Il lance enfin
 `EXPLAIN (ANALYZE, BUFFERS, FORMAT JSON)` sur la requête SQL capturée depuis le
 repository. Une limite de cinq secondes par instruction protège la machine de
 développement contre un parcours pathologique.
@@ -158,7 +164,7 @@ npm run benchmark:family-tree
 | Maximum descendants    | `descendants` |                      10 |                    225 |
 | Maximum bidirectionnel | `both`        |                      10 |                  3 758 |
 
-### Résultats du 2026-07-30
+### Résultats initiaux de la requête historique
 
 Les temps du repository sont les médianes de cinq exécutions à chaud. Le temps
 SQL vient de `EXPLAIN ANALYZE`. La taille correspond au résultat sérialisé du
@@ -191,7 +197,7 @@ aucun bloc n'a été lu depuis le disque. Le scénario bidirectionnel maximal à
 profondeur `10` a néanmoins touché 3 345 561 blocs partagés en cache, contre
 16 912 à profondeur `5`.
 
-## Conclusion du benchmark
+## Conclusion du benchmark initial
 
 - La profondeur par défaut de `3` reste rapide, y compris pour le profil
   bidirectionnel le plus dense : environ `2,2 ms` dans le repository.
@@ -206,12 +212,51 @@ profondeur `10` a néanmoins touché 3 345 561 blocs partagés en cache, contre
   dominant du cas `both` vient de la multiplication des chemins avant la
   déduplication des personnes atteignables.
 
-Avant d'envisager une utilisation intensive de `both` à grande profondeur, il
-faudra comparer la requête actuelle avec une variante qui déduplique les
-personnes pendant la récursion plutôt qu'après celle-ci. Cette optimisation
-devra conserver les résultats fonctionnels et les informations de troncature.
+Une variante qui déduplique les personnes pendant la récursion plutôt qu'après
+celle-ci a donc été évaluée, puis intégrée au repository après les contrôles
+décrits dans la section suivante.
 
 Les mesures HTTP et les essais avec un cache réellement froid restent à faire.
 Ils permettront d'évaluer le coût de Fastify, de la sérialisation et des
 lectures disque. Ils ne devraient toutefois pas modifier le diagnostic sur la
 multiplication des chemins récursifs.
+
+## Validation de la déduplication récursive
+
+La requête actuelle retire le tableau `path`, remplace `UNION ALL` par `UNION` et
+conserve uniquement `person_id` et `depth` dans la CTE `traversal`. PostgreSQL
+peut ainsi fusionner une personne atteinte plusieurs fois à la même profondeur
+au lieu de conserver une ligne par chemin.
+
+Le benchmark final du 2026-07-30 reconstruit l'ancienne requête comme référence
+et capture la nouvelle directement depuis le repository. Les 16 scénarios ont
+produit des branches strictement identiques. Cette vérification couvre les
+quatre profils et les profondeurs `1`, `3`, `5` et `10`.
+
+| Scénario              | Profondeur | Ancien repository | Repository actuel | Anciennes lignes | Lignes actuelles |
+| --------------------- | ---------: | ----------------: | ----------------: | ---------------: | ---------------: |
+| Typique `both`        |          3 |           3,71 ms |           1,36 ms |               56 |               31 |
+| Typique `both`        |         10 |          20,60 ms |           6,77 ms |           10 812 |              751 |
+| Maximum `ancestors`   |         10 |           7,22 ms |           6,79 ms |            1 246 |            1 244 |
+| Maximum `descendants` |         10 |           3,00 ms |           2,81 ms |              238 |              238 |
+| Maximum `both`        |          3 |           1,95 ms |           1,70 ms |              255 |              149 |
+| Maximum `both`        |          5 |           8,48 ms |           5,85 ms |            2 873 |              715 |
+| Maximum `both`        |         10 |         958,64 ms |          28,82 ms |          513 482 |            8 782 |
+
+Sur le scénario bidirectionnel maximal à profondeur `10`, la requête actuelle :
+
+- est environ 33 fois plus rapide dans le repository ;
+- réduit de plus de 98 % le nombre de lignes produites par la récursion ;
+- passe de 3 345 561 à 100 395 blocs partagés touchés ;
+- conserve les 500 personnes, les 694 relations et les causes
+  `depth_limit` et `size_limit`.
+
+La modification apporte peu de changement aux parcours directionnels, qui ne
+multiplient déjà presque pas les chemins. Elle cible donc précisément le coût
+observé avec `both`.
+
+Un test d'intégration couvre également un graphe en losange. Dans ce graphe,
+une personne est atteinte par deux chemins et les relations forment un cycle
+lorsqu'elles sont parcourues sans direction. La personne partagée n'est
+retournée qu'une fois et aucune troncature incorrecte n'est signalée. Les 59
+tests d'intégration passent avec la requête actuelle.

@@ -99,7 +99,7 @@ version des liens parent-enfant.
 - [x] Ajouter une route permettant de consulter les proches d'une personne.
 - [x] Borner le parcours par profondeur et par nombre de personnes, sans
       pagination classique qui séparerait les éléments du graphe.
-- [ ] Évaluer les performances sur des arbres de taille importante.
+- [x] Évaluer les performances sur des arbres de taille importante.
 
 ## Phase 5 — Import de données généalogiques
 

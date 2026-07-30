@@ -1,3 +1,4 @@
+import assert from 'node:assert/strict';
 import { performance } from 'node:perf_hooks';
 import { Pool, type QueryResult } from 'pg';
 import { FamilyTreeRepository } from '../../dist/modules/family-tree/family-tree.repository.js';
@@ -5,7 +6,10 @@ import {
     MAX_FAMILY_TREE_PEOPLE,
     TreeDirection,
 } from '../../dist/modules/family-tree/family-tree.types.js';
-import type { TreeDirection as TreeDirectionValue } from '../../src/modules/family-tree/family-tree.types.ts';
+import type {
+    FamilyTreeBranch,
+    TreeDirection as TreeDirectionValue,
+} from '../../src/modules/family-tree/family-tree.types.ts';
 
 const BENCHMARK_DATABASE_NAME = 'kinfolio_benchmark';
 const STATEMENT_TIMEOUT_MILLISECONDS = 5_000;
@@ -50,6 +54,7 @@ type ExplainDocument = {
 };
 
 type BenchmarkResult = {
+    queryVariant: 'legacy' | 'current';
     profile: string;
     direction: TreeDirectionValue;
     depth: number;
@@ -66,6 +71,11 @@ type BenchmarkResult = {
     sharedHitBlocks?: number;
     sharedReadBlocks?: number;
     recursiveRows?: number;
+};
+
+type ScenarioMeasurement = {
+    result: BenchmarkResult;
+    branch?: FamilyTreeBranch;
 };
 
 function validateBenchmarkDatabaseUrl(databaseUrl: string): void {
@@ -231,6 +241,45 @@ async function captureRepositoryQuery(): Promise<CapturedQuery> {
     return capturedQuery;
 }
 
+function replaceExactlyOnce(
+    queryText: string,
+    currentFragment: string,
+    replacementFragment: string,
+): string {
+    const fragments = queryText.split(currentFragment);
+
+    if (fragments.length !== 2) {
+        throw new Error('The repository query no longer matches the expected benchmark structure.');
+    }
+
+    return `${fragments[0]}${replacementFragment}${fragments[1]}`;
+}
+
+function buildLegacyTraversalQuery(currentQueryText: string): string {
+    let queryText = replaceExactlyOnce(
+        currentQueryText,
+        '0 AS depth',
+        `0 AS depth,
+                    ARRAY[root.id] AS path`,
+    );
+
+    queryText = replaceExactlyOnce(queryText, 'UNION', 'UNION ALL');
+    queryText = replaceExactlyOnce(
+        queryText,
+        'traversal.depth + 1 AS depth',
+        `traversal.depth + 1 AS depth,
+                    traversal.path || next_person.id AS path`,
+    );
+    queryText = replaceExactlyOnce(
+        queryText,
+        'WHERE traversal.depth < $3 + 1',
+        `WHERE traversal.depth < $3 + 1
+                    AND NOT next_person.id = ANY(traversal.path)`,
+    );
+
+    return queryText;
+}
+
 function isStatementTimeout(error: unknown): boolean {
     return (
         error instanceof Error &&
@@ -240,12 +289,13 @@ function isStatementTimeout(error: unknown): boolean {
 }
 
 async function benchmarkScenario(
+    queryVariant: BenchmarkResult['queryVariant'],
     repository: FamilyTreeRepository,
     pool: Pool,
     queryText: string,
     profile: Profile,
     depth: number,
-): Promise<BenchmarkResult> {
+): Promise<ScenarioMeasurement> {
     const startedAt = performance.now();
     let branch;
 
@@ -254,10 +304,13 @@ async function benchmarkScenario(
     } catch (error) {
         if (isStatementTimeout(error)) {
             return {
-                profile: profile.name,
-                direction: profile.direction,
-                depth,
-                status: 'timeout',
+                result: {
+                    queryVariant,
+                    profile: profile.name,
+                    direction: profile.direction,
+                    depth,
+                    status: 'timeout',
+                },
             };
         }
 
@@ -291,25 +344,29 @@ async function benchmarkScenario(
     const recursiveUnion = findPlanNode(explainDocument.Plan, 'Recursive Union');
 
     return {
-        profile: profile.name,
-        direction: profile.direction,
-        depth,
-        status: 'completed',
-        firstRunMilliseconds: roundMilliseconds(firstRunMilliseconds),
-        warmMedianMilliseconds: roundMilliseconds(percentile(warmDurations, 50)),
-        warmP95Milliseconds: roundMilliseconds(percentile(warmDurations, 95)),
-        returnedPeople: branch.people.length,
-        returnedRelationships: branch.relationships.length,
-        responseBytes: Buffer.byteLength(JSON.stringify(branch)),
-        truncationReasons: branch.truncationReasons,
-        planningMilliseconds: roundMilliseconds(explainDocument['Planning Time']),
-        executionMilliseconds: roundMilliseconds(explainDocument['Execution Time']),
-        sharedHitBlocks: explainDocument.Plan['Shared Hit Blocks'] ?? 0,
-        sharedReadBlocks: explainDocument.Plan['Shared Read Blocks'] ?? 0,
-        recursiveRows:
-            recursiveUnion?.['Actual Rows'] === undefined
-                ? undefined
-                : recursiveUnion['Actual Rows'] * (recursiveUnion['Actual Loops'] ?? 1),
+        result: {
+            queryVariant,
+            profile: profile.name,
+            direction: profile.direction,
+            depth,
+            status: 'completed',
+            firstRunMilliseconds: roundMilliseconds(firstRunMilliseconds),
+            warmMedianMilliseconds: roundMilliseconds(percentile(warmDurations, 50)),
+            warmP95Milliseconds: roundMilliseconds(percentile(warmDurations, 95)),
+            returnedPeople: branch.people.length,
+            returnedRelationships: branch.relationships.length,
+            responseBytes: Buffer.byteLength(JSON.stringify(branch)),
+            truncationReasons: branch.truncationReasons,
+            planningMilliseconds: roundMilliseconds(explainDocument['Planning Time']),
+            executionMilliseconds: roundMilliseconds(explainDocument['Execution Time']),
+            sharedHitBlocks: explainDocument.Plan['Shared Hit Blocks'] ?? 0,
+            sharedReadBlocks: explainDocument.Plan['Shared Read Blocks'] ?? 0,
+            recursiveRows:
+                recursiveUnion?.['Actual Rows'] === undefined
+                    ? undefined
+                    : recursiveUnion['Actual Rows'] * (recursiveUnion['Actual Loops'] ?? 1),
+        },
+        branch,
     };
 }
 
@@ -372,14 +429,54 @@ try {
             10,
         ),
     ];
-    const repository = new FamilyTreeRepository(pool);
+    const legacyQueryText = buildLegacyTraversalQuery(capturedQuery.text);
+    const currentRepository = new FamilyTreeRepository(pool);
+    const legacyDatabase = {
+        query: (queryText: string, values?: unknown[]) => {
+            if (queryText !== capturedQuery.text) {
+                throw new Error('The benchmark received an unexpected repository query.');
+            }
+
+            return pool.query(legacyQueryText, values);
+        },
+    };
+    const legacyRepository = new FamilyTreeRepository(legacyDatabase as unknown as Pool);
     const results: BenchmarkResult[] = [];
+    let equivalentScenarios = 0;
 
     for (const profile of profiles) {
         for (const depth of TESTED_DEPTHS) {
-            results.push(
-                await benchmarkScenario(repository, pool, capturedQuery.text, profile, depth),
+            const legacyMeasurement = await benchmarkScenario(
+                'legacy',
+                legacyRepository,
+                pool,
+                legacyQueryText,
+                profile,
+                depth,
             );
+            const currentMeasurement = await benchmarkScenario(
+                'current',
+                currentRepository,
+                pool,
+                capturedQuery.text,
+                profile,
+                depth,
+            );
+
+            if (legacyMeasurement.branch === undefined || currentMeasurement.branch === undefined) {
+                throw new Error(
+                    `A query timed out before equivalence could be checked for ${profile.name} at depth ${depth}.`,
+                );
+            }
+
+            assert.deepStrictEqual(
+                currentMeasurement.branch,
+                legacyMeasurement.branch,
+                `The current query changed ${profile.name} at depth ${depth}.`,
+            );
+
+            equivalentScenarios += 1;
+            results.push(legacyMeasurement.result, currentMeasurement.result);
         }
     }
 
@@ -392,6 +489,7 @@ try {
                 warmRuns: WARM_RUNS,
                 people: peopleResult.rowCount,
                 relationships: relationshipsResult.rowCount,
+                equivalentScenarios,
                 profiles: profiles.map(
                     ({ name, direction, selectionDepth, reachablePeopleAtSelectionDepth }) => ({
                         name,

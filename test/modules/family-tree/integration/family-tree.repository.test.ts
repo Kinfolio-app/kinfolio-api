@@ -201,6 +201,29 @@ describe('FamilyTreeRepository integration', () => {
         expect(bothDirections?.truncationReasons).toEqual([FamilyTreeTruncationReason.DepthLimit]);
     });
 
+    it('deduplicates people reached through multiple bidirectional paths', async () => {
+        const root = await personRepository.create({ firstName: 'Alice' });
+        const firstBranch = await personRepository.create({ firstName: 'Bob' });
+        const secondBranch = await personRepository.create({ firstName: 'Charlie' });
+        const sharedPerson = await personRepository.create({ firstName: 'Diane' });
+
+        await createRelationship(root.id, firstBranch.id);
+        await createRelationship(root.id, secondBranch.id);
+        await createRelationship(firstBranch.id, sharedPerson.id);
+        await createRelationship(secondBranch.id, sharedPerson.id);
+
+        const branch = await familyTreeRepository.findBranch(root.id, TreeDirection.Both, 2);
+
+        expect(branch?.people.map(({ id }) => id)).toEqual(
+            expect.arrayContaining([root.id, firstBranch.id, secondBranch.id, sharedPerson.id]),
+        );
+        expect(branch?.people).toHaveLength(4);
+        expect(branch?.people.filter(({ id }) => id === sharedPerson.id)).toHaveLength(1);
+        expect(branch?.relationships).toHaveLength(4);
+        expect(branch?.reachedDepth).toBe(2);
+        expect(branch?.truncationReasons).toEqual([]);
+    });
+
     it('does not traverse through a soft-deleted person', async () => {
         const root = await personRepository.create({ firstName: 'Alice' });
         const parent = await personRepository.create({ firstName: 'Bob' });

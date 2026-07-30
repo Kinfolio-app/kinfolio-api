@@ -70,16 +70,14 @@ export class FamilyTreeRepository {
             traversal AS (
                 SELECT
                     root.id AS person_id,
-                    0 AS depth,
-                    ARRAY[root.id] AS path
+                    0 AS depth
                 FROM root
 
-                UNION ALL
+                UNION
 
                 SELECT
                     next_person.id AS person_id,
-                    traversal.depth + 1 AS depth,
-                    traversal.path || next_person.id AS path
+                    traversal.depth + 1 AS depth
                 FROM traversal
                 INNER JOIN parent_child_relationships AS relationship
                     ON (
@@ -107,7 +105,6 @@ export class FamilyTreeRepository {
                     END
                     AND next_person.deleted_at IS NULL
                 WHERE traversal.depth < $3 + 1
-                    AND NOT next_person.id = ANY(traversal.path)
             ),
             reachable_people AS (
                 SELECT

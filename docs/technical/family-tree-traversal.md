@@ -17,18 +17,18 @@ atteinte. Cela évite d'exécuter une requête distincte pour chaque génératio
 
 ## La CTE `traversal`
 
-La CTE récursive `traversal` contient une ligne par chemin parcouru :
+La CTE récursive `traversal` contient au maximum une ligne pour une même
+personne à une même profondeur :
 
-| Colonne     | Rôle                                        |
-| ----------- | ------------------------------------------- |
-| `person_id` | Personne atteinte pendant le parcours.      |
-| `depth`     | Distance depuis la personne racine.         |
-| `path`      | Identifiants déjà rencontrés sur ce chemin. |
+| Colonne     | Rôle                                   |
+| ----------- | -------------------------------------- |
+| `person_id` | Personne atteinte pendant le parcours. |
+| `depth`     | Distance depuis la personne racine.    |
 
 Elle démarre toujours avec la personne racine :
 
 ```text
-Alice, depth 0, path [Alice]
+Alice, depth 0
 ```
 
 Puis la partie récursive recherche la personne suivante pour chaque ligne déjà
@@ -52,22 +52,23 @@ Paul,  depth 1
 La réponse contient donc Alice, Marie et Paul. Les grands-parents seraient à
 la profondeur `2` et ne seraient pas inclus.
 
-## Protection contre les retours en arrière
+## Protection contre la multiplication des chemins
 
-Le parcours vérifie que la personne suivante n'est pas déjà présente dans
-`path`. Cette protection est particulièrement nécessaire pour `both` : sans
-elle, PostgreSQL pourrait suivre `Alice → Marie → Alice → Marie` jusqu'à la
-limite de profondeur.
+La partie initiale et la partie récursive sont réunies avec `UNION`.
+PostgreSQL élimine ainsi les lignes identiques avant l'itération suivante. Si
+deux chemins atteignent la même personne à la même profondeur, cette personne
+n'est développée qu'une seule fois pour cette profondeur.
 
-Cette protection porte sur un chemin individuel. Deux chemins distincts
-peuvent donc atteindre un même ancêtre, ce qui est nécessaire lorsqu'ils
-rejoignent une branche commune.
+Cette déduplication est particulièrement utile pour `both`, qui peut revenir
+sur une relation dans l'autre sens ou rejoindre une personne par plusieurs
+branches. Une personne peut encore être rencontrée à des profondeurs
+différentes, mais le parcours reste borné par la profondeur maximale demandée.
 
 ## Déduplication et profondeur retenue
 
-Après le parcours, `reachable_people` regroupe les lignes par personne et
-conserve la profondeur minimale. Une personne présente dans deux branches est
-donc renvoyée une seule fois dans `people`.
+Après le parcours, `reachable_people` regroupe les profondeurs éventuelles
+d'une personne et conserve la profondeur minimale. Une personne présente dans
+deux branches est donc renvoyée une seule fois dans `people`.
 
 Par exemple, si Marie et Paul ont Diane comme mère :
 
@@ -138,9 +139,11 @@ présentation.
 
 ## Point d'attention pour les performances
 
-`path` évite les boucles, mais plusieurs chemins peuvent exister dans une
-branche très dense. La limite de `500` borne la réponse finale, mais elle
-n'empêche pas la CTE de produire davantage de chemins avant cette sélection.
-Des mesures sur de grands graphes restent donc nécessaires pendant le point
-suivant de la phase 4. Les statistiques et résultats sont regroupés dans la
+La déduplication pendant la récursion évite de conserver une ligne distincte
+pour chaque chemin. Sur le jeu de benchmark, elle a réduit de plus de 98 % les
+lignes récursives du scénario bidirectionnel maximal à profondeur `10`.
+
+La limite de `500` borne toujours uniquement la réponse finale : le parcours
+peut atteindre davantage de personnes avant cette sélection. Les statistiques,
+mesures et comparaisons sont regroupées dans la
 [note de performance](family-tree-performance.md).
