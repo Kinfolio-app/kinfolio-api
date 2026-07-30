@@ -100,7 +100,37 @@ version des liens parent-enfant.
 - [ ] Gérer la profondeur de parcours et la pagination si nécessaire.
 - [ ] Évaluer les performances sur des arbres de taille importante.
 
-## Phase 5 — Contenus familiaux
+## Phase 5 — Import de données généalogiques
+
+L'import GEDCOM constitue un parcours d'adoption essentiel pour les familles
+qui disposent déjà d'un arbre contenant plusieurs milliers de personnes. La
+première version devra privilégier un import contrôlable et vérifiable plutôt
+qu'une prise en charge silencieuse et partielle du format.
+
+- [ ] Définir la version de GEDCOM prise en charge et le périmètre initial de
+      l'import : personnes, filiations, relations de couple, événements,
+      sources et médias.
+- [ ] Concevoir les modèles métier encore nécessaires à un import fidèle,
+      notamment les relations de couple.
+- [ ] Parser et valider un fichier sans modifier la base de données.
+- [ ] Fournir une prévisualisation avec les éléments reconnus, ignorés,
+      ambigus ou invalides.
+- [ ] Définir les correspondances entre les individus et familles GEDCOM et
+      les personnes et relations Kinfolio.
+- [ ] Définir la stratégie de détection des doublons, de réimport et
+      d'idempotence.
+- [ ] Réaliser l'import de manière transactionnelle avec un rapport final.
+- [ ] Ajouter des tests avec des fichiers synthétiques et un graphe réel
+      volumineux préalablement anonymisé.
+- [ ] Mesurer les performances et la consommation mémoire sur un arbre de
+      plusieurs milliers de personnes.
+
+Les fichiers contenant de véritables données familiales privées ne devront pas
+être utilisés hors d'un environnement protégé. Le développement et les tests
+précédant la phase de sécurité utiliseront uniquement des données synthétiques
+ou anonymisées.
+
+## Phase 6 — Contenus familiaux
 
 - [ ] Concevoir la gestion des événements familiaux.
 - [ ] Concevoir la gestion des anecdotes et souvenirs.
@@ -109,7 +139,7 @@ version des liens parent-enfant.
       événements.
 - [ ] Organiser ces contenus sous la forme d'un album interactif.
 
-## Phase 6 — Sécurité et accès
+## Phase 7 — Sécurité et accès
 
 L'authentification et les autorisations devront être en place avant d'utiliser
 Kinfolio avec de véritables données familiales privées.
@@ -134,7 +164,8 @@ Kinfolio avec de véritables données familiales privées.
 9. Liste et modification des personnes.
 10. Relations parent-enfant.
 11. Consultation de l'arbre familial.
-12. Authentification et autorisations avant l'utilisation de données privées.
+12. Import GEDCOM avec des données synthétiques ou anonymisées.
+13. Authentification et autorisations avant l'utilisation de données privées.
 
 ## Décisions à revoir
 
@@ -145,6 +176,8 @@ Les sujets suivants restent volontairement ouverts :
 - champs définitifs du modèle `persons` ;
 - représentation des noms, lieux et dates incertaines ;
 - types de liens familiaux pris en charge ;
+- version de GEDCOM et périmètre initial de l'import ;
+- stratégie de détection des doublons et de réimport GEDCOM ;
 - stratégie de restauration et de purge définitive ;
 - structure des espaces familiaux et modèle d'autorisation ;
 - stockage des photos et documents.
