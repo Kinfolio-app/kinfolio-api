@@ -210,20 +210,48 @@ relient et les métadonnées du parcours :
 ```json
 {
     "rootPersonId": "8debb53d-f592-4a2f-8a9d-adc91263ef10",
-    "people": [],
+    "people": [
+        {
+            "id": "8debb53d-f592-4a2f-8a9d-adc91263ef10",
+            "firstName": "Alice",
+            "middleNames": null,
+            "lastName": "Martin",
+            "birthName": null,
+            "gender": "female",
+            "birthDate": null,
+            "birthPlace": null,
+            "deathDate": null,
+            "deathPlace": null,
+            "livingStatus": "living",
+            "biography": null,
+            "createdAt": "2026-07-30T10:30:00.000Z",
+            "updatedAt": "2026-07-30T10:30:00.000Z"
+        }
+    ],
     "relationships": [],
     "traversal": {
         "direction": "ancestors",
         "requestedDepth": 3,
         "reachedDepth": 0,
-        "truncated": false
+        "truncated": false,
+        "truncationReasons": [],
+        "returnedPeople": 1
     }
 }
 ```
 
+Une réponse contient au maximum `500` personnes. Les personnes les plus proches
+de la racine sont prioritaires lorsque cette limite est atteinte.
+
 `truncated` vaut `true` lorsqu'au moins une personne existe au-delà de la
-profondeur demandée. Une personne racine inexistante ou supprimée produit
-`404 Not Found`. Les personnes supprimées ne sont ni retournées ni traversées.
+profondeur demandée ou de la limite de taille. `truncationReasons` contient
+alors `depth_limit`, `size_limit` ou les deux valeurs. `returnedPeople` indique
+le nombre de personnes effectivement présentes dans `people`.
+
+La route n'utilise pas de pagination par numéro de page, car elle pourrait
+séparer une relation de l'une de ses extrémités. Une personne racine inexistante
+ou supprimée produit `404 Not Found`. Les personnes supprimées ne sont ni
+retournées ni traversées.
 
 ### Suppression des personnes
 

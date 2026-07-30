@@ -97,7 +97,8 @@ version des liens parent-enfant.
 - [x] Définir le format de représentation d'une branche familiale sous forme
       de graphe normalisé, conformément à l'[ADR 0008](adr/0008-represent-family-branches-as-graphs.md).
 - [x] Ajouter une route permettant de consulter les proches d'une personne.
-- [ ] Gérer la profondeur de parcours et la pagination si nécessaire.
+- [x] Borner le parcours par profondeur et par nombre de personnes, sans
+      pagination classique qui séparerait les éléments du graphe.
 - [ ] Évaluer les performances sur des arbres de taille importante.
 
 ## Phase 5 — Import de données généalogiques

@@ -100,6 +100,29 @@ Ainsi, pour `depth = 1` :
 - la présence d'une personne à profondeur `2` définit `truncated: true` ;
 - sinon, `truncated: false`.
 
+## Limite du nombre de personnes
+
+Une réponse contient au maximum `500` personnes. Après le parcours,
+`candidate_people` trie les personnes par profondeur, puis par identifiant pour
+obtenir un ordre déterministe. Il conserve temporairement jusqu'à `501`
+personnes :
+
+- les `500` premières deviennent `included_people` et sont retournées ;
+- la présence de la personne supplémentaire produit la raison
+  `size_limit`.
+
+Ce tri garantit que la racine et les générations les plus proches sont
+prioritaires. Les relations retournées ont toujours leurs deux extrémités dans
+`included_people`.
+
+Les raisons de troncature sont :
+
+- `depth_limit` lorsqu'une personne existe au-delà de la profondeur demandée ;
+- `size_limit` lorsque plus de `500` personnes existent dans la profondeur
+  demandée.
+
+Les deux raisons peuvent être présentes simultanément.
+
 ## Personnes supprimées logiquement
 
 La personne racine et chaque personne atteinte doivent avoir `deleted_at IS
@@ -116,6 +139,7 @@ présentation.
 ## Point d'attention pour les performances
 
 `path` évite les boucles, mais plusieurs chemins peuvent exister dans une
-branche très dense. Une limite du nombre de personnes et des mesures sur de
-grands graphes restent nécessaires. Elles relèvent des points suivants de la
-phase 4.
+branche très dense. La limite de `500` borne la réponse finale, mais elle
+n'empêche pas la CTE de produire davantage de chemins avant cette sélection.
+Des mesures sur de grands graphes restent donc nécessaires pendant le point
+suivant de la phase 4.

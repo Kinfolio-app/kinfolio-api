@@ -3,7 +3,10 @@ import type { FastifyInstance } from 'fastify';
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest';
 import { buildApp } from '../../../../src/app.js';
 import { loadConfig } from '../../../../src/config/env.js';
-import { TreeDirection } from '../../../../src/modules/family-tree/family-tree.types.js';
+import {
+    FamilyTreeTruncationReason,
+    TreeDirection,
+} from '../../../../src/modules/family-tree/family-tree.types.js';
 import { ParentChildRelationshipType } from '../../../../src/modules/relationships/parent-child-relationship.types.js';
 import { HttpStatus } from '../../../../src/shared/http/http-status.js';
 import { MediaType } from '../../../../src/shared/http/media-type.js';
@@ -122,6 +125,8 @@ describe('FamilyTreeRoute integration', () => {
                 requestedDepth: 3,
                 reachedDepth: 2,
                 truncated: false,
+                truncationReasons: [],
+                returnedPeople: 3,
             },
         });
         expect(body.people).toHaveLength(3);
@@ -159,6 +164,8 @@ describe('FamilyTreeRoute integration', () => {
             requestedDepth: 1,
             reachedDepth: 1,
             truncated: true,
+            truncationReasons: [FamilyTreeTruncationReason.DepthLimit],
+            returnedPeople: 3,
         });
     });
 

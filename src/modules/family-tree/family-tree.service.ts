@@ -28,7 +28,9 @@ export class FamilyTreeService {
                 direction,
                 requestedDepth: depth,
                 reachedDepth: branch.reachedDepth,
-                truncated: branch.truncated,
+                truncated: branch.truncationReasons.length > 0,
+                truncationReasons: branch.truncationReasons,
+                returnedPeople: branch.people.length,
             },
         };
     }

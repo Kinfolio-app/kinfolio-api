@@ -41,13 +41,32 @@ La forme initiale de la réponse est la suivante :
 ```json
 {
     "rootPersonId": "8debb53d-f592-4a2f-8a9d-adc91263ef10",
-    "people": [],
+    "people": [
+        {
+            "id": "8debb53d-f592-4a2f-8a9d-adc91263ef10",
+            "firstName": "Alice",
+            "middleNames": null,
+            "lastName": "Martin",
+            "birthName": null,
+            "gender": "female",
+            "birthDate": null,
+            "birthPlace": null,
+            "deathDate": null,
+            "deathPlace": null,
+            "livingStatus": "living",
+            "biography": null,
+            "createdAt": "2026-07-30T10:30:00.000Z",
+            "updatedAt": "2026-07-30T10:30:00.000Z"
+        }
+    ],
     "relationships": [],
     "traversal": {
         "direction": "ancestors",
         "requestedDepth": 3,
         "reachedDepth": 0,
-        "truncated": false
+        "truncated": false,
+        "truncationReasons": [],
+        "returnedPeople": 1
     }
 }
 ```
@@ -72,10 +91,11 @@ profondeur `1`. `requestedDepth` indique la profondeur demandée et
 `reachedDepth` la profondeur maximale effectivement atteinte.
 
 `truncated` vaut `true` lorsque des limites de sécurité empêchent de retourner
-la totalité du parcours demandé, par exemple à cause d'une profondeur maximale
-ou d'un nombre maximal de personnes. Les valeurs précises de ces limites
-relèvent du contrat de la future route et pourront évoluer indépendamment de la
-représentation du graphe.
+la totalité du parcours demandé. `truncationReasons` précise si la coupure est
+causée par la profondeur, la taille du graphe ou les deux. `returnedPeople`
+indique le nombre de personnes effectivement retournées. Les valeurs précises
+des limites relèvent du contrat de la route et peuvent évoluer indépendamment
+du principe de représentation du graphe.
 
 Les personnes supprimées logiquement et les relations qui les impliquent ne
 sont pas exposées. L'ordre des personnes et des relations est déterministe afin

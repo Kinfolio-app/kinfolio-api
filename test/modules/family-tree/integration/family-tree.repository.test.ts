@@ -2,7 +2,11 @@ import { randomUUID } from 'node:crypto';
 import { Pool, type PoolClient } from 'pg';
 import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, it } from 'vitest';
 import { FamilyTreeRepository } from '../../../../src/modules/family-tree/family-tree.repository.js';
-import { TreeDirection } from '../../../../src/modules/family-tree/family-tree.types.js';
+import {
+    MAX_FAMILY_TREE_PEOPLE,
+    FamilyTreeTruncationReason,
+    TreeDirection,
+} from '../../../../src/modules/family-tree/family-tree.types.js';
 import { PersonRepository } from '../../../../src/modules/people/person.repository.js';
 import { ParentChildRelationshipType } from '../../../../src/modules/relationships/parent-child-relationship.types.js';
 
@@ -100,7 +104,7 @@ describe('FamilyTreeRepository integration', () => {
             people: [root],
             relationships: [],
             reachedDepth: 0,
-            truncated: false,
+            truncationReasons: [],
         });
     });
 
@@ -143,7 +147,7 @@ describe('FamilyTreeRepository integration', () => {
                 }),
             ]),
             reachedDepth: 1,
-            truncated: true,
+            truncationReasons: [FamilyTreeTruncationReason.DepthLimit],
         });
         expect(truncatedBranch?.people).toHaveLength(3);
         expect(truncatedBranch?.relationships).toHaveLength(2);
@@ -155,7 +159,7 @@ describe('FamilyTreeRepository integration', () => {
         expect(completeBranch?.relationships).toHaveLength(4);
         expect(completeBranch).toMatchObject({
             reachedDepth: 2,
-            truncated: false,
+            truncationReasons: [],
         });
     });
 
@@ -186,7 +190,7 @@ describe('FamilyTreeRepository integration', () => {
         expect(descendants?.people).toHaveLength(3);
         expect(descendants?.relationships).toHaveLength(2);
         expect(descendants?.reachedDepth).toBe(2);
-        expect(descendants?.truncated).toBe(false);
+        expect(descendants?.truncationReasons).toEqual([]);
 
         expect(bothDirections?.people.map(({ id }) => id)).toEqual(
             expect.arrayContaining([parent.id, root.id, child.id]),
@@ -194,7 +198,7 @@ describe('FamilyTreeRepository integration', () => {
         expect(bothDirections?.people).toHaveLength(3);
         expect(bothDirections?.relationships).toHaveLength(2);
         expect(bothDirections?.reachedDepth).toBe(1);
-        expect(bothDirections?.truncated).toBe(true);
+        expect(bothDirections?.truncationReasons).toEqual([FamilyTreeTruncationReason.DepthLimit]);
     });
 
     it('does not traverse through a soft-deleted person', async () => {
@@ -212,7 +216,36 @@ describe('FamilyTreeRepository integration', () => {
             people: [root],
             relationships: [],
             reachedDepth: 0,
-            truncated: false,
+            truncationReasons: [],
         });
+    });
+
+    it('limits the branch size while preserving the closest people', async () => {
+        const root = await personRepository.create({ firstName: 'Alice' });
+
+        await client.query(
+            `WITH parents AS (
+                INSERT INTO persons (first_name)
+                SELECT 'Parent ' || number
+                FROM generate_series(1, $2) AS series(number)
+                RETURNING id
+            )
+            INSERT INTO parent_child_relationships (
+                parent_id,
+                child_id,
+                relationship_type
+            )
+            SELECT id, $1, $3
+            FROM parents`,
+            [root.id, MAX_FAMILY_TREE_PEOPLE + 1, ParentChildRelationshipType.Biological],
+        );
+
+        const branch = await familyTreeRepository.findBranch(root.id, TreeDirection.Ancestors, 1);
+
+        expect(branch?.people).toHaveLength(MAX_FAMILY_TREE_PEOPLE);
+        expect(branch?.people[0]?.id).toBe(root.id);
+        expect(branch?.relationships).toHaveLength(MAX_FAMILY_TREE_PEOPLE - 1);
+        expect(branch?.reachedDepth).toBe(1);
+        expect(branch?.truncationReasons).toEqual([FamilyTreeTruncationReason.SizeLimit]);
     });
 });

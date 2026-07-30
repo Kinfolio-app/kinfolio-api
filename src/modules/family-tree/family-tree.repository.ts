@@ -4,7 +4,12 @@ import type {
     ParentChildRelationship,
     ParentChildRelationshipType,
 } from '../relationships/parent-child-relationship.types.js';
-import type { FamilyTreeBranch, TreeDirection } from './family-tree.types.js';
+import {
+    MAX_FAMILY_TREE_PEOPLE,
+    FamilyTreeTruncationReason,
+    type FamilyTreeBranch,
+    type TreeDirection,
+} from './family-tree.types.js';
 
 type Database = Pick<Pool, 'query'>;
 
@@ -26,7 +31,8 @@ type FamilyTreeBranchRow = {
     people: SerializedPerson[];
     relationships: SerializedParentChildRelationship[];
     reached_depth: number;
-    truncated: boolean;
+    depth_truncated: boolean;
+    size_truncated: boolean;
 };
 
 function mapPerson(person: SerializedPerson): Person {
@@ -110,10 +116,18 @@ export class FamilyTreeRepository {
                 FROM traversal
                 GROUP BY person_id
             ),
-            included_people AS (
+            candidate_people AS (
                 SELECT person_id, depth
                 FROM reachable_people
                 WHERE depth <= $3
+                ORDER BY depth ASC, person_id ASC
+                LIMIT $4 + 1
+            ),
+            included_people AS (
+                SELECT person_id, depth
+                FROM candidate_people
+                ORDER BY depth ASC, person_id ASC
+                LIMIT $4
             )
             SELECT
                 COALESCE(
@@ -175,9 +189,13 @@ export class FamilyTreeRepository {
                     SELECT 1
                     FROM reachable_people AS reachable
                     WHERE reachable.depth > $3
-                ) AS truncated
+                ) AS depth_truncated,
+                (
+                    SELECT COUNT(*) > $4
+                    FROM candidate_people
+                ) AS size_truncated
             FROM root`,
-            [rootPersonId, direction, depth],
+            [rootPersonId, direction, depth, MAX_FAMILY_TREE_PEOPLE],
         );
         const row = rows[0];
 
@@ -185,11 +203,21 @@ export class FamilyTreeRepository {
             return null;
         }
 
+        const truncationReasons: FamilyTreeTruncationReason[] = [];
+
+        if (row.depth_truncated) {
+            truncationReasons.push(FamilyTreeTruncationReason.DepthLimit);
+        }
+
+        if (row.size_truncated) {
+            truncationReasons.push(FamilyTreeTruncationReason.SizeLimit);
+        }
+
         return {
             people: row.people.map(mapPerson),
             relationships: row.relationships.map(mapRelationship),
             reachedDepth: row.reached_depth,
-            truncated: row.truncated,
+            truncationReasons,
         };
     }
 }

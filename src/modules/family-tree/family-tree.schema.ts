@@ -4,6 +4,8 @@ import { ParentChildRelationshipResponseDtoSchema } from '../relationships/paren
 import {
     DEFAULT_FAMILY_TREE_DEPTH,
     MAX_FAMILY_TREE_DEPTH,
+    MAX_FAMILY_TREE_PEOPLE,
+    FamilyTreeTruncationReason,
     TreeDirection,
 } from './family-tree.types.js';
 
@@ -11,6 +13,11 @@ export const TreeDirectionSchema = Type.Union([
     Type.Literal(TreeDirection.Ancestors),
     Type.Literal(TreeDirection.Descendants),
     Type.Literal(TreeDirection.Both),
+]);
+
+export const FamilyTreeTruncationReasonSchema = Type.Union([
+    Type.Literal(FamilyTreeTruncationReason.DepthLimit),
+    Type.Literal(FamilyTreeTruncationReason.SizeLimit),
 ]);
 
 export const FamilyTreeIdParamsSchema = Type.Object(
@@ -52,7 +59,9 @@ export type FamilyTreeQuerystringDto = Type.Static<typeof FamilyTreeQuerystringS
 export const FamilyTreeResponseDtoSchema = Type.Object(
     {
         rootPersonId: Type.String({ format: 'uuid' }),
-        people: Type.Array(PersonResponseDtoSchema),
+        people: Type.Array(PersonResponseDtoSchema, {
+            maxItems: MAX_FAMILY_TREE_PEOPLE,
+        }),
         relationships: Type.Array(ParentChildRelationshipResponseDtoSchema),
         traversal: Type.Object(
             {
@@ -60,6 +69,14 @@ export const FamilyTreeResponseDtoSchema = Type.Object(
                 requestedDepth: Type.Integer({ minimum: 1 }),
                 reachedDepth: Type.Integer({ minimum: 0 }),
                 truncated: Type.Boolean(),
+                truncationReasons: Type.Array(FamilyTreeTruncationReasonSchema, {
+                    maxItems: 2,
+                    uniqueItems: true,
+                }),
+                returnedPeople: Type.Integer({
+                    minimum: 1,
+                    maximum: MAX_FAMILY_TREE_PEOPLE,
+                }),
             },
             {
                 additionalProperties: false,
