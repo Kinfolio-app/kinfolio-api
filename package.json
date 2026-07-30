@@ -2,6 +2,8 @@
     "type": "module",
     "scripts": {
         "build": "tsc -p tsconfig.json",
+        "benchmark:family-tree": "npm run build --silent && node --experimental-strip-types --env-file=.env.benchmark scripts/benchmarks/benchmark-family-tree.ts",
+        "benchmark:load-gedcom": "node --experimental-strip-types --env-file=.env.benchmark scripts/benchmarks/load-gedcom-topology.ts",
         "start": "node --env-file=.env dist/server.js",
         "migrate": "node --env-file=.env ./node_modules/node-pg-migrate/bin/node-pg-migrate.js -j ts",
         "migrate:test": "node --env-file=.env.test ./node_modules/node-pg-migrate/bin/node-pg-migrate.js -j ts",

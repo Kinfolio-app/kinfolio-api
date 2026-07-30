@@ -142,4 +142,5 @@ présentation.
 branche très dense. La limite de `500` borne la réponse finale, mais elle
 n'empêche pas la CTE de produire davantage de chemins avant cette sélection.
 Des mesures sur de grands graphes restent donc nécessaires pendant le point
-suivant de la phase 4.
+suivant de la phase 4. Les statistiques et résultats sont regroupés dans la
+[note de performance](family-tree-performance.md).
