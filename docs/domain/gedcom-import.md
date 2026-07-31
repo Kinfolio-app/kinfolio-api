@@ -145,6 +145,8 @@ parseurs est défini dans la
 [note technique sur le modèle GEDCOM normalisé](../technical/gedcom-normalized-model.md).
 L'implémentation et les limites propres à la première version sont détaillées
 dans la [note sur le parseur GEDCOM 5.5.1](../technical/gedcom-551-parser.md).
+Les écarts de syntaxe et de structure de la version moderne sont détaillés dans
+la [note sur le parseur GEDCOM 7](../technical/gedcom-7-parser.md).
 
 ## Mise à jour de ce document
 

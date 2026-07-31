@@ -53,10 +53,13 @@ GenealogicalDate
 
 GenealogicalDatePoint
 ├── calendar
+├── calendarTag
 ├── year
 ├── month
+├── monthTag
 ├── day
-└── epoch
+├── epoch
+└── epochTag
 ```
 
 `kind` décrit la sémantique de la valeur :
@@ -92,6 +95,12 @@ domaine reconnaît au minimum les calendriers définis par GEDCOM 7 :
 - `french_republican` ;
 - `hebrew` ;
 - `extension`.
+
+`calendarTag`, `monthTag` et `epochTag` conservent les identifiants textuels
+déclarés par GEDCOM 7. Ils sont particulièrement importants pour un calendrier
+ou une époque d'extension, dont la sémantique ne doit pas être inventée par le
+parseur. Pour les calendriers connus, `month` contient en parallèle le numéro
+normalisé du mois.
 
 `epoch` permet notamment de distinguer les années de l'ère commune et celles
 qui la précèdent. Les valeurs précises des mois restent liées au calendrier et

@@ -131,7 +131,7 @@ document GEDCOM. Elles seront portées par le contexte d'import.
 
 ```ts
 type NormalizedIndividual = {
-    id: string;
+    id: string | null;
     names: NormalizedName[];
     sex: NormalizedSex | null;
     events: NormalizedEvent[];
@@ -147,7 +147,9 @@ type NormalizedIndividual = {
 ```
 
 `id` contient l'identifiant GEDCOM dans sa forme originale, par exemple `@I1@`,
-sans lui donner la sémantique d'un identifiant Kinfolio.
+sans lui donner la sémantique d'un identifiant Kinfolio. Il peut être `null`
+pour un enregistrement GEDCOM 7 non référencé, car cette version n'impose pas
+d'identifiant dans ce cas. Le parseur n'en invente jamais un.
 
 Les événements regroupent notamment la naissance et le décès. Les attributs
 regroupent les informations décrivant un état ou une caractéristique, comme
@@ -207,7 +209,7 @@ rattache ensuite à l'enfant correspondant dans la famille.
 
 ```ts
 type NormalizedFamily = {
-    id: string;
+    id: string | null;
     partners: NormalizedFamilyPartner[];
     children: NormalizedFamilyChild[];
     events: NormalizedEvent[];
@@ -302,7 +304,7 @@ références et d'expliquer leur traitement dans la prévisualisation.
 
 ```ts
 type NormalizedSource = {
-    id: string;
+    id: string | null;
     title: string | null;
     author: string | null;
     publication: string | null;
@@ -313,7 +315,7 @@ type NormalizedSource = {
 };
 
 type NormalizedRepository = {
-    id: string;
+    id: string | null;
     name: string | null;
     address: string | null;
     extensions: NormalizedExtension[];
@@ -330,6 +332,7 @@ type NormalizedMediaFile = {
     path: string;
     mediaType: string | null;
     title: string | null;
+    extensions: NormalizedExtension[];
 };
 
 type NormalizedNote = {
