@@ -13,6 +13,8 @@ export const GREGORIAN_AND_JULIAN_MONTHS = [
     'DEC',
 ] as const;
 
+export type GregorianAndJulianMonthTag = (typeof GREGORIAN_AND_JULIAN_MONTHS)[number];
+
 export const FRENCH_REPUBLICAN_MONTHS = [
     'VEND',
     'BRUM',
@@ -29,6 +31,8 @@ export const FRENCH_REPUBLICAN_MONTHS = [
     'COMP',
 ] as const;
 
+export type FrenchRepublicanMonthTag = (typeof FRENCH_REPUBLICAN_MONTHS)[number];
+
 export const HEBREW_MONTHS = [
     'TSH',
     'CSH',
@@ -44,3 +48,5 @@ export const HEBREW_MONTHS = [
     'AAV',
     'ELL',
 ] as const;
+
+export type HebrewMonthTag = (typeof HEBREW_MONTHS)[number];

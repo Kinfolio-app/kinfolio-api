@@ -43,6 +43,7 @@ import {
 } from '../common/gedcom-structure-constants.js';
 import type { DetectedGedcomFile, SupportedGedcomVersion } from '../gedcom-file.types.js';
 import { parseGedcom7Date } from './date-parser.js';
+import { GEDCOM_7_DATE_SYNTAX } from './date-constants.js';
 import { isValidGedcom7Pointer, isValidGedcom7Xref } from './line-parser.js';
 import { buildGedcom7Tree } from './tree-builder.js';
 
@@ -276,8 +277,8 @@ function parseDate(
     recordId: string,
 ): GenealogicalDate | null {
     if (node === null) return null;
-    validateMaximum(node, 'PHRASE', 1, context, recordId);
-    const phrase = firstChild(node, 'PHRASE')?.value ?? null;
+    validateMaximum(node, GEDCOM_7_DATE_SYNTAX.phraseTag, 1, context, recordId);
+    const phrase = firstChild(node, GEDCOM_7_DATE_SYNTAX.phraseTag)?.value ?? null;
     const result = parseGedcom7Date(node.value, phrase);
     if (!result.success) {
         addError(context, GedcomDiagnosticCode.InvalidDate, result.message, node, recordId, 'DATE');

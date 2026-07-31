@@ -9,6 +9,19 @@ import {
     GREGORIAN_AND_JULIAN_MONTHS,
     HEBREW_MONTHS,
 } from '../common/gedcom-calendar-constants.js';
+import {
+    GEDCOM_DATE_PERIOD_KEYWORDS,
+    GEDCOM_DATE_QUALIFIERS,
+    GEDCOM_DATE_RANGE_KEYWORDS,
+    dateKeywordPrefix,
+    dateKeywordSeparator,
+    type GenealogicalDateQualifierKind,
+} from '../common/gedcom-date-constants.js';
+import {
+    GEDCOM_551_CALENDARS,
+    GEDCOM_551_DATE_SYNTAX,
+    type Gedcom551CalendarTag,
+} from './date-constants.js';
 
 export type GedcomDateParseResult =
     | {
@@ -41,27 +54,21 @@ function extractCalendar(
 ):
     | { success: true; calendar: GenealogicalCalendar; dateText: string }
     | { success: false; message: string } {
-    if (!value.startsWith('@#D')) {
+    if (!value.startsWith(GEDCOM_551_DATE_SYNTAX.calendarEscapePrefix)) {
         return { success: true, calendar: 'gregorian', dateText: value };
     }
 
-    const escapeEnd = value.indexOf('@', 3);
+    const escapeEnd = value.indexOf(
+        GEDCOM_551_DATE_SYNTAX.calendarEscapeTerminator,
+        GEDCOM_551_DATE_SYNTAX.calendarEscapePrefix.length,
+    );
 
     if (escapeEnd === -1 || value[escapeEnd + 1] !== ' ') {
         return { success: false, message: 'The GEDCOM calendar escape is invalid.' };
     }
 
-    const calendarName = value.slice(3, escapeEnd);
-    const calendar =
-        calendarName === 'GREGORIAN'
-            ? 'gregorian'
-            : calendarName === 'JULIAN'
-              ? 'julian'
-              : calendarName === 'HEBREW'
-                ? 'hebrew'
-                : calendarName === 'FRENCH R'
-                  ? 'french_republican'
-                  : null;
+    const calendarName = value.slice(GEDCOM_551_DATE_SYNTAX.calendarEscapePrefix.length, escapeEnd);
+    const calendar = GEDCOM_551_CALENDARS[calendarName as Gedcom551CalendarTag] ?? null;
 
     if (calendar === null) {
         return {
@@ -94,7 +101,7 @@ function parseDatePoint(
 
     let epoch: GenealogicalDatePoint['epoch'] = 'common';
 
-    if (parts.at(-1) === 'B.C.') {
+    if (parts.at(-1) === GEDCOM_551_DATE_SYNTAX.beforeCommonEpoch) {
         epoch = 'before_common';
         parts.pop();
     }
@@ -158,7 +165,7 @@ function parseDatePoint(
 
 function singlePointDate(
     originalText: string,
-    kind: 'exact' | 'about' | 'calculated' | 'estimated' | 'interpreted' | 'before' | 'after',
+    kind: 'exact' | 'interpreted' | GenealogicalDateQualifierKind,
     value: string,
     phrase: string | null = null,
 ): GedcomDateParseResult {
@@ -215,7 +222,11 @@ export function parseGedcom551Date(value: string): GedcomDateParseResult {
         return failure('A GEDCOM date value must not be empty.');
     }
 
-    if (value.startsWith('(') && value.endsWith(')') && value.length > 2) {
+    if (
+        value.startsWith(GEDCOM_551_DATE_SYNTAX.phraseOpening) &&
+        value.endsWith(GEDCOM_551_DATE_SYNTAX.phraseClosing) &&
+        value.length > 2
+    ) {
         return {
             success: true,
             date: {
@@ -228,37 +239,41 @@ export function parseGedcom551Date(value: string): GedcomDateParseResult {
         };
     }
 
-    if (value.startsWith('INT ')) {
-        const phraseStart = value.indexOf(' (', 4);
+    const interpretedPrefix = dateKeywordPrefix(GEDCOM_551_DATE_SYNTAX.interpreted);
 
-        if (phraseStart === -1 || !value.endsWith(')')) {
+    if (value.startsWith(interpretedPrefix)) {
+        const phraseStart = value.indexOf(
+            GEDCOM_551_DATE_SYNTAX.interpretedPhraseSeparator,
+            interpretedPrefix.length,
+        );
+
+        if (phraseStart === -1 || !value.endsWith(GEDCOM_551_DATE_SYNTAX.phraseClosing)) {
             return failure('An interpreted GEDCOM date must contain a parenthesized phrase.');
         }
 
         return singlePointDate(
             value,
             'interpreted',
-            value.slice(4, phraseStart),
-            value.slice(phraseStart + 2, -1),
+            value.slice(interpretedPrefix.length, phraseStart),
+            value.slice(
+                phraseStart + GEDCOM_551_DATE_SYNTAX.interpretedPhraseSeparator.length,
+                -GEDCOM_551_DATE_SYNTAX.phraseClosing.length,
+            ),
         );
     }
 
-    const singlePointQualifiers = [
-        ['ABT ', 'about'],
-        ['CAL ', 'calculated'],
-        ['EST ', 'estimated'],
-        ['BEF ', 'before'],
-        ['AFT ', 'after'],
-    ] as const;
-
-    for (const [prefix, kind] of singlePointQualifiers) {
+    for (const { keyword, kind } of GEDCOM_DATE_QUALIFIERS) {
+        const prefix = dateKeywordPrefix(keyword);
         if (value.startsWith(prefix)) {
             return singlePointDate(value, kind, value.slice(prefix.length));
         }
     }
 
-    if (value.startsWith('BET ')) {
-        const separator = value.indexOf(' AND ', 4);
+    const betweenPrefix = dateKeywordPrefix(GEDCOM_DATE_RANGE_KEYWORDS.between);
+    const andSeparator = dateKeywordSeparator(GEDCOM_DATE_RANGE_KEYWORDS.and);
+
+    if (value.startsWith(betweenPrefix)) {
+        const separator = value.indexOf(andSeparator, betweenPrefix.length);
 
         if (separator === -1) {
             return failure('A GEDCOM date range must contain AND.');
@@ -267,24 +282,27 @@ export function parseGedcom551Date(value: string): GedcomDateParseResult {
         return twoPointDate(
             value,
             'between',
-            value.slice(4, separator),
-            value.slice(separator + 5),
+            value.slice(betweenPrefix.length, separator),
+            value.slice(separator + andSeparator.length),
         );
     }
 
-    if (value.startsWith('FROM ')) {
-        const separator = value.indexOf(' TO ', 5);
+    const fromPrefix = dateKeywordPrefix(GEDCOM_DATE_PERIOD_KEYWORDS.from);
+    const toSeparator = dateKeywordSeparator(GEDCOM_DATE_PERIOD_KEYWORDS.to);
+
+    if (value.startsWith(fromPrefix)) {
+        const separator = value.indexOf(toSeparator, fromPrefix.length);
 
         if (separator !== -1) {
             return twoPointDate(
                 value,
                 'period',
-                value.slice(5, separator),
-                value.slice(separator + 4),
+                value.slice(fromPrefix.length, separator),
+                value.slice(separator + toSeparator.length),
             );
         }
 
-        const result = parseDatePoint(value.slice(5));
+        const result = parseDatePoint(value.slice(fromPrefix.length));
 
         if (!result.success) {
             return failure(result.message);
@@ -302,8 +320,10 @@ export function parseGedcom551Date(value: string): GedcomDateParseResult {
         };
     }
 
-    if (value.startsWith('TO ')) {
-        const result = parseDatePoint(value.slice(3));
+    const toPrefix = dateKeywordPrefix(GEDCOM_DATE_PERIOD_KEYWORDS.to);
+
+    if (value.startsWith(toPrefix)) {
+        const result = parseDatePoint(value.slice(toPrefix.length));
 
         if (!result.success) {
             return failure(result.message);
