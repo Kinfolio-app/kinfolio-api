@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { parseGedcomLine } from '../../../../src/modules/gedcom-import/gedcom-line-parser.js';
+import { parseGedcomLine } from '../../../../src/modules/gedcom-import/v5/line-parser.js';
 
 describe('parseGedcomLine', () => {
     it('parses a record without a value', () => {

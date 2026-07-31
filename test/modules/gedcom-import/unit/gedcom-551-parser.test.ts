@@ -1,9 +1,9 @@
 import { describe, expect, it } from 'vitest';
-import { Gedcom551Parser } from '../../../../src/modules/gedcom-import/gedcom-551-parser.js';
+import { Gedcom551Parser } from '../../../../src/modules/gedcom-import/v5/parser.js';
 import {
     GedcomDiagnosticCode,
     GedcomDiagnosticSeverity,
-} from '../../../../src/modules/gedcom-import/gedcom-parser.types.js';
+} from '../../../../src/modules/gedcom-import/common/gedcom-parser.types.js';
 import type { DetectedGedcomFile } from '../../../../src/modules/gedcom-import/gedcom-file.types.js';
 
 const parser = new Gedcom551Parser();

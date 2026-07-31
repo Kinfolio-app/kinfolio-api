@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { isAsciiDigits } from '../../../../src/modules/gedcom-import/gedcom-character-utils.js';
+import { isAsciiDigits } from '../../../../src/modules/gedcom-import/common/gedcom-character-utils.js';
 
 describe('isAsciiDigits', () => {
     it.each(['0', '1234567890'])('accepts ASCII digits in %s', (value) => {

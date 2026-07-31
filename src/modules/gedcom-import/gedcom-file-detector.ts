@@ -1,4 +1,4 @@
-import { isAsciiDigits } from './gedcom-character-utils.js';
+import { isAsciiDigits } from './common/gedcom-character-utils.js';
 import {
     GedcomDetectionDiagnosticCode,
     type GedcomDetectionDiagnostic,

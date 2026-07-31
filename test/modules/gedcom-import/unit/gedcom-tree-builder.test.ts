@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
-import { buildGedcomTree } from '../../../../src/modules/gedcom-import/gedcom-tree-builder.js';
-import { GedcomDiagnosticCode } from '../../../../src/modules/gedcom-import/gedcom-parser.types.js';
+import { GedcomDiagnosticCode } from '../../../../src/modules/gedcom-import/common/gedcom-parser.types.js';
+import { buildGedcomTree } from '../../../../src/modules/gedcom-import/v5/tree-builder.js';
 
 describe('buildGedcomTree', () => {
     it('builds parent-child relationships across common line endings', () => {

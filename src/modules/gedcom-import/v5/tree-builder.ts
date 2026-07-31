@@ -1,42 +1,16 @@
-import { parseGedcomLine } from './gedcom-line-parser.js';
+import { parseGedcomLine } from './line-parser.js';
+import { splitGedcomLines } from '../common/gedcom-text-utils.js';
 import {
     GedcomDiagnosticCode,
     GedcomDiagnosticSeverity,
     type GedcomDiagnostic,
     type GedcomNode,
-} from './gedcom-parser.types.js';
+} from '../common/gedcom-parser.types.js';
 
 export type GedcomTreeBuildResult = {
     roots: GedcomNode[];
     diagnostics: GedcomDiagnostic[];
 };
-
-function splitGedcomText(content: string): string[] {
-    const lines: string[] = [];
-    let lineStart = 0;
-
-    for (let index = 0; index < content.length; index += 1) {
-        const character = content.charCodeAt(index);
-
-        if (character !== 0x0a && character !== 0x0d) {
-            continue;
-        }
-
-        lines.push(content.slice(lineStart, index));
-
-        if (character === 0x0d && content.charCodeAt(index + 1) === 0x0a) {
-            index += 1;
-        }
-
-        lineStart = index + 1;
-    }
-
-    if (lineStart < content.length) {
-        lines.push(content.slice(lineStart));
-    }
-
-    return lines;
-}
 
 function diagnostic(
     code: GedcomDiagnosticCode,
@@ -55,7 +29,7 @@ function diagnostic(
 }
 
 export function buildGedcomTree(content: string): GedcomTreeBuildResult {
-    const lines = splitGedcomText(content);
+    const lines = splitGedcomLines(content);
     const roots: GedcomNode[] = [];
     const stack: GedcomNode[] = [];
     const diagnostics: GedcomDiagnostic[] = [];

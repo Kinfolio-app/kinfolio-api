@@ -1,4 +1,4 @@
-import type { DetectedGedcomFile, SupportedGedcomVersion } from './gedcom-file.types.js';
+import type { DetectedGedcomFile, SupportedGedcomVersion } from '../gedcom-file.types.js';
 
 export type GedcomSourceLocation = {
     line: number;
@@ -61,10 +61,13 @@ export type GenealogicalCalendar =
 
 export type GenealogicalDatePoint = {
     calendar: GenealogicalCalendar;
+    calendarTag?: string | null;
     year: number;
     month: number | null;
+    monthTag?: string | null;
     day: number | null;
     epoch: 'common' | 'before_common';
+    epochTag?: string | null;
 };
 
 type GenealogicalSinglePointDate = {
@@ -139,6 +142,7 @@ export type NormalizedMediaFile = {
     path: string;
     mediaType: string | null;
     title: string | null;
+    extensions: NormalizedExtension[];
 };
 
 export type NormalizedMedia = {
@@ -208,7 +212,7 @@ export type NormalizedIdentifier = {
 };
 
 export type NormalizedIndividual = {
-    id: string;
+    id: string | null;
     names: NormalizedName[];
     sex: NormalizedSex | null;
     events: NormalizedEvent[];
@@ -234,7 +238,7 @@ export type NormalizedFamilyChild = {
 };
 
 export type NormalizedFamily = {
-    id: string;
+    id: string | null;
     partners: NormalizedFamilyPartner[];
     children: NormalizedFamilyChild[];
     events: NormalizedEvent[];
@@ -250,7 +254,7 @@ export type NormalizedRepositoryReference = {
 };
 
 export type NormalizedSource = {
-    id: string;
+    id: string | null;
     title: string | null;
     author: string | null;
     publication: string | null;
@@ -261,7 +265,7 @@ export type NormalizedSource = {
 };
 
 export type NormalizedRepository = {
-    id: string;
+    id: string | null;
     name: string | null;
     address: string | null;
     extensions: NormalizedExtension[];

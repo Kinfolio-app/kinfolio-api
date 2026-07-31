@@ -1,5 +1,24 @@
-import { parseGedcom551Date } from './gedcom-551-date-parser.js';
-import { isValidXref } from './gedcom-line-parser.js';
+import { parseGedcom551Date } from './date-parser.js';
+import { isValidXref } from './line-parser.js';
+import {
+    childNodes as children,
+    firstChild,
+    normalizeExtension as extension,
+    normalizeExtensions as extensions,
+    readContinuedText as readText,
+} from '../common/gedcom-node-utils.js';
+import {
+    addGedcomError as addError,
+    addGedcomWarning as addWarning,
+    hasGedcomErrors as hasErrors,
+    makeGedcomDiagnostic as makeDiagnostic,
+    validateMaximumCardinality as validateCardinality,
+} from '../common/gedcom-diagnostic-utils.js';
+import {
+    FAMILY_EVENT_TAGS,
+    INDIVIDUAL_ATTRIBUTE_TAGS,
+    INDIVIDUAL_EVENT_TAGS,
+} from '../common/gedcom-structure-constants.js';
 import {
     GedcomDiagnosticCode,
     GedcomDiagnosticSeverity,
@@ -10,7 +29,6 @@ import {
     type GenealogicalDate,
     type NormalizedAttribute,
     type NormalizedEvent,
-    type NormalizedExtension,
     type NormalizedFamily,
     type NormalizedGedcomDocument,
     type NormalizedIndividual,
@@ -24,9 +42,9 @@ import {
     type NormalizedRepository,
     type NormalizedSource,
     type NormalizedSourceCitation,
-} from './gedcom-parser.types.js';
-import { buildGedcomTree } from './gedcom-tree-builder.js';
-import type { DetectedGedcomFile, SupportedGedcomVersion } from './gedcom-file.types.js';
+} from '../common/gedcom-parser.types.js';
+import { buildGedcomTree } from './tree-builder.js';
+import type { DetectedGedcomFile, SupportedGedcomVersion } from '../gedcom-file.types.js';
 
 const RECORD_TAGS_REQUIRING_IDENTIFIER = new Set([
     'INDI',
@@ -39,156 +57,10 @@ const RECORD_TAGS_REQUIRING_IDENTIFIER = new Set([
     'SUBN',
 ]);
 
-const INDIVIDUAL_EVENT_TAGS = new Set([
-    'BIRT',
-    'CHR',
-    'DEAT',
-    'BURI',
-    'CREM',
-    'ADOP',
-    'BAPM',
-    'BARM',
-    'BASM',
-    'BLES',
-    'CHRA',
-    'CONF',
-    'FCOM',
-    'ORDN',
-    'NATU',
-    'EMIG',
-    'IMMI',
-    'CENS',
-    'PROB',
-    'WILL',
-    'GRAD',
-    'RETI',
-    'EVEN',
-]);
-
-const INDIVIDUAL_ATTRIBUTE_TAGS = new Set([
-    'CAST',
-    'DSCR',
-    'EDUC',
-    'IDNO',
-    'NATI',
-    'NCHI',
-    'NMR',
-    'OCCU',
-    'PROP',
-    'RELI',
-    'RESI',
-    'SSN',
-    'TITL',
-    'FACT',
-]);
-
-const FAMILY_EVENT_TAGS = new Set([
-    'ANUL',
-    'CENS',
-    'DIV',
-    'DIVF',
-    'ENGA',
-    'MARB',
-    'MARC',
-    'MARL',
-    'MARR',
-    'RESI',
-    'EVEN',
-]);
-
 type ParserContext = {
     diagnostics: GedcomDiagnostic[];
     recordsById: Map<string, GedcomNode>;
 };
-
-function children(node: GedcomNode, tag: string): GedcomNode[] {
-    return node.children.filter((child) => child.tag === tag);
-}
-
-function firstChild(node: GedcomNode, tag: string): GedcomNode | null {
-    return node.children.find((child) => child.tag === tag) ?? null;
-}
-
-function readText(node: GedcomNode): string {
-    let text = node.value ?? '';
-
-    for (const child of node.children) {
-        if (child.tag === 'CONC') {
-            text += child.value ?? '';
-        } else if (child.tag === 'CONT') {
-            text += `\n${child.value ?? ''}`;
-        }
-    }
-
-    return text;
-}
-
-function makeDiagnostic(
-    severity: GedcomDiagnostic['severity'],
-    code: GedcomDiagnostic['code'],
-    message: string,
-    node: GedcomNode | null,
-    recordId: string | null = null,
-    path: string | null = null,
-): GedcomDiagnostic {
-    return {
-        severity,
-        code,
-        message,
-        location: node?.location ?? null,
-        recordId,
-        path,
-    };
-}
-
-function addError(
-    context: ParserContext,
-    code: GedcomDiagnostic['code'],
-    message: string,
-    node: GedcomNode | null,
-    recordId: string | null = null,
-    path: string | null = null,
-): void {
-    context.diagnostics.push(
-        makeDiagnostic(GedcomDiagnosticSeverity.Error, code, message, node, recordId, path),
-    );
-}
-
-function addWarning(
-    context: ParserContext,
-    code: GedcomDiagnostic['code'],
-    message: string,
-    node: GedcomNode | null,
-    recordId: string | null = null,
-    path: string | null = null,
-): void {
-    context.diagnostics.push(
-        makeDiagnostic(GedcomDiagnosticSeverity.Warning, code, message, node, recordId, path),
-    );
-}
-
-function extension(node: GedcomNode, path: string): NormalizedExtension {
-    return {
-        tag: node.tag,
-        uri: null,
-        value: node.value,
-        path,
-        location: node.location,
-        children: node.children.map((child, index) =>
-            extension(child, `${path}.${child.tag}[${index}]`),
-        ),
-    };
-}
-
-function extensions(
-    node: GedcomNode,
-    knownTags: ReadonlySet<string>,
-    path: string,
-): NormalizedExtension[] {
-    return node.children
-        .filter((child) => !knownTags.has(child.tag))
-        .map((child, index) => extension(child, `${path}.${child.tag}[${index}]`));
-}
 
 function pointerValue(
     node: GedcomNode,
@@ -212,27 +84,6 @@ function pointerValue(
     }
 
     return node.value;
-}
-
-function validateCardinality(
-    node: GedcomNode,
-    tag: string,
-    maximum: number,
-    context: ParserContext,
-    recordId: string | null,
-): void {
-    const matchingChildren = children(node, tag);
-
-    if (matchingChildren.length > maximum) {
-        addError(
-            context,
-            GedcomDiagnosticCode.InvalidCardinality,
-            `${tag} occurs ${matchingChildren.length} times but permits at most ${maximum}.`,
-            matchingChildren[maximum] ?? node,
-            recordId,
-            tag,
-        );
-    }
 }
 
 function parseDate(
@@ -316,10 +167,11 @@ function normalizeMedia(node: GedcomNode): NormalizedMedia {
         id: node.xref,
         files: fileNodes
             .filter((fileNode) => fileNode.value !== null)
-            .map((fileNode) => ({
+            .map((fileNode, index) => ({
                 path: fileNode.value ?? '',
                 mediaType: firstChild(fileNode, 'FORM')?.value ?? null,
                 title: firstChild(fileNode, 'TITL')?.value ?? null,
+                extensions: extensions(fileNode, new Set(['FORM', 'TITL']), `OBJE.FILE[${index}]`),
             })),
         title: firstChild(node, 'TITL')?.value ?? null,
         extensions: extensions(node, knownTags, 'OBJE'),
@@ -891,7 +743,9 @@ function validateReverseFamilyLinks(
                     context,
                     GedcomDiagnosticCode.InconsistentFamilyLink,
                     `${individual.id} references ${link.familyId} through FAMC but is not listed as CHIL.`,
-                    context.recordsById.get(individual.id) ?? null,
+                    individual.id === null
+                        ? null
+                        : (context.recordsById.get(individual.id) ?? null),
                     individual.id,
                     'FAMC',
                 );
@@ -909,17 +763,15 @@ function validateReverseFamilyLinks(
                     context,
                     GedcomDiagnosticCode.InconsistentFamilyLink,
                     `${individual.id} references ${familyId} through FAMS but is not listed as a partner.`,
-                    context.recordsById.get(individual.id) ?? null,
+                    individual.id === null
+                        ? null
+                        : (context.recordsById.get(individual.id) ?? null),
                     individual.id,
                     'FAMS',
                 );
             }
         }
     }
-}
-
-function hasErrors(diagnostics: GedcomDiagnostic[]): boolean {
-    return diagnostics.some((item) => item.severity === GedcomDiagnosticSeverity.Error);
 }
 
 export class Gedcom551Parser implements GedcomParser {
@@ -964,12 +816,21 @@ export class Gedcom551Parser implements GedcomParser {
         const individualRecords = tree.roots.filter((node) => node.tag === 'INDI');
         const individuals = individualRecords.map((node) => normalizeIndividual(node, context));
         const individualsById = new Map(
-            individuals.map((individual) => [individual.id, individual]),
+            individuals
+                .filter(
+                    (individual): individual is NormalizedIndividual & { id: string } =>
+                        individual.id !== null,
+                )
+                .map((individual) => [individual.id, individual]),
         );
         const families = tree.roots
             .filter((node) => node.tag === 'FAM')
             .map((node) => normalizeFamily(node, context, individualsById));
-        const familiesById = new Map(families.map((family) => [family.id, family]));
+        const familiesById = new Map(
+            families
+                .filter((family): family is NormalizedFamily & { id: string } => family.id !== null)
+                .map((family) => [family.id, family]),
+        );
         validateReverseFamilyLinks(individuals, familiesById, context);
 
         if (hasErrors(context.diagnostics)) {

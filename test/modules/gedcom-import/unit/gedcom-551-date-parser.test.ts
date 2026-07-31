@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { parseGedcom551Date } from '../../../../src/modules/gedcom-import/gedcom-551-date-parser.js';
+import { parseGedcom551Date } from '../../../../src/modules/gedcom-import/v5/date-parser.js';
 
 describe('parseGedcom551Date', () => {
     it('parses an exact partial Gregorian date', () => {

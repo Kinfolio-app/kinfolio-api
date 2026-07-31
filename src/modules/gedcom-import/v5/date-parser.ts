@@ -2,8 +2,13 @@ import type {
     GenealogicalCalendar,
     GenealogicalDate,
     GenealogicalDatePoint,
-} from './gedcom-parser.types.js';
-import { isAsciiDigits } from './gedcom-character-utils.js';
+} from '../common/gedcom-parser.types.js';
+import { isAsciiDigits } from '../common/gedcom-character-utils.js';
+import {
+    FRENCH_REPUBLICAN_MONTHS,
+    GREGORIAN_AND_JULIAN_MONTHS,
+    HEBREW_MONTHS,
+} from '../common/gedcom-calendar-constants.js';
 
 export type GedcomDateParseResult =
     | {
@@ -14,53 +19,6 @@ export type GedcomDateParseResult =
           success: false;
           message: string;
       };
-
-const GREGORIAN_AND_JULIAN_MONTHS = [
-    'JAN',
-    'FEB',
-    'MAR',
-    'APR',
-    'MAY',
-    'JUN',
-    'JUL',
-    'AUG',
-    'SEP',
-    'OCT',
-    'NOV',
-    'DEC',
-] as const;
-
-const HEBREW_MONTHS = [
-    'TSH',
-    'CSH',
-    'KSL',
-    'TVT',
-    'SHV',
-    'ADR',
-    'ADS',
-    'NSN',
-    'IYR',
-    'SVN',
-    'TMZ',
-    'AAV',
-    'ELL',
-] as const;
-
-const FRENCH_REPUBLICAN_MONTHS = [
-    'VEND',
-    'BRUM',
-    'FRIM',
-    'NIVO',
-    'PLUV',
-    'VENT',
-    'GERM',
-    'FLOR',
-    'PRAI',
-    'MESS',
-    'THER',
-    'FRUC',
-    'COMP',
-] as const;
 
 function failure(message: string): GedcomDateParseResult {
     return { success: false, message };
