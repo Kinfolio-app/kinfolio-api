@@ -108,21 +108,32 @@ qui disposent déjà d'un arbre contenant plusieurs milliers de personnes. La
 première version devra privilégier un import contrôlable et vérifiable plutôt
 qu'une prise en charge silencieuse et partielle du format.
 
-- [ ] Définir la version de GEDCOM prise en charge et le périmètre initial de
-      l'import : personnes, filiations, relations de couple, événements,
-      sources et médias.
-- [ ] Concevoir les modèles métier encore nécessaires à un import fidèle,
-      notamment les relations de couple.
-- [ ] Parser et valider un fichier sans modifier la base de données.
-- [ ] Fournir une prévisualisation avec les éléments reconnus, ignorés,
-      ambigus ou invalides.
+- [x] Définir les versions de GEDCOM prises en charge et le
+      [périmètre initial de l'import](domain/gedcom-import.md) : personnes,
+      filiations, relations de couple, événements, sources et médias,
+      conformément à l'[ADR 0010](adr/0010-support-gedcom-551-and-70-with-dedicated-parsers.md).
+- [x] Concevoir les modèles métier encore nécessaires à un import fidèle,
+      notamment les [relations de couple](domain/couple-relationships.md) et
+      les [dates généalogiques structurées](adr/0009-represent-genealogical-dates-as-structured-values.md).
+- [x] Définir le
+      [modèle GEDCOM intermédiaire normalisé et l'interface commune des parseurs](technical/gedcom-normalized-model.md).
+- [x] Détecter la
+      [version, le conteneur et l'encodage d'un fichier GEDCOM](technical/gedcom-file-detection.md).
+- [x] Parser et valider un fichier GEDCOM 5.5.1 sans modifier la base de
+      données, conformément à la
+      [note technique du parseur](technical/gedcom-551-parser.md).
+- [ ] Parser et valider un fichier GEDCOM 7.0.x sans modifier la base de
+      données.
+- [ ] Fournir une prévisualisation commune aux deux versions avec les éléments
+      reconnus, ignorés, ambigus ou invalides.
 - [ ] Définir les correspondances entre les individus et familles GEDCOM et
       les personnes et relations Kinfolio.
 - [ ] Définir la stratégie de détection des doublons, de réimport et
       d'idempotence.
 - [ ] Réaliser l'import de manière transactionnelle avec un rapport final.
-- [ ] Ajouter des tests avec des fichiers synthétiques et un graphe réel
-      volumineux préalablement anonymisé.
+- [ ] Ajouter des tests pour les deux versions avec des fichiers synthétiques,
+      des exports représentatifs anonymisés et un graphe réel volumineux
+      préalablement anonymisé.
 - [ ] Mesurer les performances et la consommation mémoire sur un arbre de
       plusieurs milliers de personnes.
 
