@@ -48,6 +48,20 @@ export class ConflictError extends AppError {
     }
 }
 
+export class PayloadTooLargeError extends AppError {
+    constructor({ detail, cause }: HttpError) {
+        super({
+            type: 'about:blank',
+            title: 'Payload Too Large',
+            status: HttpStatus.PayloadTooLarge,
+            detail,
+            cause,
+        });
+
+        this.name = 'PayloadTooLargeError';
+    }
+}
+
 export class InternalServerError extends AppError {
     constructor(cause?: unknown) {
         super({

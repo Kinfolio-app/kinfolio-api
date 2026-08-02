@@ -5,5 +5,6 @@ export const HttpStatus = {
     BadRequest: 400,
     NotFound: 404,
     Conflict: 409,
+    PayloadTooLarge: 413,
     InternalServerError: 500,
 } as const;

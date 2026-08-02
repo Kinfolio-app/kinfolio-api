@@ -1,6 +1,10 @@
 import type { FastifyPluginCallback } from 'fastify';
 import { AppError } from '../shared/errors/app-error.js';
-import { BadRequestError, InternalServerError } from '../shared/errors/http-error.js';
+import {
+    BadRequestError,
+    InternalServerError,
+    PayloadTooLargeError,
+} from '../shared/errors/http-error.js';
 import { HttpStatus } from '../shared/http/http-status.js';
 import { MediaType } from '../shared/http/media-type.js';
 import fastifyPlugin from 'fastify-plugin';
@@ -13,6 +17,12 @@ function isFastifyValidationError(error: unknown): error is FastifyValidationErr
     return error instanceof Error && 'validation' in error && error.validation !== undefined;
 }
 
+function isRequestFileTooLarge(
+    error: unknown,
+): error is Error & { code: 'FST_REQ_FILE_TOO_LARGE' } {
+    return error instanceof Error && 'code' in error && error.code === 'FST_REQ_FILE_TOO_LARGE';
+}
+
 export function normalizeError(error: unknown): AppError {
     if (error instanceof AppError) {
         return error;
@@ -21,6 +31,13 @@ export function normalizeError(error: unknown): AppError {
     if (isFastifyValidationError(error)) {
         return new BadRequestError({
             detail: 'The request is invalid.',
+            cause: error,
+        });
+    }
+
+    if (isRequestFileTooLarge(error)) {
+        return new PayloadTooLargeError({
+            detail: 'The GEDCOM file exceeds the maximum allowed size.',
             cause: error,
         });
     }
