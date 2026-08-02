@@ -125,8 +125,9 @@ qu'une prise en charge silencieuse et partielle du format.
 - [x] Parser et valider un fichier GEDCOM 7.0.x sans modifier la base de
       données, conformément à la
       [note technique du parseur](technical/gedcom-7-parser.md).
-- [ ] Fournir une prévisualisation commune aux deux versions avec les éléments
-      reconnus, ignorés, ambigus ou invalides.
+- [x] Fournir une
+      [analyse commune aux deux versions](technical/gedcom-import-analysis.md)
+      avec les éléments reconnus, ignorés, ambigus ou invalides.
 - [ ] Définir les correspondances entre les individus et familles GEDCOM et
       les personnes et relations Kinfolio.
 - [ ] Définir la stratégie de détection des doublons, de réimport et

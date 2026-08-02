@@ -8,7 +8,7 @@ Ce modèle permet de séparer trois responsabilités :
 - comprendre la syntaxe et les règles propres à chaque version de GEDCOM ;
 - conserver les informations reconnues sans les adapter prématurément à
   Kinfolio ;
-- préparer la validation, la prévisualisation et les correspondances vers le
+- préparer la validation, l'analyse et les correspondances vers le
   domaine Kinfolio.
 
 Le modèle est temporaire. Il existe pendant l'analyse et l'import d'un fichier,
@@ -293,14 +293,14 @@ type NormalizedPlace = {
 ```
 
 La première correspondance Kinfolio peut n'utiliser que `value`, mais les
-autres composantes restent disponibles dans la prévisualisation et pour les
+autres composantes restent disponibles dans l'analyse et pour les
 évolutions futures.
 
 ## Sources, dépôts, notes et médias
 
 Ces éléments sont normalisés même lorsqu'ils ne sont pas encore persistés dans
 Kinfolio. Cette représentation permet de les compter, de vérifier leurs
-références et d'expliquer leur traitement dans la prévisualisation.
+références et d'expliquer leur traitement dans l'analyse.
 
 ```ts
 type NormalizedSource = {
@@ -399,7 +399,7 @@ rester absent.
 
 Une structure inconnue n'est pas automatiquement invalide. Elle est conservée
 avec sa position et sera classée comme reconnue, ignorée ou ambiguë par la
-prévisualisation.
+[analyse commune](gedcom-import-analysis.md).
 
 ## Diagnostics
 
@@ -485,7 +485,7 @@ arbre syntaxique brut
     v
 document GEDCOM normalisé + diagnostics
     |
-    +--> prévisualisation
+    +--> analyse
     +--> correspondances Kinfolio
     +--> détection des doublons
     +--> import transactionnel
@@ -519,4 +519,5 @@ Le document normalisé décrit ce que contient le fichier. Il ne décide pas :
 
 Ces décisions appartiennent au service de correspondance et au plan d'import.
 Cette frontière permet de tester les parseurs sans PostgreSQL et de réutiliser
-la même prévisualisation pour GEDCOM 5.5.1 et GEDCOM 7.0.x.
+la même [analyse](gedcom-import-analysis.md) pour GEDCOM 5.5.1 et
+GEDCOM 7.0.x.

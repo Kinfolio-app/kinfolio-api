@@ -113,8 +113,8 @@ Les premières correspondances d'événements sont :
 | `EVEN` avec un type de séparation reconnu               | `separation`  |
 | autre événement familial pris en charge mais non classé | `other`       |
 
-Les événements GEDCOM hors du périmètre initial sont comptabilisés dans la
-prévisualisation. Ils ne sont pas transformés silencieusement en `other` si
+Les événements GEDCOM hors du périmètre initial sont comptabilisés dans
+l'analyse. Ils ne sont pas transformés silencieusement en `other` si
 leur sens est inconnu ou ambigu.
 
 GEDCOM 5.5.1 emploie historiquement les noms `HUSB` et `WIFE`. Leur présence ne

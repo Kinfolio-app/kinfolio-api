@@ -167,7 +167,7 @@ Le détecteur ne gère pas :
 - la grammaire GEDCOM complète ;
 - les références entre enregistrements ;
 - les tags propriétaires ;
-- la prévisualisation du contenu ;
+- l'analyse du contenu ;
 - l'import en base de données.
 
 Ces responsabilités sont prises en charge par les étapes suivantes du pipeline

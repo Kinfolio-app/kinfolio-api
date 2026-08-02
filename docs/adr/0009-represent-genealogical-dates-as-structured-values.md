@@ -110,7 +110,7 @@ ne sont pas converties silencieusement en mois grégoriens.
 valeur principale lorsque `kind` vaut `phrase`.
 
 `originalText` conserve, lorsqu'elle existe, la représentation reçue de la
-source. Elle sert à l'audit et à la prévisualisation, mais la logique métier ne
+source. Elle sert à l'audit et à l'analyse, mais la logique métier ne
 doit pas l'analyser de nouveau pour retrouver la sémantique déjà présente dans
 les champs structurés.
 

@@ -96,10 +96,11 @@ les cibles absentes ou incompatibles, les dates et les incohérences familiales.
 Une erreur empêche la production du document ; un avertissement laisse le
 document disponible.
 
-Cette étape ne comprend pas encore :
+Le classement des extensions conservées est réalisé par la
+[analyse commune](gedcom-import-analysis.md). Les responsabilités
+suivantes restent hors du parseur GEDCOM 7 :
 
 - GEDZIP et l'extraction des fichiers médias ;
-- la prévisualisation commune ;
 - la correspondance avec les entités Kinfolio ;
 - la détection des doublons et le réimport ;
 - la persistance transactionnelle.

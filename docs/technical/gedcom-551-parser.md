@@ -73,12 +73,11 @@ type de pointeur.
 Les sous-structures non normalisées sont conservées comme extensions avec leur
 valeur, leur position et leurs enfants. Elles ne sont ni interprétées ni
 supprimées silencieusement. Leur classement détaillé comme reconnu, ignoré ou
-ambigu appartient à l'étape de prévisualisation.
+ambigu appartient à la
+[analyse commune](gedcom-import-analysis.md), après le parsing.
 
-Ce point de la roadmap ne comprend pas encore :
+Les responsabilités suivantes restent hors du parseur GEDCOM 5.5.1 :
 
-- le parseur GEDCOM 7.0.x ;
-- la prévisualisation commune ;
 - la correspondance avec les entités Kinfolio ;
 - la détection des doublons et le réimport ;
 - la persistance transactionnelle ;

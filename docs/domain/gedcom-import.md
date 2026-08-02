@@ -92,14 +92,18 @@ Le contrat et les diagnostics sont détaillés dans la
 | Filiations          | Importées sous forme de relations parent-enfant, avec une correspondance prudente de `PEDI`                        |
 | Relations de couple | Importées après la conception du modèle métier Kinfolio correspondant                                              |
 | Événements          | Naissance, décès, mariage et divorce importés ; les autres événements sont reconnus et signalés comme non importés |
-| Sources             | Analysées et comptabilisées dans la prévisualisation, mais non persistées tant que leur modèle métier n'existe pas |
+| Sources             | Analysées et comptabilisées, mais non persistées tant que leur modèle métier n'existe pas                          |
 | Médias              | Références analysées et comptabilisées, mais fichiers et références non persistés dans la première version         |
 | Extensions          | Détectées et présentées comme reconnues, ambiguës ou ignorées ; jamais interprétées silencieusement                |
 
 Un fichier peut être valide tout en contenant des éléments hors périmètre.
-Ceux-ci ne doivent pas provoquer une perte silencieuse : la prévisualisation et
-le rapport final doivent indiquer leur quantité, leur emplacement et la raison
+Ceux-ci ne doivent pas provoquer une perte silencieuse : l'analyse et le
+rapport final doivent indiquer leur quantité, leur emplacement et la raison
 pour laquelle ils ne sont pas importés.
+
+Le contrat HTTP, les compteurs et les règles de classement actuellement
+appliquées sont détaillés dans la
+[note technique sur l'analyse](../technical/gedcom-import-analysis.md).
 
 ## Architecture de parsing
 
@@ -115,7 +119,7 @@ GedcomVersionDetector
         +-- Gedcom7Parser ----+--> NormalizedGedcomDocument
                                       |
                                       +--> validation métier
-                                      +--> prévisualisation
+                                      +--> analyse
                                       +--> correspondances Kinfolio
                                       +--> import transactionnel
 ```
@@ -133,7 +137,7 @@ Chaque parseur est responsable :
 - de la remontée des tags inconnus ou propriétaires sans les supprimer.
 
 Le document intermédiaire ne dépend pas de GEDCOM 5.5.1 ou 7. Il permet
-d'appliquer une seule fois les validations métier, la prévisualisation, la
+d'appliquer une seule fois les validations métier, l'analyse, la
 détection des doublons et l'import transactionnel.
 
 Cette séparation doit rester explicite : une différence entre les deux normes
@@ -147,6 +151,8 @@ L'implémentation et les limites propres à la première version sont détaillé
 dans la [note sur le parseur GEDCOM 5.5.1](../technical/gedcom-551-parser.md).
 Les écarts de syntaxe et de structure de la version moderne sont détaillés dans
 la [note sur le parseur GEDCOM 7](../technical/gedcom-7-parser.md).
+Le contrat commun exposé après la sélection du parseur est détaillé dans la
+[note sur l'analyse d'un import](../technical/gedcom-import-analysis.md).
 
 ## Mise à jour de ce document
 

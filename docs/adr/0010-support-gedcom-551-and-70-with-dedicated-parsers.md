@@ -61,7 +61,7 @@ deux spécifications est établie et testée.
 Les deux implémentations produisent le même document GEDCOM intermédiaire. Son
 contrat est défini dans la
 [note technique sur le modèle normalisé](../technical/gedcom-normalized-model.md).
-La prévisualisation, les correspondances vers Kinfolio, la détection des
+L'analyse, les correspondances vers Kinfolio, la détection des
 doublons et l'import transactionnel ne dépendent ainsi d'aucune version GEDCOM.
 
 GEDCOM 5.5 et les versions antérieures ne font pas partie du contrat initial.
@@ -111,8 +111,8 @@ GEDCOM 7.
 
 Une conversion préalable permettrait de n'écrire qu'un parseur sémantique, mais
 la conversion elle-même devrait comprendre et valider entièrement GEDCOM 5.5.1.
-Elle pourrait également modifier ou perdre des informations avant la
-prévisualisation, ce qui rendrait les diagnostics moins transparents.
+Elle pourrait également modifier ou perdre des informations avant l'analyse,
+ce qui rendrait les diagnostics moins transparents.
 
 ### Utiliser un parseur unique avec des conditions de version
 
