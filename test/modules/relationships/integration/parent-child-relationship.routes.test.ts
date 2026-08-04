@@ -3,7 +3,10 @@ import type { FastifyInstance } from 'fastify';
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest';
 import { buildApp } from '../../../../src/app.js';
 import { loadConfig } from '../../../../src/config/env.js';
-import { ParentChildRelationshipType } from '../../../../src/modules/relationships/parent-child-relationship.types.js';
+import {
+    ParentChildRelationshipEvidenceStatus,
+    ParentChildRelationshipType,
+} from '../../../../src/modules/relationships/parent-child-relationship.types.js';
 import { HttpStatus } from '../../../../src/shared/http/http-status.js';
 import { MediaType } from '../../../../src/shared/http/media-type.js';
 
@@ -60,6 +63,7 @@ describe('ParentChildRelationshipRoute integration', () => {
         parentId: string,
         childId: string,
         relationshipType?: ParentChildRelationshipType,
+        evidenceStatus?: ParentChildRelationshipEvidenceStatus,
     ): Promise<InjectResponse> {
         return app.inject({
             method: 'POST',
@@ -68,6 +72,7 @@ describe('ParentChildRelationshipRoute integration', () => {
                 parentId,
                 childId,
                 ...(relationshipType === undefined ? {} : { relationshipType }),
+                ...(evidenceStatus === undefined ? {} : { evidenceStatus }),
             },
         });
     }
@@ -90,37 +95,45 @@ describe('ParentChildRelationshipRoute integration', () => {
         await app.close();
     });
 
-    it('creates and returns a parent-child relationship', async () => {
-        const parent = await createPerson('Alice');
-        const child = await createPerson('Bob');
+    it.each([
+        ParentChildRelationshipEvidenceStatus.Proven,
+        ParentChildRelationshipEvidenceStatus.Challenged,
+    ])(
+        'creates and returns a parent-child relationship with %s evidence',
+        async (evidenceStatus) => {
+            const parent = await createPerson('Alice');
+            const child = await createPerson('Bob');
 
-        const createResponse = await createRelationship(
-            parent.id,
-            child.id,
-            ParentChildRelationshipType.Biological,
-        );
+            const createResponse = await createRelationship(
+                parent.id,
+                child.id,
+                ParentChildRelationshipType.Biological,
+                evidenceStatus,
+            );
 
-        expect(createResponse.statusCode).toBe(HttpStatus.Created);
-        expect(createResponse.json()).toEqual({
-            id: expect.any(String),
-            parentId: parent.id,
-            childId: child.id,
-            relationshipType: ParentChildRelationshipType.Biological,
-            createdAt: expect.any(String),
-            updatedAt: expect.any(String),
-        });
+            expect(createResponse.statusCode).toBe(HttpStatus.Created);
+            expect(createResponse.json()).toEqual({
+                id: expect.any(String),
+                parentId: parent.id,
+                childId: child.id,
+                relationshipType: ParentChildRelationshipType.Biological,
+                evidenceStatus,
+                createdAt: expect.any(String),
+                updatedAt: expect.any(String),
+            });
 
-        const relationship = createResponse.json();
-        const getResponse = await app.inject({
-            method: 'GET',
-            url: `/parent-child-relationships/${relationship.id}`,
-        });
+            const relationship = createResponse.json();
+            const getResponse = await app.inject({
+                method: 'GET',
+                url: `/parent-child-relationships/${relationship.id}`,
+            });
 
-        expect(getResponse.statusCode).toBe(HttpStatus.Ok);
-        expect(getResponse.json()).toEqual(relationship);
-    });
+            expect(getResponse.statusCode).toBe(HttpStatus.Ok);
+            expect(getResponse.json()).toEqual(relationship);
+        },
+    );
 
-    it('uses unspecified as the default relationship type', async () => {
+    it('uses unspecified and unassessed as defaults', async () => {
         const parent = await createPerson('Alice');
         const child = await createPerson('Bob');
 
@@ -129,6 +142,7 @@ describe('ParentChildRelationshipRoute integration', () => {
         expect(response.statusCode).toBe(HttpStatus.Created);
         expect(response.json()).toMatchObject({
             relationshipType: ParentChildRelationshipType.Unspecified,
+            evidenceStatus: ParentChildRelationshipEvidenceStatus.Unassessed,
         });
     });
 
@@ -315,6 +329,14 @@ describe('ParentChildRelationshipRoute integration', () => {
                 parentId: randomUUID(),
                 childId: randomUUID(),
                 relationshipType: 'missing',
+            },
+        },
+        {
+            name: 'an invalid evidence status',
+            payload: {
+                parentId: randomUUID(),
+                childId: randomUUID(),
+                evidenceStatus: 'missing',
             },
         },
         {

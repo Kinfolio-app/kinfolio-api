@@ -1,6 +1,9 @@
 import Type from 'typebox';
 import { createCollectionResponseSchema } from '../../shared/http/collection-response.js';
-import { ParentChildRelationshipType } from './parent-child-relationship.types.js';
+import {
+    ParentChildRelationshipEvidenceStatus,
+    ParentChildRelationshipType,
+} from './parent-child-relationship.types.js';
 
 const ParentChildRelationshipTypeSchema = Type.Union([
     Type.Literal(ParentChildRelationshipType.Biological),
@@ -11,11 +14,18 @@ const ParentChildRelationshipTypeSchema = Type.Union([
     Type.Literal(ParentChildRelationshipType.Unspecified),
 ]);
 
+const ParentChildRelationshipEvidenceStatusSchema = Type.Union([
+    Type.Literal(ParentChildRelationshipEvidenceStatus.Unassessed),
+    Type.Literal(ParentChildRelationshipEvidenceStatus.Proven),
+    Type.Literal(ParentChildRelationshipEvidenceStatus.Challenged),
+]);
+
 export const CreateParentChildRelationshipDtoSchema = Type.Object(
     {
         parentId: Type.String({ format: 'uuid' }),
         childId: Type.String({ format: 'uuid' }),
         relationshipType: Type.Optional(ParentChildRelationshipTypeSchema),
+        evidenceStatus: Type.Optional(ParentChildRelationshipEvidenceStatusSchema),
     },
     {
         additionalProperties: false,
@@ -72,6 +82,7 @@ export const ParentChildRelationshipResponseDtoSchema = Type.Object(
         parentId: Type.String({ format: 'uuid' }),
         childId: Type.String({ format: 'uuid' }),
         relationshipType: ParentChildRelationshipTypeSchema,
+        evidenceStatus: ParentChildRelationshipEvidenceStatusSchema,
         createdAt: Type.String({ format: 'date-time' }),
         updatedAt: Type.String({ format: 'date-time' }),
     },

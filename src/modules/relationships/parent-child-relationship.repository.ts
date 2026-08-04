@@ -6,6 +6,7 @@ import {
 } from './parent-child-relationship.error.js';
 import type { CreateParentChildRelationshipDto } from './parent-child-relationship.schema.js';
 import {
+    ParentChildRelationshipEvidenceStatus,
     ParentChildRelationshipType,
     type ParentChildRelationship,
 } from './parent-child-relationship.types.js';
@@ -17,6 +18,7 @@ type ParentChildRelationshipRow = {
     parent_id: string;
     child_id: string;
     relationship_type: ParentChildRelationshipType;
+    evidence_status: ParentChildRelationshipEvidenceStatus;
     created_at: Date;
     updated_at: Date;
 };
@@ -40,6 +42,7 @@ function mapParentChildRelationshipRow(row: ParentChildRelationshipRow): ParentC
         parentId: row.parent_id,
         childId: row.child_id,
         relationshipType: row.relationship_type,
+        evidenceStatus: row.evidence_status,
         createdAt: row.created_at,
         updatedAt: row.updated_at,
     };
@@ -98,14 +101,16 @@ export class ParentChildRelationshipRepository {
                 `INSERT INTO parent_child_relationships (
                     parent_id,
                     child_id,
-                    relationship_type
+                    relationship_type,
+                    evidence_status
                 )
-                VALUES ($1, $2, $3)
+                VALUES ($1, $2, $3, $4)
                 RETURNING *`,
                 [
                     relationship.parentId,
                     relationship.childId,
                     relationship.relationshipType ?? ParentChildRelationshipType.Unspecified,
+                    relationship.evidenceStatus ?? ParentChildRelationshipEvidenceStatus.Unassessed,
                 ],
             );
             const row = rows[0];

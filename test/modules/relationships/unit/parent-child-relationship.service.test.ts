@@ -8,6 +8,7 @@ import {
 } from '../../../../src/modules/relationships/parent-child-relationship.error.js';
 import { ParentChildRelationshipService } from '../../../../src/modules/relationships/parent-child-relationship.service.js';
 import {
+    ParentChildRelationshipEvidenceStatus,
     ParentChildRelationshipType,
     type ParentChildRelationship,
 } from '../../../../src/modules/relationships/parent-child-relationship.types.js';
@@ -20,6 +21,7 @@ const relationship: ParentChildRelationship = {
     parentId,
     childId,
     relationshipType: ParentChildRelationshipType.Biological,
+    evidenceStatus: ParentChildRelationshipEvidenceStatus.Unassessed,
     createdAt: new Date('2026-07-29T10:00:00.000Z'),
     updatedAt: new Date('2026-07-29T10:00:00.000Z'),
 };
@@ -35,7 +37,11 @@ function createRepository() {
 describe('ParentChildRelationshipService', () => {
     it('creates a parent-child relationship', async () => {
         const repository = createRepository();
-        repository.create.mockResolvedValue(relationship);
+        const provenRelationship = {
+            ...relationship,
+            evidenceStatus: ParentChildRelationshipEvidenceStatus.Proven,
+        };
+        repository.create.mockResolvedValue(provenRelationship);
         const service = new ParentChildRelationshipService(repository);
 
         await expect(
@@ -43,8 +49,15 @@ describe('ParentChildRelationshipService', () => {
                 parentId,
                 childId,
                 relationshipType: ParentChildRelationshipType.Biological,
+                evidenceStatus: ParentChildRelationshipEvidenceStatus.Proven,
             }),
-        ).resolves.toEqual(relationship);
+        ).resolves.toEqual(provenRelationship);
+        expect(repository.create).toHaveBeenCalledWith({
+            parentId,
+            childId,
+            relationshipType: ParentChildRelationshipType.Biological,
+            evidenceStatus: ParentChildRelationshipEvidenceStatus.Proven,
+        });
     });
 
     it('rejects a self relationship without querying the repository', async () => {
