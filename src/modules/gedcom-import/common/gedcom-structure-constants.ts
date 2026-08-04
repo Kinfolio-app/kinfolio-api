@@ -51,6 +51,7 @@ export const FAMILY_EVENT_TAGS = new Set([
     'MARC',
     'MARL',
     'MARR',
+    'MARS',
     'RESI',
     'EVEN',
 ]);

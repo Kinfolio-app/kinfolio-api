@@ -74,6 +74,7 @@ function validLines(): string[] {
         '2 DATE 1920',
         '2 HUSB',
         '3 AGE 20',
+        '1 MARS',
         '0 TRLR',
     ];
 }
@@ -123,6 +124,7 @@ describe('Gedcom7Parser', () => {
                 { individualId: '@I1@', sourceRole: 'wife' },
             ],
             children: [{ individualId: '@I3@', pedigree: 'BIRTH' }],
+            events: [{ tag: 'MARR' }, { tag: 'MARS' }],
         });
         expect(result.document?.sharedNotes[0]).toMatchObject({
             id: '@N1@',

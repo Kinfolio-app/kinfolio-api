@@ -56,6 +56,7 @@ function validDocumentLines(): string[] {
         '2 PLAC Paris, France',
         '2 HUSB',
         '3 AGE 20',
+        '1 MARS',
         '0 TRLR',
     ];
 }
@@ -99,7 +100,7 @@ describe('Gedcom551Parser', () => {
                 { individualId: '@I1@', sourceRole: 'wife' },
             ],
             children: [{ individualId: '@I3@', pedigree: 'birth' }],
-            events: [{ tag: 'MARR', date: { first: { year: 1920 } } }],
+            events: [{ tag: 'MARR', date: { first: { year: 1920 } } }, { tag: 'MARS' }],
         });
     });
 
