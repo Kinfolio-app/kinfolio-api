@@ -17,6 +17,10 @@ Elle permet au client de connaître :
 L'analyse ne réalise ni correspondance avec les entités Kinfolio, ni
 détection de doublons, ni écriture en base de données.
 
+Lorsque l'analyse et le parsing ont produit un document normalisé valide, la
+projection vers un plan d'import est décrite par la
+[note sur les correspondances GEDCOM vers Kinfolio](gedcom-to-kinfolio-mapping.md).
+
 ## Contrat HTTP
 
 La route `POST /gedcom-imports/analysis` accepte une requête

@@ -14,6 +14,10 @@ Ce modèle permet de séparer trois responsabilités :
 Le modèle est temporaire. Il existe pendant l'analyse et l'import d'un fichier,
 mais ne constitue pas un schéma de base de données.
 
+Les règles qui sélectionnent et transforment ensuite ces données sont décrites
+séparément dans la
+[note sur les correspondances GEDCOM vers Kinfolio](gedcom-to-kinfolio-mapping.md).
+
 ## Principes
 
 Le modèle intermédiaire :

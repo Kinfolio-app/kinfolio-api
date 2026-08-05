@@ -104,6 +104,9 @@ pour laquelle ils ne sont pas importés.
 Le contrat HTTP, les compteurs et les règles de classement actuellement
 appliquées sont détaillés dans la
 [note technique sur l'analyse](../technical/gedcom-import-analysis.md).
+Les choix qui transforment ensuite le document normalisé en personnes,
+filiations, relations et événements Kinfolio sont définis dans la
+[note technique sur les correspondances](../technical/gedcom-to-kinfolio-mapping.md).
 
 ## Architecture de parsing
 
@@ -153,6 +156,8 @@ Les écarts de syntaxe et de structure de la version moderne sont détaillés da
 la [note sur le parseur GEDCOM 7](../technical/gedcom-7-parser.md).
 Le contrat commun exposé après la sélection du parseur est détaillé dans la
 [note sur l'analyse d'un import](../technical/gedcom-import-analysis.md).
+La projection métier commune aux deux versions est détaillée dans la
+[note sur les correspondances GEDCOM vers Kinfolio](../technical/gedcom-to-kinfolio-mapping.md).
 
 ## Mise à jour de ce document
 

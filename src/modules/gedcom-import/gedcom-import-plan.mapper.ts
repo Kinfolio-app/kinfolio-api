@@ -1085,19 +1085,116 @@ function createPlannedCoupleRelationshipEvents(
     return { events, issues };
 }
 
-export function createGedcomImportPlan(
-    document: NormalizedGedcomDocument | null,
-): GedcomImportPlan {
-    if (document === null) {
-        return {
-            people: [],
-            parentChildRelationships: [],
-            coupleRelationships: [],
-            coupleRelationshipEvents: [],
-            issues: [],
-        };
-    }
+type ExtensionWithProvenance = {
+    extension: NormalizedExtension;
+    gedcomId: string | null;
+};
 
+function appendExtensionsWithProvenance(
+    target: ExtensionWithProvenance[],
+    extensions: NormalizedExtension[],
+    gedcomId: string | null,
+): void {
+    extensions.forEach((extension) => {
+        target.push({ extension, gedcomId });
+        appendExtensionsWithProvenance(target, extension.children, gedcomId);
+    });
+}
+
+function collectDocumentLevelExtensions(
+    document: NormalizedGedcomDocument,
+): ExtensionWithProvenance[] {
+    const extensions: ExtensionWithProvenance[] = [];
+
+    appendExtensionsWithProvenance(extensions, document.extensions, null);
+    document.sources.forEach((source) => {
+        appendExtensionsWithProvenance(extensions, source.extensions, source.id);
+    });
+    document.repositories.forEach((repository) => {
+        appendExtensionsWithProvenance(extensions, repository.extensions, repository.id);
+    });
+    document.sharedNotes.forEach((note) => {
+        appendExtensionsWithProvenance(extensions, note.extensions, note.id);
+    });
+    document.media.forEach((media) => {
+        appendExtensionsWithProvenance(extensions, media.extensions, media.id);
+        media.files.forEach((file) => {
+            appendExtensionsWithProvenance(extensions, file.extensions, media.id);
+        });
+    });
+
+    return extensions;
+}
+
+function createDocumentLevelIssues(document: NormalizedGedcomDocument): GedcomMappingIssue[] {
+    const issues: GedcomMappingIssue[] = [];
+    const unsupportedCollections = [
+        {
+            count: document.sources.length,
+            code: GedcomMappingIssueCode.UnsupportedSources,
+            message: 'GEDCOM source records are not imported.',
+            path: 'sources',
+        },
+        {
+            count: document.repositories.length,
+            code: GedcomMappingIssueCode.UnsupportedRepositories,
+            message: 'GEDCOM repository records are not imported.',
+            path: 'repositories',
+        },
+        {
+            count: document.sharedNotes.length,
+            code: GedcomMappingIssueCode.UnsupportedNotes,
+            message: 'GEDCOM shared note records are not imported.',
+            path: 'sharedNotes',
+        },
+        {
+            count: document.media.length,
+            code: GedcomMappingIssueCode.UnsupportedMedia,
+            message: 'GEDCOM media records are not imported.',
+            path: 'media',
+        },
+    ];
+
+    unsupportedCollections.forEach(({ count, code, message, path }) => {
+        if (count <= 0) return;
+
+        issues.push({
+            kind: GedcomMappingIssueKind.Ignored,
+            code,
+            message,
+            provenance: {
+                gedcomId: null,
+                path,
+            },
+            count,
+        });
+    });
+
+    collectDocumentLevelExtensions(document).forEach(({ extension, gedcomId }) => {
+        const hasResolvedUri = extension.uri !== null && extension.uri.trim().length > 0;
+
+        issues.push({
+            kind: hasResolvedUri
+                ? GedcomMappingIssueKind.Ignored
+                : GedcomMappingIssueKind.Ambiguous,
+            code: hasResolvedUri
+                ? GedcomMappingIssueCode.UnsupportedExtension
+                : GedcomMappingIssueCode.AmbiguousExtension,
+            message: hasResolvedUri
+                ? `Extension "${extension.tag}" is not imported.`
+                : `Extension "${extension.tag}" has no identifiable URI.`,
+            provenance: {
+                gedcomId,
+                path: extension.path,
+            },
+            count: 1,
+        });
+    });
+
+    return issues;
+}
+
+export function createGedcomImportPlan(document: NormalizedGedcomDocument): GedcomImportPlan {
     const issues: GedcomMappingIssue[] = [];
     const people: PlannedPerson[] = [];
     const parentChildRelationships: PlannedParentChildRelationship[] = [];
@@ -1146,6 +1243,7 @@ export function createGedcomImportPlan(
     });
 
     issues.push(...detectParentChildCycles(parentChildRelationships));
+    issues.push(...createDocumentLevelIssues(document));
 
     return {
         people,

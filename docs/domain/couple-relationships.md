@@ -103,19 +103,23 @@ mariage. Son traitement initial suit ces règles :
 
 Les premières correspondances d'événements sont :
 
-| GEDCOM                                                  | Kinfolio      |
-| ------------------------------------------------------- | ------------- |
-| `ENGA`                                                  | `engagement`  |
-| `MARR`                                                  | `marriage`    |
-| `DIV`                                                   | `divorce`     |
-| `ANUL`                                                  | `annulment`   |
-| `EVEN` avec un type d'union civile reconnu              | `civil_union` |
-| `EVEN` avec un type de séparation reconnu               | `separation`  |
-| autre événement familial pris en charge mais non classé | `other`       |
+| GEDCOM                                     | Kinfolio      |
+| ------------------------------------------ | ------------- |
+| `ENGA`                                     | `engagement`  |
+| `MARR`                                     | `marriage`    |
+| `DIV`                                      | `divorce`     |
+| `ANUL`                                     | `annulment`   |
+| `MARB`, `MARC`, `MARL`, `MARS`, `DIVF`     | `other`       |
+| `EVEN` avec un type d'union civile reconnu | `civil_union` |
+| `EVEN` avec un type de séparation reconnu  | `separation`  |
 
 Les événements GEDCOM hors du périmètre initial sont comptabilisés dans
 l'analyse. Ils ne sont pas transformés silencieusement en `other` si
 leur sens est inconnu ou ambigu.
+
+Les registres de valeurs `EVEN`, les règles de normalisation et les diagnostics
+sont détaillés dans la
+[note technique de correspondance](../technical/gedcom-to-kinfolio-mapping.md).
 
 GEDCOM 5.5.1 emploie historiquement les noms `HUSB` et `WIFE`. Leur présence ne
 doit pas écraser le genre déjà enregistré sur une personne ni empêcher de

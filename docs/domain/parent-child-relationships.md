@@ -10,7 +10,8 @@ Une relation est toujours orientée :
 
 - `parentId` identifie le parent ;
 - `childId` identifie l'enfant ;
-- `relationshipType` décrit la nature du lien.
+- `relationshipType` décrit la nature du lien ;
+- `evidenceStatus` décrit l'état de la preuve disponible.
 
 Les termes père, mère, fils et fille ne constituent pas des types de relation.
 L'API pourra les déterminer pour l'affichage à partir de la direction du lien
@@ -23,8 +24,8 @@ pour représenter les conjoints dans l'arbre familial. Elles devront utiliser un
 modèle distinct des liens parent-enfant afin de prendre en charge leur nature,
 leurs dates et leur éventuelle fin.
 
-Ce besoin est identifié, mais sa conception et son implémentation sont
-volontairement reportées après la première version des liens parent-enfant.
+Ce modèle distinct est décrit dans la
+[note métier sur les relations de couple](couple-relationships.md).
 
 ## Types pris en charge
 
@@ -41,6 +42,17 @@ volontairement reportées après la première version des liens parent-enfant.
 nature du lien est connue mais absente de la classification actuelle, tandis
 que `unspecified` indique que cette nature est inconnue.
 
+## État de la preuve
+
+| Valeur       | Signification                                                |
+| ------------ | ------------------------------------------------------------ |
+| `unassessed` | La preuve n'a pas été évaluée ou n'est pas renseignée.       |
+| `proven`     | Le fichier ou l'utilisateur déclare le lien comme prouvé.    |
+| `challenged` | Le lien existe dans le graphe, mais sa preuve est contestée. |
+
+L'état de la preuve ne remplace pas la nature de la relation. Une filiation
+peut par exemple être `adoptive` et `challenged`.
+
 ## Stockage
 
 Les relations sont stockées dans la table `parent_child_relationships` :
@@ -51,6 +63,7 @@ Les relations sont stockées dans la table `parent_child_relationships` :
 | `parent_id`         | Référence vers la personne qui joue le rôle parent. |
 | `child_id`          | Référence vers la personne qui joue le rôle enfant. |
 | `relationship_type` | Nature du lien, avec `unspecified` par défaut.      |
+| `evidence_status`   | État de la preuve, avec `unassessed` par défaut.    |
 | `created_at`        | Date de création de la relation.                    |
 | `updated_at`        | Date de dernière modification de la relation.       |
 
@@ -67,20 +80,25 @@ désigner une filiation génétique ou une relation sociale au moment de la
 naissance. Elle ne doit donc pas être automatiquement interprétée comme une
 filiation biologique.
 
-Un futur import GEDCOM appliquera par défaut les correspondances suivantes :
+L'import GEDCOM applique les correspondances prudentes suivantes :
 
-| GEDCOM                           | Kinfolio      |
-| -------------------------------- | ------------- |
-| `ADOPTED`                        | `adoptive`    |
-| `FOSTER`                         | `foster`      |
-| `BIRTH`                          | `unspecified` |
-| `OTHER` décrivant un beau-parent | `step`        |
-| autre valeur `OTHER`             | `other`       |
-| `SEALING`                        | `other`       |
-| valeur `PEDI` absente            | `unspecified` |
+| GEDCOM                | Kinfolio      |
+| --------------------- | ------------- |
+| `ADOPTED`             | `adoptive`    |
+| `FOSTER`              | `foster`      |
+| `BIRTH`               | `unspecified` |
+| `OTHER`               | `other`       |
+| `SEALING`             | `other`       |
+| valeur `PEDI` absente | `unspecified` |
 
 Une valeur `BIRTH` ne pourra devenir `biological` que si une autre information
 fiable permet de confirmer explicitement la filiation biologique.
+
+Le champ GEDCOM `STAT` est projeté séparément : absence vers `unassessed`,
+`PROVEN` vers `proven` et `CHALLENGED` vers `challenged`. Un lien `DISPROVEN`
+n'est pas planifié. Une valeur inconnue reste `unassessed` et produit une
+ambiguïté à résoudre. Les règles complètes et les diagnostics sont décrits dans
+la [note technique de correspondance](../technical/gedcom-to-kinfolio-mapping.md).
 
 La définition officielle de `PEDI` est disponible dans la
 [spécification FamilySearch GEDCOM 7](https://gedcom.io/specifications/FamilySearchGEDCOMv7.html).

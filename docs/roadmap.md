@@ -128,7 +128,7 @@ qu'une prise en charge silencieuse et partielle du format.
 - [x] Fournir une
       [analyse commune aux deux versions](technical/gedcom-import-analysis.md)
       avec les éléments reconnus, ignorés, ambigus ou invalides.
-- [ ] Définir les correspondances entre les individus et familles GEDCOM et
+- [x] Définir les correspondances entre les individus et familles GEDCOM et
       les personnes et relations Kinfolio.
 - [ ] Définir la stratégie de détection des doublons, de réimport et
       d'idempotence.

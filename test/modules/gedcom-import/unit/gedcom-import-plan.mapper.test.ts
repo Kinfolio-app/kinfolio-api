@@ -104,6 +104,7 @@ function createFamily(overrides: Partial<NormalizedFamily> = {}): NormalizedFami
 function createDocument(
     individuals: NormalizedIndividual[],
     families: NormalizedFamily[] = [],
+    overrides: Partial<NormalizedGedcomDocument> = {},
 ): NormalizedGedcomDocument {
     return {
         metadata: {
@@ -121,6 +122,7 @@ function createDocument(
         media: [],
         sharedNotes: [],
         extensions: [],
+        ...overrides,
     };
 }
 
@@ -1481,5 +1483,137 @@ describe('createGedcomImportPlan', () => {
             [GedcomMappingIssueCode.UnsupportedExtension, 1],
             [GedcomMappingIssueCode.AmbiguousExtension, 1],
         ]);
+    });
+
+    it('returns an empty plan for an empty normalized document', () => {
+        const plan = createGedcomImportPlan(createDocument([]));
+
+        expect(plan).toEqual({
+            people: [],
+            parentChildRelationships: [],
+            coupleRelationships: [],
+            coupleRelationshipEvents: [],
+            issues: [],
+        });
+    });
+
+    it('reports unsupported document records and their extensions in stable order', () => {
+        const documentExtension = createExtension('_DOCUMENT', 'extensions[0]', null);
+        const sourceExtension = createExtension(
+            '_SOURCE',
+            'sources[0].extensions[0]',
+            'https://example.com/source',
+        );
+        const fileExtension = createExtension(
+            '_FILE',
+            'media[0].files[0].extensions[0]',
+            'https://example.com/file',
+        );
+        const document = createDocument([], [], {
+            sources: [
+                {
+                    id: '@S1@',
+                    title: null,
+                    author: null,
+                    publication: null,
+                    repositoryReferences: [],
+                    noteReferences: [],
+                    mediaReferences: [],
+                    extensions: [sourceExtension],
+                },
+            ],
+            repositories: [
+                {
+                    id: '@R1@',
+                    name: null,
+                    address: null,
+                    extensions: [],
+                },
+            ],
+            sharedNotes: [
+                {
+                    id: '@N1@',
+                    text: 'Shared note',
+                    language: null,
+                    mediaType: null,
+                    extensions: [],
+                },
+            ],
+            media: [
+                {
+                    id: '@M1@',
+                    files: [
+                        {
+                            path: 'certificate.jpg',
+                            mediaType: 'image/jpeg',
+                            title: null,
+                            extensions: [fileExtension],
+                        },
+                    ],
+                    title: null,
+                    extensions: [],
+                },
+            ],
+            extensions: [documentExtension],
+        });
+
+        const firstPlan = createGedcomImportPlan(document);
+        const secondPlan = createGedcomImportPlan(document);
+
+        expect(secondPlan).toEqual(firstPlan);
+        expect(firstPlan.issues.map((issue) => [issue.code, issue.count])).toEqual([
+            [GedcomMappingIssueCode.UnsupportedSources, 1],
+            [GedcomMappingIssueCode.UnsupportedRepositories, 1],
+            [GedcomMappingIssueCode.UnsupportedNotes, 1],
+            [GedcomMappingIssueCode.UnsupportedMedia, 1],
+            [GedcomMappingIssueCode.AmbiguousExtension, 1],
+            [GedcomMappingIssueCode.UnsupportedExtension, 1],
+            [GedcomMappingIssueCode.UnsupportedExtension, 1],
+        ]);
+        expect(firstPlan.issues.slice(4).map((issue) => issue.provenance)).toEqual([
+            { gedcomId: null, path: 'extensions[0]' },
+            { gedcomId: '@S1@', path: 'sources[0].extensions[0]' },
+            { gedcomId: '@M1@', path: 'media[0].files[0].extensions[0]' },
+        ]);
+    });
+
+    it('reports mapped, ignored, ambiguous, and invalid document content together', () => {
+        const individuals = [
+            createIndividual({
+                id: '@I1@',
+                names: [createName({ value: 'Alice /Durand/' })],
+            }),
+            createIndividual({
+                id: '@I2@',
+                names: [createName({ value: 'Bob /Martin/' })],
+            }),
+            createIndividual({
+                id: '@I3@',
+                names: [createName({ value: '   ' })],
+            }),
+        ];
+        const family = createFamily({
+            id: '@F1@',
+            partners: [
+                { individualId: '@I1@', sourceRole: 'partner' },
+                { individualId: '@I2@', sourceRole: 'partner' },
+            ],
+            events: [createEvent('CENS')],
+        });
+        const document = createDocument(individuals, [family], {
+            extensions: [createExtension('_UNKNOWN', 'extensions[0]', null)],
+        });
+
+        const plan = createGedcomImportPlan(document);
+
+        expect(plan.people).toHaveLength(2);
+        expect(plan.coupleRelationships).toHaveLength(1);
+        expect(new Set(plan.issues.map((issue) => issue.kind))).toEqual(
+            new Set([
+                GedcomMappingIssueKind.Ignored,
+                GedcomMappingIssueKind.Ambiguous,
+                GedcomMappingIssueKind.Invalid,
+            ]),
+        );
     });
 });
