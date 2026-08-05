@@ -21,29 +21,50 @@ Avant d'implémenter les fonctionnalités de généalogie, le socle de l'API doi
       `GET /health`.
 - [x] Définir une gestion cohérente des erreurs de l'API.
 
+### Publication du contrat HTTP
+
+- [x] Publier le choix d'OpenAPI conformément à
+      l'[ADR 0011](adr/0011-publish-the-http-contract-as-openapi.md).
+- [ ] Générer le contrat OpenAPI depuis les schémas TypeBox avec
+      `@fastify/swagger`.
+- [ ] Compléter les routes avec des `operationId`, des tags et leurs réponses
+      d'erreur RFC 9457.
+- [ ] Décrire correctement les paramètres de collection, les réponses sans
+      contenu et le transfert des fichiers GEDCOM.
+- [ ] Ajouter une commande produisant un `openapi.json` déterministe.
+- [ ] Valider en CI que `openapi.json` est valide et à jour.
+- [ ] Publier le contrat avec les tags ou releases de Kinfolio API afin que les
+      clients puissent sélectionner une version immuable.
+- [ ] Vérifier la génération des types du client web avec
+      `openapi-typescript`.
+
 ## Phase 2 — Première tranche métier : les personnes
 
 La première fonctionnalité sera développée de manière verticale : schéma de
 base de données, accès aux données, logique métier, routes, validation et tests.
 
-### Modèle initial envisagé
+### Modèle actuel
 
-Créer une table `persons` contenant au minimum :
+La table `persons` contient actuellement :
 
 - `id` ;
 - `first_name` ;
 - `middle_names` ;
 - `last_name` ;
+- `birth_name` ;
 - `gender` ;
 - `birth_date` ;
 - `death_date` ;
 - `birth_place` ;
+- `death_place` ;
+- `living_status` ;
 - `biography` ;
+- `deleted_at` ;
 - `created_at` ;
 - `updated_at`.
 
-La liste exacte des champs et leurs contraintes seront revues avant la création
-de la migration.
+Ce modèle pourra encore évoluer avec la persistance des dates généalogiques
+structurées et les futurs contenus familiaux.
 
 ### Implémentation
 
@@ -67,21 +88,20 @@ et souvenirs associés à une personne.
 
 Une fois la gestion des personnes stabilisée, ajouter les relations familiales.
 
-Le modèle initial envisagé est une table `parent_child_relationships` contenant
-notamment :
+La table `parent_child_relationships` contient notamment :
 
 - `parent_id` ;
 - `child_id` ;
-- `relationship_type`.
+- `relationship_type` ;
+- `evidence_status`.
 
 Une table de relations distincte est préférée à des colonnes `father_id` et
 `mother_id` dans `persons`. Elle permet de représenter plus facilement les
 familles adoptives ou recomposées ainsi que les informations incomplètes.
 
-Les relations de couple seront également nécessaires pour représenter les
-conjoints, les mariages et les unions civiles. Elles utiliseront un modèle
-distinct, dont la conception est volontairement reportée après la première
-version des liens parent-enfant.
+Le [modèle métier des relations de couple](domain/couple-relationships.md) et
+leurs événements est défini séparément. Sa persistance et ses routes restent à
+implémenter avec les étapes qui en auront besoin.
 
 - [x] Préciser les différents types de relations pris en charge dans le
       [modèle métier des liens parent-enfant](domain/parent-child-relationships.md).
@@ -167,31 +187,26 @@ Kinfolio avec de véritables données familiales privées.
 
 ## Ordre recommandé des prochains tickets
 
-1. Validation de la configuration et vérification de PostgreSQL.
-2. Mise en place des migrations.
-3. Infrastructure minimale de tests.
-4. Endpoint `GET /health`.
-5. Migration `create_persons`.
-6. Route `POST /people` avec validation.
-7. Route `GET /people/:id`.
-8. Tests d'intégration des premières routes métier.
-9. Liste et modification des personnes.
-10. Relations parent-enfant.
-11. Consultation de l'arbre familial.
-12. Import GEDCOM avec des données synthétiques ou anonymisées.
-13. Authentification et autorisations avant l'utilisation de données privées.
+À partir de l'état actuel du projet :
+
+1. Définir la détection des doublons, le réimport et l'idempotence GEDCOM.
+2. Réaliser l'import transactionnel et produire son rapport final.
+3. Ajouter des exports représentatifs anonymisés et un graphe synthétique
+   volumineux aux tests d'import.
+4. Mesurer les performances et la consommation mémoire de l'import.
+5. Publier le contrat OpenAPI et vérifier la génération du client web.
+6. Mettre en place l'authentification, les espaces familiaux et les
+   autorisations avant l'utilisation de données privées.
+7. Concevoir puis implémenter les contenus de l'album familial.
 
 ## Décisions à revoir
 
 Les sujets suivants restent volontairement ouverts :
 
-- choix de l'outil de migrations ;
-- utilisation de SQL direct, d'un query builder ou d'un ORM ;
-- champs définitifs du modèle `persons` ;
-- représentation des noms, lieux et dates incertaines ;
-- types de liens familiaux pris en charge ;
-- version de GEDCOM et périmètre initial de l'import ;
 - stratégie de détection des doublons et de réimport GEDCOM ;
+- persistance des dates généalogiques structurées, alors que les colonnes des
+  personnes utilisent encore PostgreSQL `DATE` ;
+- persistance et API des relations et événements de couple ;
 - stratégie de restauration et de purge définitive ;
 - structure des espaces familiaux et modèle d'autorisation ;
 - stockage des photos et documents.

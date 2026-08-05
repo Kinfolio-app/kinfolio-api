@@ -2,10 +2,12 @@
 
 Kinfolio API est le backend d'une application de généalogie pensée comme un **album familial interactif**. Le projet vise à réunir les personnes, les liens de parenté, les souvenirs et les documents d'une famille dans une expérience plus vivante qu'un arbre généalogique traditionnel.
 
-Le dépôt est actuellement au stade de prototype fonctionnel. Le socle technique
-de l'API Fastify et la première tranche métier consacrée à la gestion des
-personnes sont terminés. Les liens parent-enfant directs sont également pris en
-charge. La prochaine étape porte sur la consultation de l'arbre familial.
+Le dépôt est actuellement au stade de prototype fonctionnel. Le socle Fastify,
+la gestion des personnes, les liens parent-enfant et la consultation bornée de
+l'arbre familial sont opérationnels. Les fichiers GEDCOM 5.5.1 et 7.0.x peuvent
+être détectés, analysés et projetés vers un plan d'import sans écriture en base.
+La prochaine étape de ce parcours porte sur les doublons, le réimport et
+l'idempotence.
 
 ## Vision du projet
 
@@ -31,7 +33,12 @@ Les fonctionnalités actuellement disponibles sont :
 - création, consultation, modification et suppression logique des personnes,
   avec prise en charge de leur genre ;
 - création et consultation des liens parent-enfant directs, avec détection des
-  doublons et des cycles ;
+  doublons et des cycles, ainsi qu'un état de preuve ;
+- consultation d'une branche familiale sous forme de graphe borné en profondeur
+  et en nombre de personnes ;
+- détection, parsing et analyse des fichiers GEDCOM 5.5.1 et 7.0.x en UTF-8 ;
+- projection déterministe du document GEDCOM normalisé vers un plan contenant
+  personnes, filiations, relations de couple, événements et diagnostics ;
 - tests automatisés avec Vitest et l'injection HTTP de Fastify ;
 - route de santé `GET /health`, qui retourne `{ "status": "ok" }`.
 
@@ -39,7 +46,10 @@ Les fonctionnalités actuellement disponibles sont :
 
 Les fonctionnalités métier suivantes constituent des orientations envisagées. Elles ne sont pas encore implémentées :
 
-- représentation et navigation dans l'arbre familial ;
+- détection des doublons, réimport et idempotence GEDCOM ;
+- import transactionnel du plan GEDCOM avec un rapport final ;
+- persistance et API des relations et événements de couple ;
+- publication du contrat HTTP au format OpenAPI ;
 - ajout de photos, documents, anecdotes et événements familiaux ;
 - organisation de ces contenus sous la forme d'un album interactif ;
 - évolution du schéma PostgreSQL avec les futurs domaines métier ;
@@ -68,8 +78,16 @@ Le format commun des réponses de collection est détaillé dans
 l'[ADR 0006](docs/adr/0006-use-an-envelope-for-collection-responses.md).
 La stratégie de suppression logique des personnes est détaillée dans
 l'[ADR 0007](docs/adr/0007-use-soft-deletion-for-people.md).
+La représentation des branches familiales est définie dans
+l'[ADR 0008](docs/adr/0008-represent-family-branches-as-graphs.md).
+La représentation des dates généalogiques est définie dans
+l'[ADR 0009](docs/adr/0009-represent-genealogical-dates-as-structured-values.md).
+Le support séparé de GEDCOM 5.5.1 et 7.0.x est défini dans
+l'[ADR 0010](docs/adr/0010-support-gedcom-551-and-70-with-dedicated-parsers.md).
 Les règles pratiques de conception des routes, schémas et DTO sont regroupées
 dans les [conventions de l'API HTTP](docs/api-conventions.md).
+La publication du contrat HTTP au format OpenAPI est définie dans
+l'[ADR 0011](docs/adr/0011-publish-the-http-contract-as-openapi.md).
 
 ## Structure du projet
 
@@ -81,6 +99,8 @@ dans les [conventions de l'API HTTP](docs/api-conventions.md).
 │   ├── modules/
 │   │   ├── health/
 │   │   │   └── health.routes.ts    # Route de santé
+│   │   ├── family-tree/             # Consultation bornée de l'arbre
+│   │   ├── gedcom-import/           # Détection, parsing, analyse et mapping
 │   │   ├── people/
 │   │   │   ├── person.entity.ts     # Invariants et normalisation
 │   │   │   ├── person.module.ts     # Assemblage du module Fastify
@@ -89,7 +109,7 @@ dans les [conventions de l'API HTTP](docs/api-conventions.md).
 │   │   │   ├── person.schema.ts     # Schémas et DTO HTTP
 │   │   │   ├── person.service.ts    # Logique métier
 │   │   │   └── person.types.ts      # Types du domaine
-│   │   └── relationships/           # Liens parent-enfant
+│   │   └── relationships/           # Liens parent-enfant et types de couple
 │   ├── plugins/
 │   │   ├── database.ts             # Connexion et vérification de PostgreSQL
 │   │   └── error-handler.ts        # Erreurs HTTP au format RFC 9457
@@ -100,6 +120,7 @@ dans les [conventions de l'API HTTP](docs/api-conventions.md).
 ├── migrations/                     # Migrations PostgreSQL
 ├── test/
 │   ├── modules/
+│   │   ├── gedcom-import/            # Tests des parseurs, analyses et mappings
 │   │   ├── people/
 │   │   │   ├── integration/        # Tests HTTP et PostgreSQL
 │   │   │   └── unit/               # Tests du domaine
@@ -110,6 +131,7 @@ dans les [conventions de l'API HTTP](docs/api-conventions.md).
 ├── docs/
 │   ├── adr/                        # Décisions d'architecture
 │   ├── domain/                     # Modèles et règles métier
+│   ├── technical/                  # Contrats et notes d'implémentation
 │   ├── api-conventions.md          # Conventions du contrat HTTP
 │   └── roadmap.md                  # Roadmap du projet
 ├── .env.example                    # Exemple de configuration locale
@@ -157,9 +179,11 @@ Le fichier `.env` peut contenir des informations sensibles et ne doit pas être 
 
 ## Compilation et lancement
 
-Compilez le TypeScript dans `dist/`, puis lancez l'API en chargeant la configuration depuis `.env` :
+Appliquez les migrations, compilez le TypeScript dans `dist/`, puis lancez
+l'API en chargeant la configuration depuis `.env` :
 
 ```bash
+npm run migrate
 npm run build
 npm start
 ```
@@ -188,6 +212,13 @@ Lancez les tests automatisés :
 npm test
 ```
 
+Les tests d'intégration nécessitent une base configurée dans `.env.test` :
+
+```bash
+npm run migrate:test
+npm run test:integration
+```
+
 Vérifiez ensuite la compilation, le lint et le formatage :
 
 ```bash
@@ -196,22 +227,27 @@ npm run check
 
 ## État du développement
 
-Le socle technique, la gestion des personnes et la première version des liens
-parent-enfant sont terminés. L'API permet de créer et consulter des relations
-directes tout en empêchant les doublons, les auto-relations et les cycles. Ces
-comportements sont couverts par des tests unitaires et des tests d'intégration
-avec PostgreSQL. La navigation dans l'arbre, les relations de couple, les
-souvenirs, les médias et le mécanisme d'authentification restent à implémenter.
+Le socle technique, les personnes, les liens parent-enfant et la consultation
+de l'arbre familial sont terminés. Le pipeline GEDCOM détecte et parse les deux
+versions ciblées, produit une analyse commune puis un plan de correspondance
+vers le domaine Kinfolio. Cette projection reste sans effet sur PostgreSQL.
 
-La priorité immédiate est de concevoir la consultation de l'arbre familial.
+Les relations de couple et leurs événements disposent de types métier et d'une
+projection GEDCOM, mais pas encore de tables, repositories ou routes HTTP. Les
+souvenirs, les médias persistés et l'authentification restent également à
+implémenter.
+
+La priorité immédiate de l'import est de définir la détection des doublons, le
+réimport et l'idempotence avant toute écriture transactionnelle.
 
 ## Prochaines étapes envisagées
 
-- définir le format de représentation d'un arbre ou d'une branche familiale ;
-- ajouter une route de consultation des proches d'une personne ;
-- gérer la profondeur de parcours et la pagination ;
-- évaluer les performances sur des arbres de taille importante ;
-- concevoir ultérieurement les relations de couple ;
+- définir la stratégie de détection des doublons et de réimport GEDCOM ;
+- implémenter l'import transactionnel et son rapport final ;
+- tester des exports représentatifs anonymisés et mesurer les performances ;
+- publier le contrat HTTP OpenAPI ;
+- persister et exposer les relations et événements de couple lorsque le
+  parcours produit le nécessite ;
 - mettre en place l'authentification et les autorisations avant la gestion de données familiales privées.
 
 Le détail et l'ordre envisagé de ces étapes sont disponibles dans la [roadmap](docs/roadmap.md).
