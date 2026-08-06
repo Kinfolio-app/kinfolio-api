@@ -13,30 +13,22 @@ Avant d'implémenter les fonctionnalités de généalogie, le socle de l'API doi
     - `DATABASE_URL` doit être définie et valide ;
     - `PORT` doit représenter un port valide ;
     - `HOST` doit avoir une valeur exploitable.
-- [x] Vérifier réellement la disponibilité de PostgreSQL au démarrage, par
-      exemple avec une requête `SELECT 1`.
+- [x] Vérifier réellement la disponibilité de PostgreSQL au démarrage, par exemple avec une requête `SELECT 1`.
 - [x] Mettre en place un outil de migrations PostgreSQL.
 - [x] Ajouter une infrastructure minimale de tests autour de `buildApp()`.
-- [x] Remplacer les routes de démonstration par un endpoint de santé
-      `GET /health`.
+- [x] Remplacer les routes de démonstration par un endpoint de santé `GET /health`.
 - [x] Définir une gestion cohérente des erreurs de l'API.
 
 ### Publication du contrat HTTP
 
-- [x] Publier le choix d'OpenAPI conformément à
-      l'[ADR 0011](adr/0011-publish-the-http-contract-as-openapi.md).
-- [ ] Générer le contrat OpenAPI depuis les schémas TypeBox avec
-      `@fastify/swagger`.
-- [ ] Compléter les routes avec des `operationId`, des tags et leurs réponses
-      d'erreur RFC 9457.
-- [ ] Décrire correctement les paramètres de collection, les réponses sans
-      contenu et le transfert des fichiers GEDCOM.
+- [x] Publier le choix d'OpenAPI conformément à l'[ADR 0011](adr/0011-publish-the-http-contract-as-openapi.md).
+- [ ] Générer le contrat OpenAPI depuis les schémas TypeBox avec `@fastify/swagger`.
+- [ ] Compléter les routes avec des `operationId`, des tags et leurs réponses d'erreur RFC 9457.
+- [ ] Décrire correctement les paramètres de collection, les réponses sans contenu et le transfert des fichiers GEDCOM.
 - [ ] Ajouter une commande produisant un `openapi.json` déterministe.
 - [ ] Valider en CI que `openapi.json` est valide et à jour.
-- [ ] Publier le contrat avec les tags ou releases de Kinfolio API afin que les
-      clients puissent sélectionner une version immuable.
-- [ ] Vérifier la génération des types du client web avec
-      `openapi-typescript`.
+- [ ] Publier le contrat avec les tags ou releases de Kinfolio API afin que les clients puissent sélectionner une version immuable.
+- [ ] Vérifier la génération des types du client web avec `openapi-typescript`.
 
 ## Phase 2 — Première tranche métier : les personnes
 
@@ -53,8 +45,8 @@ La table `persons` contient actuellement :
 - `last_name` ;
 - `birth_name` ;
 - `gender` ;
-- `birth_date` ;
-- `death_date` ;
+- `birth_date_id` ;
+- `death_date_id` ;
 - `birth_place` ;
 - `death_place` ;
 - `living_status` ;
@@ -63,8 +55,12 @@ La table `persons` contient actuellement :
 - `created_at` ;
 - `updated_at`.
 
-Ce modèle pourra encore évoluer avec la persistance des dates généalogiques
-structurées et les futurs contenus familiaux.
+Les deux identifiants de date référencent la table `genealogical_dates`, qui
+conserve les dates partielles, qualifiées, textuelles ou exprimées dans
+différents calendriers conformément aux ADR
+[0009](adr/0009-represent-genealogical-dates-as-structured-values.md) et
+[0013](adr/0013-persist-genealogical-dates-in-a-dedicated-table.md). Ce modèle
+pourra encore évoluer avec les futurs contenus familiaux.
 
 ### Implémentation
 
@@ -103,13 +99,11 @@ Le [modèle métier des relations de couple](domain/couple-relationships.md) et
 leurs événements est défini séparément. Sa persistance et ses routes restent à
 implémenter avec les étapes qui en auront besoin.
 
-- [x] Préciser les différents types de relations pris en charge dans le
-      [modèle métier des liens parent-enfant](domain/parent-child-relationships.md).
+- [x] Préciser les différents types de relations pris en charge dans le [modèle métier des liens parent-enfant](domain/parent-child-relationships.md).
 - [x] Définir les contraintes et règles métier des liens de parenté.
 - [x] Créer la migration correspondante.
 - [x] Ajouter les opérations de création et de consultation des relations.
-- [x] Empêcher les relations incohérentes ou cycliques lorsque cela est
-      nécessaire.
+- [x] Empêcher les relations incohérentes ou cycliques lorsque cela est nécessaire.
 - [x] Ajouter les tests métier et les tests d'intégration.
 
 ## Phase 4 — Consultation de l'arbre familial
@@ -128,23 +122,17 @@ qui disposent déjà d'un arbre contenant plusieurs milliers de personnes. La
 première version devra privilégier un import contrôlable et vérifiable plutôt
 qu'une prise en charge silencieuse et partielle du format.
 
-- [x] Définir les versions de GEDCOM prises en charge et le
-      [périmètre initial de l'import](domain/gedcom-import.md) : personnes,
-      filiations, relations de couple, événements, sources et médias,
-      conformément à l'[ADR 0010](adr/0010-support-gedcom-551-and-70-with-dedicated-parsers.md).
-- [x] Concevoir les modèles métier encore nécessaires à un import fidèle,
-      notamment les [relations de couple](domain/couple-relationships.md) et
-      les [dates généalogiques structurées](adr/0009-represent-genealogical-dates-as-structured-values.md).
-- [x] Définir le
-      [modèle GEDCOM intermédiaire normalisé et l'interface commune des parseurs](technical/gedcom-normalized-model.md).
-- [x] Détecter la
-      [version, le conteneur et l'encodage d'un fichier GEDCOM](technical/gedcom-file-detection.md).
+- [x] Définir les versions de GEDCOM prises en charge et le [périmètre initial de l'import](domain/gedcom-import.md) : personnes, filiations, relations de couple, événements, sources et médias, conformément à l'[ADR 0010](adr/0010-support-gedcom-551-and-70-with-dedicated-parsers.md).
+- [x] Concevoir les modèles métier encore nécessaires à un import fidèle, notamment les [relations de couple](domain/couple-relationships.md) et les [dates généalogiques structurées](adr/0009-represent-genealogical-dates-as-structured-values.md).
+- [x] Définir le [modèle GEDCOM intermédiaire normalisé et l'interface commune des parseurs](technical/gedcom-normalized-model.md).
+- [x] Détecter la [version, le conteneur et l'encodage d'un fichier GEDCOM](technical/gedcom-file-detection.md).
 - [x] Parser et valider un fichier GEDCOM 5.5.1 sans modifier la base de données, conformément à la [note technique du parseur](technical/gedcom-551-parser.md).
 - [x] Parser et valider un fichier GEDCOM 7.0.x sans modifier la base de données, conformément à la [note technique du parseur](technical/gedcom-7-parser.md).
 - [x] Fournir une [analyse commune aux deux versions](technical/gedcom-import-analysis.md) avec les éléments reconnus, ignorés, ambigus ou invalides.
 - [x] Définir les correspondances entre les individus et familles GEDCOM et les personnes et relations Kinfolio.
 - [x] Définir la stratégie de détection des doublons, de réimport et d'idempotence conformément à l'[ADR 0012](adr/0012-preview-and-reimport-gedcom-from-persistent-sources.md).
-- [ ] Réaliser l'import de manière transactionnelle avec un rapport final, conformément à la [note technique dédiée](technical/gedcom-transactional-import.md), après la persistance des dates généalogiques structurées et des relations et événements de couple.
+- [x] Persister les dates généalogiques structurées des personnes conformément aux ADR [0009](adr/0009-represent-genealogical-dates-as-structured-values.md) et [0013](adr/0013-persist-genealogical-dates-in-a-dedicated-table.md).
+- [ ] Réaliser l'import de manière transactionnelle avec un rapport final, conformément à la [note technique dédiée](technical/gedcom-transactional-import.md), après la persistance des relations et événements de couple.
 - [ ] Ajouter des tests pour les deux versions avec des fichiers synthétiques, des exports représentatifs anonymisés et un graphe réel volumineux préalablement anonymisé.
 - [ ] Mesurer les performances et la consommation mémoire sur un arbre de plusieurs milliers de personnes.
 
@@ -191,8 +179,6 @@ Kinfolio avec de véritables données familiales privées.
 
 Les sujets suivants restent volontairement ouverts :
 
-- persistance des dates généalogiques structurées, alors que les colonnes des
-  personnes utilisent encore PostgreSQL `DATE` ;
 - persistance et API des relations et événements de couple ;
 - stratégie de restauration et de purge définitive ;
 - structure des espaces familiaux et modèle d'autorisation ;

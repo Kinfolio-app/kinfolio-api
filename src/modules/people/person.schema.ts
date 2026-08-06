@@ -1,6 +1,7 @@
 import Type from 'typebox';
 import { createCollectionResponseSchema } from '../../shared/http/collection-response.js';
 import { Gender, LivingStatus } from './person.types.js';
+import { GenealogicalDateSchema } from '../../shared/genealogy/genealogical-date.schema.js';
 
 const GenderSchema = Type.Union([
     Type.Literal(Gender.Male),
@@ -16,9 +17,9 @@ export const CreatePersonDtoSchema = Type.Object(
         lastName: Type.Optional(Type.String({ minLength: 1 })),
         birthName: Type.Optional(Type.String({ minLength: 1 })),
         gender: Type.Optional(GenderSchema),
-        birthDate: Type.Optional(Type.String({ format: 'date' })),
+        birthDate: Type.Optional(GenealogicalDateSchema),
         birthPlace: Type.Optional(Type.String({ minLength: 1 })),
-        deathDate: Type.Optional(Type.String({ format: 'date' })),
+        deathDate: Type.Optional(GenealogicalDateSchema),
         deathPlace: Type.Optional(Type.String({ minLength: 1 })),
         livingStatus: Type.Optional(
             Type.Union([
@@ -43,9 +44,9 @@ export const UpdatePersonDtoSchema = Type.Object(
         lastName: Type.Optional(Type.Union([Type.Null(), Type.String({ minLength: 1 })])),
         birthName: Type.Optional(Type.Union([Type.Null(), Type.String({ minLength: 1 })])),
         gender: Type.Optional(GenderSchema),
-        birthDate: Type.Optional(Type.Union([Type.Null(), Type.String({ format: 'date' })])),
+        birthDate: Type.Optional(Type.Union([Type.Null(), GenealogicalDateSchema])),
         birthPlace: Type.Optional(Type.Union([Type.Null(), Type.String({ minLength: 1 })])),
-        deathDate: Type.Optional(Type.Union([Type.Null(), Type.String({ format: 'date' })])),
+        deathDate: Type.Optional(Type.Union([Type.Null(), GenealogicalDateSchema])),
         deathPlace: Type.Optional(Type.Union([Type.Null(), Type.String({ minLength: 1 })])),
         livingStatus: Type.Optional(
             Type.Union([
@@ -110,9 +111,9 @@ export const PersonResponseDtoSchema = Type.Object(
         lastName: Type.Union([Type.String(), Type.Null()]),
         birthName: Type.Union([Type.String(), Type.Null()]),
         gender: GenderSchema,
-        birthDate: Type.Union([Type.String({ format: 'date' }), Type.Null()]),
+        birthDate: Type.Union([GenealogicalDateSchema, Type.Null()]),
         birthPlace: Type.Union([Type.String(), Type.Null()]),
-        deathDate: Type.Union([Type.String({ format: 'date' }), Type.Null()]),
+        deathDate: Type.Union([GenealogicalDateSchema, Type.Null()]),
         deathPlace: Type.Union([Type.String(), Type.Null()]),
         livingStatus: Type.Union([
             Type.Literal(LivingStatus.Unknown),

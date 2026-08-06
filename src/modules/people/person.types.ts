@@ -1,3 +1,5 @@
+import type { GenealogicalDate } from '../../shared/genealogy/genealogical-date.types.js';
+
 export const LivingStatus = {
     Unknown: 'unknown',
     Living: 'living',
@@ -22,9 +24,9 @@ export type Person = {
     lastName: string | null;
     birthName: string | null;
     gender: Gender;
-    birthDate: string | null;
+    birthDate: GenealogicalDate | null;
     birthPlace: string | null;
-    deathDate: string | null;
+    deathDate: GenealogicalDate | null;
     deathPlace: string | null;
     livingStatus: LivingStatus;
     biography: string | null;

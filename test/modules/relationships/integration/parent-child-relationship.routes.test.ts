@@ -87,11 +87,15 @@ describe('ParentChildRelationshipRoute integration', () => {
     });
 
     beforeEach(async () => {
-        await app.pg.query('TRUNCATE TABLE parent_child_relationships, persons');
+        await app.pg.query(
+            'TRUNCATE TABLE parent_child_relationships, persons, genealogical_dates',
+        );
     });
 
     afterAll(async () => {
-        await app.pg.query('TRUNCATE TABLE parent_child_relationships, persons');
+        await app.pg.query(
+            'TRUNCATE TABLE parent_child_relationships, persons, genealogical_dates',
+        );
         await app.close();
     });
 

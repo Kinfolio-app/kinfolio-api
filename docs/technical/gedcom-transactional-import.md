@@ -27,19 +27,14 @@ résout uniquement les correspondances nécessaires à une source GEDCOM donnée
 
 ## Prérequis métier et techniques
 
-Le plan actuel contient des données que PostgreSQL ne sait pas encore toutes
-persister :
+Les dates généalogiques structurées des personnes sont désormais persistées
+sans conversion silencieuse en dates grégoriennes exactes. Le plan contient
+encore des relations et événements de couple dont les tables, repositories et
+services ne sont pas implémentés.
 
-- `PlannedPerson.birthDate` et `deathDate` utilisent des dates généalogiques
-  structurées, alors que `persons` utilise encore des colonnes `DATE` ;
-- les relations et événements de couple sont modélisés, mais leurs tables,
-  repositories et services ne sont pas implémentés.
-
-Ces deux capacités doivent être réalisées avant l'écriture transactionnelle du
-périmètre GEDCOM complet. L'import ne convertit pas silencieusement une date
-approximative, une période ou une date utilisant un autre calendrier en date
-grégorienne exacte. Il ne supprime pas non plus les relations de couple du plan
-pour contourner l'absence de persistance.
+Cette capacité restante doit être réalisée avant l'écriture transactionnelle
+du périmètre GEDCOM complet. L'import ne supprime pas les relations de couple
+du plan pour contourner l'absence de persistance.
 
 La prévisualisation, le stockage des brouillons et la résolution des personnes
 peuvent être développés avant ces prérequis. La confirmation reste désactivée
@@ -512,13 +507,12 @@ Les fichiers de ces tests restent synthétiques ou préalablement anonymisés.
 
 ## Ordre d'implémentation recommandé
 
-1. persister les dates généalogiques structurées ;
-2. persister les relations et événements de couple ;
-3. créer les sources, exécutions et correspondances ;
-4. créer les brouillons et leur nettoyage ;
-5. construire la recherche de correspondances et la fusion à trois versions ;
-6. adapter les limites multipart et exposer les routes de prévisualisation et
+1. persister les relations et événements de couple ;
+2. créer les sources, exécutions et correspondances ;
+3. créer les brouillons et leur nettoyage ;
+4. construire la recherche de correspondances et la fusion à trois versions ;
+5. adapter les limites multipart et exposer les routes de prévisualisation et
    de résolution ;
-7. implémenter la confirmation transactionnelle et son rapport ;
-8. ajouter les tests de concurrence, de rollback et d'idempotence ;
-9. mesurer le stockage, la mémoire et le temps sur les grands fichiers.
+6. implémenter la confirmation transactionnelle et son rapport ;
+7. ajouter les tests de concurrence, de rollback et d'idempotence ;
+8. mesurer le stockage, la mémoire et le temps sur les grands fichiers.

@@ -4,6 +4,7 @@ import createPerson, {
     updatePerson,
 } from '../../../../src/modules/people/person.entity.js';
 import { Gender, LivingStatus, type Person } from '../../../../src/modules/people/person.types.js';
+import { exactGregorianDate } from '../../../fixtures/genealogical-date.js';
 
 const person: Person = {
     id: '4cf44241-0f1b-4e69-b070-d47ee66b7203',
@@ -12,7 +13,7 @@ const person: Person = {
     lastName: null,
     birthName: null,
     gender: Gender.Female,
-    birthDate: '1980-01-01',
+    birthDate: exactGregorianDate(1980, 1, 1),
     birthPlace: null,
     deathDate: null,
     deathPlace: null,
@@ -30,9 +31,9 @@ describe('createPerson', () => {
             lastName: ' Martin ',
             birthName: ' Durand ',
             gender: Gender.Female,
-            birthDate: '1985-03-12',
+            birthDate: exactGregorianDate(1985, 3, 12),
             birthPlace: ' Lyon ',
-            deathDate: '2025-06-18',
+            deathDate: exactGregorianDate(2025, 6, 18),
             deathPlace: ' Paris ',
             livingStatus: LivingStatus.Deceased,
             biography: ' Test biography. ',
@@ -46,9 +47,9 @@ describe('createPerson', () => {
             lastName: 'Martin',
             birthName: 'Durand',
             gender: Gender.Female,
-            birthDate: '1985-03-12',
+            birthDate: exactGregorianDate(1985, 3, 12),
             birthPlace: 'Lyon',
-            deathDate: '2025-06-18',
+            deathDate: exactGregorianDate(2025, 6, 18),
             deathPlace: 'Paris',
             livingStatus: LivingStatus.Deceased,
             biography: 'Test biography.',
@@ -79,8 +80,8 @@ describe('createPerson', () => {
         expect(() =>
             createPerson({
                 firstName: 'Alice',
-                birthDate: '2000-01-01',
-                deathDate: '1990-01-01',
+                birthDate: exactGregorianDate(2000, 1, 1),
+                deathDate: exactGregorianDate(1990, 1, 1),
             }),
         ).toThrow(new InvalidPersonError('Death date must not be earlier than birth date.'));
     });
@@ -113,7 +114,7 @@ describe('updatePerson', () => {
     it('rejects a death date earlier than the existing birth date', () => {
         expect(() =>
             updatePerson(person, {
-                deathDate: '1970-01-01',
+                deathDate: exactGregorianDate(1970, 1, 1),
             }),
         ).toThrow(new InvalidPersonError('Death date must not be earlier than birth date.'));
     });

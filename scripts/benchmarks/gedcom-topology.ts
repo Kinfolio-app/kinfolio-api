@@ -346,9 +346,9 @@ export async function loadGedcomTopology(
                     FROM persons
                     WHERE middle_names IS NOT NULL
                         OR birth_name IS NOT NULL
-                        OR birth_date IS NOT NULL
+                        OR birth_date_id IS NOT NULL
                         OR birth_place IS NOT NULL
-                        OR death_date IS NOT NULL
+                        OR death_date_id IS NOT NULL
                         OR death_place IS NOT NULL
                         OR biography IS NOT NULL
                 ) AS people_with_private_fields,

@@ -7,6 +7,7 @@ import type { CreatePersonDto } from '../../../../src/modules/people/person.sche
 import { Gender, LivingStatus } from '../../../../src/modules/people/person.types.js';
 import { HttpStatus } from '../../../../src/shared/http/http-status.js';
 import { MediaType } from '../../../../src/shared/http/media-type.js';
+import { exactGregorianDate } from '../../../fixtures/genealogical-date.js';
 
 const TEST_DATABASE_NAME = 'kinfolio_test';
 
@@ -48,11 +49,15 @@ describe('PersonRoute integration', () => {
     });
 
     beforeEach(async () => {
-        await app.pg.query('TRUNCATE TABLE parent_child_relationships, persons');
+        await app.pg.query(
+            'TRUNCATE TABLE parent_child_relationships, persons, genealogical_dates',
+        );
     });
 
     afterAll(async () => {
-        await app.pg.query('TRUNCATE TABLE parent_child_relationships, persons');
+        await app.pg.query(
+            'TRUNCATE TABLE parent_child_relationships, persons, genealogical_dates',
+        );
         await app.close();
     });
 
@@ -63,9 +68,9 @@ describe('PersonRoute integration', () => {
             lastName: 'Martin',
             birthName: 'Durand',
             gender: Gender.Female,
-            birthDate: '1985-03-12',
+            birthDate: exactGregorianDate(1985, 3, 12),
             birthPlace: 'Lyon',
-            deathDate: '2025-06-18',
+            deathDate: exactGregorianDate(2025, 6, 18),
             deathPlace: 'Paris',
             livingStatus: LivingStatus.Deceased,
             biography: 'Test biography.',
@@ -161,8 +166,8 @@ describe('PersonRoute integration', () => {
             url: '/people',
             payload: {
                 firstName: 'Alice',
-                birthDate: '2000-01-01',
-                deathDate: '1990-01-01',
+                birthDate: exactGregorianDate(2000, 1, 1),
+                deathDate: exactGregorianDate(1990, 1, 1),
             },
         });
 
@@ -235,15 +240,15 @@ describe('PersonRoute integration', () => {
         for (const payload of [
             {
                 firstName: 'Alice',
-                birthDate: '1980-01-01',
+                birthDate: exactGregorianDate(1980, 1, 1),
             },
             {
                 firstName: 'Bob',
-                birthDate: '1970-01-01',
+                birthDate: exactGregorianDate(1970, 1, 1),
             },
             {
                 firstName: 'Alice',
-                birthDate: '2000-01-01',
+                birthDate: exactGregorianDate(2000, 1, 1),
             },
         ]) {
             const createResponse = await app.inject({
@@ -265,11 +270,11 @@ describe('PersonRoute integration', () => {
             data: [
                 {
                     firstName: 'Alice',
-                    birthDate: '2000-01-01',
+                    birthDate: exactGregorianDate(2000, 1, 1),
                 },
                 {
                     firstName: 'Alice',
-                    birthDate: '1980-01-01',
+                    birthDate: exactGregorianDate(1980, 1, 1),
                 },
             ],
             pagination: {

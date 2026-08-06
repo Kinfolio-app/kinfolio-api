@@ -1,5 +1,6 @@
 import type { CreatePersonDto, UpdatePersonDto } from './person.schema.js';
 import type { Person } from './person.types.js';
+import { compareGenealogicalDates } from '../../shared/genealogy/genealogical-date.comparison.js';
 
 export class InvalidPersonError extends Error {
     constructor(message: string) {
@@ -46,7 +47,7 @@ export default function createPerson(input: CreatePersonDto): CreatePersonDto {
     if (
         person.birthDate !== undefined &&
         person.deathDate !== undefined &&
-        person.birthDate > person.deathDate
+        compareGenealogicalDates(person.deathDate, person.birthDate) === -1
     ) {
         throw new InvalidPersonError('Death date must not be earlier than birth date.');
     }
@@ -95,7 +96,7 @@ export function updatePerson(person: Person, input: UpdatePersonDto): Person {
     if (
         updatedPerson.birthDate !== null &&
         updatedPerson.deathDate !== null &&
-        updatedPerson.birthDate > updatedPerson.deathDate
+        compareGenealogicalDates(updatedPerson.deathDate, updatedPerson.birthDate) === -1
     ) {
         throw new InvalidPersonError('Death date must not be earlier than birth date.');
     }

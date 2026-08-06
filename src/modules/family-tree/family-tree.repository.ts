@@ -1,4 +1,5 @@
 import type { Pool } from 'pg';
+import { selectGenealogicalDate } from '../../shared/genealogy/genealogical-date.repository.js';
 import type { Person } from '../people/person.types.js';
 import type {
     ParentChildRelationship,
@@ -137,9 +138,9 @@ export class FamilyTreeRepository {
                                 'lastName', person.last_name,
                                 'birthName', person.birth_name,
                                 'gender', person.gender,
-                                'birthDate', person.birth_date,
+                                'birthDate', ${selectGenealogicalDate('birth_date')},
                                 'birthPlace', person.birth_place,
-                                'deathDate', person.death_date,
+                                'deathDate', ${selectGenealogicalDate('death_date')},
                                 'deathPlace', person.death_place,
                                 'livingStatus', person.living_status,
                                 'biography', person.biography,
@@ -151,6 +152,10 @@ export class FamilyTreeRepository {
                         FROM included_people AS included
                         INNER JOIN persons AS person
                             ON person.id = included.person_id
+                        LEFT JOIN genealogical_dates AS birth_date
+                            ON birth_date.id = person.birth_date_id
+                        LEFT JOIN genealogical_dates AS death_date
+                            ON death_date.id = person.death_date_id
                     ),
                     '[]'::jsonb
                 ) AS people,
@@ -162,6 +167,7 @@ export class FamilyTreeRepository {
                                 'parentId', relationship.parent_id,
                                 'childId', relationship.child_id,
                                 'relationshipType', relationship.relationship_type,
+                                'evidenceStatus', relationship.evidence_status,
                                 'createdAt', relationship.created_at,
                                 'updatedAt', relationship.updated_at
                             )
