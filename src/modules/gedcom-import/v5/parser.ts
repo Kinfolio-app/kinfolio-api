@@ -26,7 +26,6 @@ import {
     type GedcomNode,
     type GedcomParseResult,
     type GedcomParser,
-    type GenealogicalDate,
     type NormalizedAttribute,
     type NormalizedEvent,
     type NormalizedFamily,
@@ -43,6 +42,7 @@ import {
     type NormalizedSource,
     type NormalizedSourceCitation,
 } from '../common/gedcom-parser.types.js';
+import type { GenealogicalDate } from '../../../shared/genealogy/genealogical-date.types.js';
 import { buildGedcomTree } from './tree-builder.js';
 import type { DetectedGedcomFile, SupportedGedcomVersion } from '../gedcom-file.types.js';
 

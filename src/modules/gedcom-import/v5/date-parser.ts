@@ -2,7 +2,7 @@ import type {
     GenealogicalCalendar,
     GenealogicalDate,
     GenealogicalDatePoint,
-} from '../common/gedcom-parser.types.js';
+} from '../../../shared/genealogy/genealogical-date.types.js';
 import { isAsciiDigits } from '../common/gedcom-character-utils.js';
 import {
     FRENCH_REPUBLICAN_MONTHS,

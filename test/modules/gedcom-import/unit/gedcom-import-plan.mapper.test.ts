@@ -6,7 +6,6 @@ import {
     type GedcomMappingIssue,
 } from '../../../../src/modules/gedcom-import/gedcom-import-plan.types.js';
 import type {
-    GenealogicalDate,
     NormalizedEvent,
     NormalizedExtension,
     NormalizedFamily,
@@ -14,6 +13,7 @@ import type {
     NormalizedIndividual,
     NormalizedName,
 } from '../../../../src/modules/gedcom-import/common/gedcom-parser.types.js';
+import type { GenealogicalDate } from '../../../../src/shared/genealogy/genealogical-date.types.js';
 import { Gender, LivingStatus } from '../../../../src/modules/people/person.types.js';
 import { CoupleRelationshipEventType } from '../../../../src/modules/relationships/couple-relationship.types.js';
 import {

@@ -1,4 +1,5 @@
-import type { GenealogicalDate, NormalizedIdentifier } from './common/gedcom-parser.types.js';
+import type { GenealogicalDate } from '../../shared/genealogy/genealogical-date.types.js';
+import type { NormalizedIdentifier } from './common/gedcom-parser.types.js';
 import type { Gender, LivingStatus } from '../people/person.types.js';
 import type { CoupleRelationshipEventType } from '../relationships/couple-relationship.types.js';
 import type {

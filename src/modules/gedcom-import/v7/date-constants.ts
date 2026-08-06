@@ -1,4 +1,4 @@
-import type { GenealogicalCalendar } from '../common/gedcom-parser.types.js';
+import type { GenealogicalCalendar } from '../../../shared/genealogy/genealogical-date.types.js';
 
 export const GEDCOM_7_CALENDARS = {
     GREGORIAN: 'gregorian',

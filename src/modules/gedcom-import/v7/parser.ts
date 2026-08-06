@@ -19,7 +19,6 @@ import {
     type GedcomNode,
     type GedcomParseResult,
     type GedcomParser,
-    type GenealogicalDate,
     type NormalizedAttribute,
     type NormalizedEvent,
     type NormalizedFamily,
@@ -36,6 +35,7 @@ import {
     type NormalizedSource,
     type NormalizedSourceCitation,
 } from '../common/gedcom-parser.types.js';
+import type { GenealogicalDate } from '../../../shared/genealogy/genealogical-date.types.js';
 import {
     FAMILY_EVENT_TAGS as FAMILY_EVENTS,
     INDIVIDUAL_ATTRIBUTE_TAGS as INDIVIDUAL_ATTRIBUTES,

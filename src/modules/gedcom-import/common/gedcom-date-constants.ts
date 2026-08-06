@@ -1,4 +1,4 @@
-import type { GenealogicalDate } from './gedcom-parser.types.js';
+import type { GenealogicalDate } from '../../../shared/genealogy/genealogical-date.types.js';
 
 export const GEDCOM_DATE_QUALIFIERS = [
     { keyword: 'ABT', kind: 'about' },

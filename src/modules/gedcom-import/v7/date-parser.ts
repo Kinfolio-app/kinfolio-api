@@ -16,7 +16,7 @@ import type {
     GenealogicalCalendar,
     GenealogicalDate,
     GenealogicalDatePoint,
-} from '../common/gedcom-parser.types.js';
+} from '../../../shared/genealogy/genealogical-date.types.js';
 import {
     GEDCOM_7_CALENDARS,
     GEDCOM_7_DATE_SYNTAX,

@@ -1,3 +1,4 @@
+import type { GenealogicalDate } from '../../../shared/genealogy/genealogical-date.types.js';
 import type { DetectedGedcomFile, SupportedGedcomVersion } from '../gedcom-file.types.js';
 
 export type GedcomSourceLocation = {
@@ -55,58 +56,6 @@ export type GedcomDiagnostic = {
     recordId: string | null;
     path: string | null;
 };
-
-export type GenealogicalCalendar =
-    'gregorian' | 'julian' | 'french_republican' | 'hebrew' | 'extension';
-
-export type GenealogicalDatePoint = {
-    calendar: GenealogicalCalendar;
-    calendarTag?: string | null;
-    year: number;
-    month: number | null;
-    monthTag?: string | null;
-    day: number | null;
-    epoch: 'common' | 'before_common';
-    epochTag?: string | null;
-};
-
-type GenealogicalSinglePointDate = {
-    kind: 'exact' | 'about' | 'calculated' | 'estimated' | 'interpreted' | 'before' | 'after';
-    first: GenealogicalDatePoint;
-    second: null;
-    phrase: string | null;
-    originalText: string;
-};
-
-type GenealogicalBetweenDate = {
-    kind: 'between';
-    first: GenealogicalDatePoint;
-    second: GenealogicalDatePoint;
-    phrase: string | null;
-    originalText: string;
-};
-
-type GenealogicalPeriodDate = {
-    kind: 'period';
-    first: GenealogicalDatePoint | null;
-    second: GenealogicalDatePoint | null;
-    phrase: string | null;
-    originalText: string;
-};
-
-type GenealogicalPhraseDate = {
-    kind: 'phrase';
-    first: null;
-    second: null;
-    phrase: string;
-    originalText: string;
-};
-
-export type GenealogicalDate =
-    | GenealogicalSinglePointDate
-    | GenealogicalBetweenDate
-    | GenealogicalPeriodDate
-    | GenealogicalPhraseDate;
 
 export type NormalizedExtension = {
     tag: string;
