@@ -158,6 +158,11 @@ Le contrat commun exposé après la sélection du parseur est détaillé dans la
 [note sur l'analyse d'un import](../technical/gedcom-import-analysis.md).
 La projection métier commune aux deux versions est détaillée dans la
 [note sur les correspondances GEDCOM vers Kinfolio](../technical/gedcom-to-kinfolio-mapping.md).
+La prévisualisation, la détection des doublons et le réimport sont régis par
+l'[ADR 0012](../adr/0012-preview-and-reimport-gedcom-from-persistent-sources.md).
+Leur modèle de persistance, leur cycle de confirmation et leur stratégie de
+tests sont détaillés dans la
+[note technique de l'import transactionnel](../technical/gedcom-transactional-import.md).
 
 ## Mise à jour de ce document
 

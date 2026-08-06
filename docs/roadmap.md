@@ -139,25 +139,14 @@ qu'une prise en charge silencieuse et partielle du format.
       [modèle GEDCOM intermédiaire normalisé et l'interface commune des parseurs](technical/gedcom-normalized-model.md).
 - [x] Détecter la
       [version, le conteneur et l'encodage d'un fichier GEDCOM](technical/gedcom-file-detection.md).
-- [x] Parser et valider un fichier GEDCOM 5.5.1 sans modifier la base de
-      données, conformément à la
-      [note technique du parseur](technical/gedcom-551-parser.md).
-- [x] Parser et valider un fichier GEDCOM 7.0.x sans modifier la base de
-      données, conformément à la
-      [note technique du parseur](technical/gedcom-7-parser.md).
-- [x] Fournir une
-      [analyse commune aux deux versions](technical/gedcom-import-analysis.md)
-      avec les éléments reconnus, ignorés, ambigus ou invalides.
-- [x] Définir les correspondances entre les individus et familles GEDCOM et
-      les personnes et relations Kinfolio.
-- [ ] Définir la stratégie de détection des doublons, de réimport et
-      d'idempotence.
-- [ ] Réaliser l'import de manière transactionnelle avec un rapport final.
-- [ ] Ajouter des tests pour les deux versions avec des fichiers synthétiques,
-      des exports représentatifs anonymisés et un graphe réel volumineux
-      préalablement anonymisé.
-- [ ] Mesurer les performances et la consommation mémoire sur un arbre de
-      plusieurs milliers de personnes.
+- [x] Parser et valider un fichier GEDCOM 5.5.1 sans modifier la base de données, conformément à la [note technique du parseur](technical/gedcom-551-parser.md).
+- [x] Parser et valider un fichier GEDCOM 7.0.x sans modifier la base de données, conformément à la [note technique du parseur](technical/gedcom-7-parser.md).
+- [x] Fournir une [analyse commune aux deux versions](technical/gedcom-import-analysis.md) avec les éléments reconnus, ignorés, ambigus ou invalides.
+- [x] Définir les correspondances entre les individus et familles GEDCOM et les personnes et relations Kinfolio.
+- [x] Définir la stratégie de détection des doublons, de réimport et d'idempotence conformément à l'[ADR 0012](adr/0012-preview-and-reimport-gedcom-from-persistent-sources.md).
+- [ ] Réaliser l'import de manière transactionnelle avec un rapport final, conformément à la [note technique dédiée](technical/gedcom-transactional-import.md), après la persistance des dates généalogiques structurées et des relations et événements de couple.
+- [ ] Ajouter des tests pour les deux versions avec des fichiers synthétiques, des exports représentatifs anonymisés et un graphe réel volumineux préalablement anonymisé.
+- [ ] Mesurer les performances et la consommation mémoire sur un arbre de plusieurs milliers de personnes.
 
 Les fichiers contenant de véritables données familiales privées ne devront pas
 être utilisés hors d'un environnement protégé. Le développement et les tests
@@ -189,21 +178,19 @@ Kinfolio avec de véritables données familiales privées.
 
 À partir de l'état actuel du projet :
 
-1. Définir la détection des doublons, le réimport et l'idempotence GEDCOM.
-2. Réaliser l'import transactionnel et produire son rapport final.
-3. Ajouter des exports représentatifs anonymisés et un graphe synthétique
+1. Réaliser l'import transactionnel et produire son rapport final.
+2. Ajouter des exports représentatifs anonymisés et un graphe synthétique
    volumineux aux tests d'import.
-4. Mesurer les performances et la consommation mémoire de l'import.
-5. Publier le contrat OpenAPI et vérifier la génération du client web.
-6. Mettre en place l'authentification, les espaces familiaux et les
+3. Mesurer les performances et la consommation mémoire de l'import.
+4. Publier le contrat OpenAPI et vérifier la génération du client web.
+5. Mettre en place l'authentification, les espaces familiaux et les
    autorisations avant l'utilisation de données privées.
-7. Concevoir puis implémenter les contenus de l'album familial.
+6. Concevoir puis implémenter les contenus de l'album familial.
 
 ## Décisions à revoir
 
 Les sujets suivants restent volontairement ouverts :
 
-- stratégie de détection des doublons et de réimport GEDCOM ;
 - persistance des dates généalogiques structurées, alors que les colonnes des
   personnes utilisent encore PostgreSQL `DATE` ;
 - persistance et API des relations et événements de couple ;

@@ -88,6 +88,9 @@ Les règles pratiques de conception des routes, schémas et DTO sont regroupées
 dans les [conventions de l'API HTTP](docs/api-conventions.md).
 La publication du contrat HTTP au format OpenAPI est définie dans
 l'[ADR 0011](docs/adr/0011-publish-the-http-contract-as-openapi.md).
+La stratégie de prévisualisation, de détection des doublons et de réimport
+GEDCOM est définie dans
+l'[ADR 0012](docs/adr/0012-preview-and-reimport-gedcom-from-persistent-sources.md).
 
 ## Structure du projet
 

@@ -209,5 +209,6 @@ Cette étape ne couvre pas :
 - la résolution interactive des issues bloquantes ;
 - l'écriture transactionnelle et le rapport d'import final.
 
-Ces responsabilités appartiennent aux étapes suivantes de la
-[roadmap](../roadmap.md).
+Ces responsabilités sont détaillées dans la
+[note technique de l'import transactionnel](gedcom-transactional-import.md) et
+appartiennent aux étapes suivantes de la [roadmap](../roadmap.md).

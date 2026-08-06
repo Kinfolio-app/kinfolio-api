@@ -39,6 +39,13 @@ la limite produit une réponse `413 Payload Too Large`. Une requête multipart
 incomplète ou dont le corps ne respecte pas le schéma produit une réponse
 `400 Bad Request`.
 
+La future route de prévisualisation autorisera un champ texte pour identifier
+la source d'import et nécessitera donc d'élargir les limites multipart globales
+de `buildApp()`. Cet élargissement ne modifie pas le contrat de la présente
+route : son schéma TypeBox continue d'interdire tout champ autre que `file`,
+conformément à la
+[note technique de l'import transactionnel](gedcom-transactional-import.md).
+
 La validité du contenu GEDCOM fait partie du résultat de l'analyse et non du
 statut de la requête. Un fichier reçu correctement peut donc produire une
 réponse `200 OK` avec `valid: false` et des diagnostics expliquant les erreurs.
