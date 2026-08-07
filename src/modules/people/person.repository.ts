@@ -115,24 +115,6 @@ async function createDate(
     return new GenealogicalDateRepository(database).create(date);
 }
 
-async function deleteOrphanedDates(database: QueryableDatabase, ids: string[]): Promise<void> {
-    if (ids.length === 0) {
-        return;
-    }
-
-    await database.query(
-        `DELETE FROM genealogical_dates AS date
-        WHERE date.id = ANY($1::uuid[])
-            AND NOT EXISTS (
-                SELECT 1
-                FROM persons AS person
-                WHERE person.birth_date_id = date.id
-                    OR person.death_date_id = date.id
-            )`,
-        [ids],
-    );
-}
-
 export class PersonRepository {
     constructor(private readonly database: Database) {}
 
@@ -323,7 +305,7 @@ export class PersonRepository {
                 deathDateChanged ? state.death_date_id : null,
             ].filter((id): id is string => id !== null);
 
-            await deleteOrphanedDates(database, replacedDateIds);
+            await new GenealogicalDateRepository(database).deleteOrphaned(replacedDateIds);
 
             const updatedPerson = await this.findByIdWithDatabase(database, person.id);
 

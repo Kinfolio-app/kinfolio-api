@@ -120,4 +120,27 @@ export class GenealogicalDateRepository {
 
         return row.id;
     }
+
+    async deleteOrphaned(ids: string[]): Promise<void> {
+        if (ids.length === 0) {
+            return;
+        }
+
+        await this.database.query(
+            `DELETE FROM genealogical_dates AS date
+            WHERE date.id = ANY($1::uuid[])
+                AND NOT EXISTS (
+                    SELECT 1
+                    FROM persons AS person
+                    WHERE person.birth_date_id = date.id
+                        OR person.death_date_id = date.id
+                )
+                AND NOT EXISTS (
+                    SELECT 1
+                    FROM couple_relationship_events AS event
+                    WHERE event.date_id = date.id
+                )`,
+            [ids],
+        );
+    }
 }

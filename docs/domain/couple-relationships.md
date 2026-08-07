@@ -25,7 +25,7 @@ encore active.
 Les enfants ne sont pas stockés dans la relation de couple. Ils restent reliés
 individuellement à leurs parents par les liens parent-enfant existants.
 
-## Modèle envisagé
+## Modèle
 
 ### Relation
 
@@ -63,7 +63,9 @@ Un événement de couple contient :
 | `updatedAt`            | Date technique de dernière modification de l'événement. |
 
 Les dates utilisent la représentation définie par
-l'[ADR 0009](../adr/0009-represent-genealogical-dates-as-structured-values.md).
+les ADR
+[0009](../adr/0009-represent-genealogical-dates-as-structured-values.md) et
+[0013](../adr/0013-persist-genealogical-dates-in-a-dedicated-table.md).
 
 Les types initiaux sont :
 
@@ -125,15 +127,37 @@ GEDCOM 5.5.1 emploie historiquement les noms `HUSB` et `WIFE`. Leur présence ne
 doit pas écraser le genre déjà enregistré sur une personne ni empêcher de
 représenter un couple de même genre.
 
+## API
+
+La première version expose les routes suivantes :
+
+| Méthode | Route                              | Rôle                                  |
+| ------- | ---------------------------------- | ------------------------------------- |
+| `POST`  | `/couple-relationships`            | Créer une relation.                   |
+| `GET`   | `/couple-relationships/:id`        | Consulter une relation.               |
+| `GET`   | `/people/:id/couple-relationships` | Lister les relations d'une personne.  |
+| `POST`  | `/couple-relationships/:id/events` | Créer un événement.                   |
+| `GET`   | `/couple-relationships/:id/events` | Lister les événements d'une relation. |
+| `GET`   | `/couple-relationship-events/:id`  | Consulter un événement.               |
+| `PATCH` | `/couple-relationship-events/:id`  | Modifier un événement.                |
+
+Les listes utilisent l'enveloppe de pagination commune. La modification d'un
+événement permet de remplacer ou retirer sa date, son lieu et sa description.
+Les partenaires d'une relation ne sont pas modifiables : une nouvelle union
+entre deux personnes produit une nouvelle relation.
+
+La suppression et la fusion des relations sont reportées tant que leurs règles
+métier et leur interaction avec les imports ne sont pas définies.
+
 ## Contraintes et suppression logique
 
-PostgreSQL devra garantir :
+PostgreSQL garantit :
 
 - les clés étrangères vers les personnes et la relation de couple ;
 - l'interdiction d'une relation d'une personne avec elle-même ;
 - les valeurs permises pour les types d'événements.
 
-Le service métier vérifiera :
+Le service métier vérifie :
 
 - que les deux personnes sont actives lors de la création ;
 - que les événements ciblent une relation existante ;
@@ -150,7 +174,6 @@ La suppression définitive d'une personne devra rester protégée par des clés
 
 La conception initiale ne définit pas encore :
 
-- les routes de création, consultation, modification ou suppression ;
 - la stratégie de fusion de relations dupliquées ;
 - la gestion détaillée des sources, citations et médias d'un événement ;
 - la conversion automatique entre calendriers ;

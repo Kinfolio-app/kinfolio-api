@@ -96,8 +96,8 @@ Une table de relations distincte est préférée à des colonnes `father_id` et
 familles adoptives ou recomposées ainsi que les informations incomplètes.
 
 Le [modèle métier des relations de couple](domain/couple-relationships.md) et
-leurs événements est défini séparément. Sa persistance et ses routes restent à
-implémenter avec les étapes qui en auront besoin.
+leurs événements est défini séparément. Les tables, repositories, services et
+routes nécessaires sont implémentés.
 
 - [x] Préciser les différents types de relations pris en charge dans le [modèle métier des liens parent-enfant](domain/parent-child-relationships.md).
 - [x] Définir les contraintes et règles métier des liens de parenté.
@@ -105,6 +105,9 @@ implémenter avec les étapes qui en auront besoin.
 - [x] Ajouter les opérations de création et de consultation des relations.
 - [x] Empêcher les relations incohérentes ou cycliques lorsque cela est nécessaire.
 - [x] Ajouter les tests métier et les tests d'intégration.
+- [x] Persister les relations et événements de couple.
+- [x] Ajouter leurs opérations de création, consultation et modification ainsi
+      que leurs tests unitaires et d'intégration.
 
 ## Phase 4 — Consultation de l'arbre familial
 
@@ -132,7 +135,8 @@ qu'une prise en charge silencieuse et partielle du format.
 - [x] Définir les correspondances entre les individus et familles GEDCOM et les personnes et relations Kinfolio.
 - [x] Définir la stratégie de détection des doublons, de réimport et d'idempotence conformément à l'[ADR 0012](adr/0012-preview-and-reimport-gedcom-from-persistent-sources.md).
 - [x] Persister les dates généalogiques structurées des personnes conformément aux ADR [0009](adr/0009-represent-genealogical-dates-as-structured-values.md) et [0013](adr/0013-persist-genealogical-dates-in-a-dedicated-table.md).
-- [ ] Réaliser l'import de manière transactionnelle avec un rapport final, conformément à la [note technique dédiée](technical/gedcom-transactional-import.md), après la persistance des relations et événements de couple.
+- [x] Persister les [relations et événements de couple](domain/couple-relationships.md).
+- [ ] Réaliser l'import de manière transactionnelle avec un rapport final, conformément à la [note technique dédiée](technical/gedcom-transactional-import.md).
 - [ ] Ajouter des tests pour les deux versions avec des fichiers synthétiques, des exports représentatifs anonymisés et un graphe réel volumineux préalablement anonymisé.
 - [ ] Mesurer les performances et la consommation mémoire sur un arbre de plusieurs milliers de personnes.
 
@@ -179,7 +183,6 @@ Kinfolio avec de véritables données familiales privées.
 
 Les sujets suivants restent volontairement ouverts :
 
-- persistance et API des relations et événements de couple ;
 - stratégie de restauration et de purge définitive ;
 - structure des espaces familiaux et modèle d'autorisation ;
 - stockage des photos et documents.
