@@ -8,6 +8,7 @@ import {
 import type { GenealogicalDate } from '../../shared/genealogy/genealogical-date.types.js';
 import type { CreatePersonDto } from './person.schema.js';
 import { Gender, LivingStatus, type Person } from './person.types.js';
+import { runInTransaction } from '../../shared/database/transaction.js';
 
 type QueryableDatabase = Pick<Pool, 'query'>;
 type Database = Pool | PoolClient;
@@ -101,30 +102,6 @@ function mapPersonRow(row: PersonRow): Person {
         createdAt: row.created_at,
         updatedAt: row.updated_at,
     };
-}
-
-async function runInTransaction<T>(
-    database: Database,
-    operation: (transaction: QueryableDatabase) => Promise<T>,
-): Promise<T> {
-    if (!(database instanceof Pool)) {
-        return operation(database);
-    }
-
-    const client = await database.connect();
-
-    try {
-        await client.query('BEGIN');
-        const result = await operation(client);
-        await client.query('COMMIT');
-
-        return result;
-    } catch (error) {
-        await client.query('ROLLBACK');
-        throw error;
-    } finally {
-        client.release();
-    }
 }
 
 async function createDate(
