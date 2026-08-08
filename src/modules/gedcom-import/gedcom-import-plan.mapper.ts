@@ -468,7 +468,7 @@ function createPlannedPerson(
     if (individual.sex?.value === 'other') {
         appendIndividualIssue(issues, individual, index, {
             code: GedcomMappingIssueCode.UnsupportedSex,
-            message: `GEDCOM sex value "${individual.sex.originalValue}" cannot be mapped to a Kinfolio gender.`,
+            message: `GEDCOM sex value "${individual.sex.originalValue}" cannot be mapped to a Genealaine gender.`,
             path: '.sex',
             count: 1,
         });
@@ -655,7 +655,7 @@ function createPlannedParentChildRelationships(
                 issues.push({
                     kind: GedcomMappingIssueKind.Ambiguous,
                     code: GedcomMappingIssueCode.UnknownPedigree,
-                    message: `PEDI value "${pedigreeMapping.unknownValue}" cannot be mapped to a Kinfolio relationship type.`,
+                    message: `PEDI value "${pedigreeMapping.unknownValue}" cannot be mapped to a Genealaine relationship type.`,
                     provenance: {
                         gedcomId: family.id,
                         path: `families[${index}].children[${childIndex}].pedigree`,
@@ -668,7 +668,7 @@ function createPlannedParentChildRelationships(
                 issues.push({
                     kind: GedcomMappingIssueKind.Ambiguous,
                     code: GedcomMappingIssueCode.UnknownEvidenceStatus,
-                    message: `STAT value "${evidenceStatusMapping.unknownValue}" cannot be mapped to a Kinfolio evidence status.`,
+                    message: `STAT value "${evidenceStatusMapping.unknownValue}" cannot be mapped to a Genealaine evidence status.`,
                     provenance: {
                         gedcomId: family.id,
                         path: `families[${index}].children[${childIndex}].status`,

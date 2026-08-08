@@ -1,6 +1,6 @@
-# Kinfolio API
+# Genealaine API
 
-Kinfolio API est le backend d'une application de généalogie pensée comme un **album familial interactif**. Le projet vise à réunir les personnes, les liens de parenté, les souvenirs et les documents d'une famille dans une expérience plus vivante qu'un arbre généalogique traditionnel.
+Genealaine API est le backend d'une application de généalogie pensée comme un **album familial interactif**. Le projet vise à réunir les personnes, les liens de parenté, les souvenirs et les documents d'une famille dans une expérience plus vivante qu'un arbre généalogique traditionnel.
 
 Le dépôt est actuellement au stade de prototype fonctionnel. Le socle Fastify,
 la gestion des personnes, les liens parent-enfant et la consultation bornée de
@@ -13,7 +13,10 @@ l'idempotence.
 
 Les informations familiales sont souvent dispersées entre albums photo, documents, souvenirs oraux et outils généalogiques parfois complexes. Il devient alors difficile de préserver ce patrimoine, de comprendre les liens entre les personnes et de le transmettre aux générations suivantes.
 
-Kinfolio a pour ambition de centraliser cette histoire familiale et de permettre de la parcourir comme un album interactif : les membres d'une famille, leurs relations et leurs souvenirs doivent pouvoir être consultés dans un même espace, de manière simple et accessible.
+Genealaine a pour ambition de centraliser cette histoire familiale et de permettre de la parcourir comme un album interactif : les membres d'une famille, leurs relations et leurs souvenirs doivent pouvoir être consultés dans un même espace, de manière simple et accessible.
+
+Le [choix du nom Genealaine](docs/product/brand-name.md) documente son origine,
+son orthographe officielle et les vérifications préliminaires effectuées.
 
 ## Fonctionnalités
 
@@ -233,7 +236,7 @@ npm run check
 Le socle technique, les personnes, les liens parent-enfant et la consultation
 de l'arbre familial sont terminés. Le pipeline GEDCOM détecte et parse les deux
 versions ciblées, produit une analyse commune puis un plan de correspondance
-vers le domaine Kinfolio. Cette projection reste sans effet sur PostgreSQL.
+vers le domaine Genealaine. Cette projection reste sans effet sur PostgreSQL.
 
 Les relations de couple et leurs événements disposent de types métier et d'une
 projection GEDCOM, mais pas encore de tables, repositories ou routes HTTP. Les

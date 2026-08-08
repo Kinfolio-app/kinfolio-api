@@ -40,7 +40,7 @@ describe('GedcomImportService', () => {
                 kind: 'extension',
                 tag: '_IDENTIFIED',
                 uri: 'https://example.com/extensions/identified',
-                reason: 'The extension is identified but is not supported by Kinfolio.',
+                reason: 'The extension is identified but is not supported by Genealaine.',
             }),
         ]);
         expect(result.ambiguous).toEqual([

@@ -258,7 +258,7 @@ describe('createGedcomImportPlan', () => {
         ]);
     });
 
-    it('keeps an individual whose GEDCOM sex cannot be mapped to a Kinfolio gender', () => {
+    it('keeps an individual whose GEDCOM sex cannot be mapped to a Genealaine gender', () => {
         const document = createDocument([
             createIndividual({
                 id: '@I1@',
@@ -275,7 +275,7 @@ describe('createGedcomImportPlan', () => {
             {
                 kind: GedcomMappingIssueKind.Ignored,
                 code: GedcomMappingIssueCode.UnsupportedSex,
-                message: 'GEDCOM sex value "X" cannot be mapped to a Kinfolio gender.',
+                message: 'GEDCOM sex value "X" cannot be mapped to a Genealaine gender.',
                 provenance: {
                     gedcomId: '@I1@',
                     path: 'individuals[0].sex',

@@ -156,7 +156,7 @@ describe('GEDCOM analysis route integration', () => {
                     kind: 'extension',
                     tag: '_IDENTIFIED',
                     uri: 'https://example.com/extensions/identified',
-                    reason: 'The extension is identified but is not supported by Kinfolio.',
+                    reason: 'The extension is identified but is not supported by Genealaine.',
                     path: expect.any(String),
                     location: {
                         line: 7,

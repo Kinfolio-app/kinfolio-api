@@ -85,7 +85,7 @@ function classifyGedcomExtensions(
             location: extension.location,
             reason: isAmbiguous
                 ? 'The extension could not be identified uniquely.'
-                : 'The extension is identified but is not supported by Kinfolio.',
+                : 'The extension is identified but is not supported by Genealaine.',
         };
 
         if (isAmbiguous) {
