@@ -78,7 +78,7 @@ ambigu appartient à la
 
 Les responsabilités suivantes restent hors du parseur GEDCOM 5.5.1 :
 
-- la correspondance avec les entités Kinfolio ;
+- la correspondance avec les entités Genealaine ;
 - la détection des doublons et le réimport ;
 - la persistance transactionnelle ;
 - la prise en charge d'ANSEL, de GEDZIP ou des fichiers médias eux-mêmes.

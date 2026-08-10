@@ -31,14 +31,14 @@ Les détails sont définis dans les spécifications
 Transformer `1900`, `ABT 1900` ou `BEF 1900` en `1900-01-01` créerait une
 précision inexistante et modifierait le sens de la donnée. Conserver uniquement
 le texte original empêcherait en revanche de valider, comparer et exploiter la
-date dans Kinfolio.
+date dans Genealaine.
 
 Ce besoin concerne les naissances et décès, mais également les relations de
 couple, les événements familiaux et les futurs contenus généalogiques.
 
 ## Décision
 
-Kinfolio représente une date généalogique par une valeur structurée commune à
+Genealaine représente une date généalogique par une valeur structurée commune à
 tous les modules.
 
 Le modèle conceptuel comprend :
@@ -233,7 +233,7 @@ calendriers.
 
 Le texte préserve la source, mais il mélange la syntaxe d'échange et le domaine.
 Il impose de reparsing la valeur pour chaque validation, recherche ou
-présentation et ne couvre pas les dates saisies directement dans Kinfolio.
+présentation et ne couvre pas les dates saisies directement dans Genealaine.
 
 ### Stocker uniquement un intervalle calculé
 

@@ -1,7 +1,7 @@
 # Conventions de l'API HTTP
 
 Ce document rassemble les conventions pratiques utilisées pour concevoir les
-routes HTTP de Kinfolio API. Il constitue un guide vivant : il évolue lorsque
+routes HTTP de Genealaine API. Il constitue un guide vivant : il évolue lorsque
 le contrat public de l'API évolue, contrairement aux ADR qui conservent
 l'historique et la justification des décisions structurantes.
 

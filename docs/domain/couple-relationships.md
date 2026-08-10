@@ -1,6 +1,6 @@
 # Relations de couple
 
-Ce document décrit le modèle métier des relations de couple de Kinfolio et leur
+Ce document décrit le modèle métier des relations de couple de Genealaine et leur
 interaction avec les familles GEDCOM.
 
 ## Principes
@@ -95,7 +95,7 @@ mariage. Son traitement initial suit ces règles :
 
 - une famille contenant deux partenaires crée une relation de couple ;
 - `HUSB` et `WIFE` identifient des partenaires, sans imposer leur genre dans
-  Kinfolio ;
+  Genealaine ;
 - une famille contenant un seul partenaire et des enfants ne crée pas de
   partenaire fictif ni de relation de couple incomplète ;
 - chaque `CHIL` produit les relations parent-enfant nécessaires avec les
@@ -105,7 +105,7 @@ mariage. Son traitement initial suit ces règles :
 
 Les premières correspondances d'événements sont :
 
-| GEDCOM                                     | Kinfolio      |
+| GEDCOM                                     | Genealaine    |
 | ------------------------------------------ | ------------- |
 | `ENGA`                                     | `engagement`  |
 | `MARR`                                     | `marriage`    |
@@ -121,7 +121,7 @@ leur sens est inconnu ou ambigu.
 
 Les registres de valeurs `EVEN`, les règles de normalisation et les diagnostics
 sont détaillés dans la
-[note technique de correspondance](../technical/gedcom-to-kinfolio-mapping.md).
+[note technique de correspondance](../technical/gedcom-to-genealaine-mapping.md).
 
 GEDCOM 5.5.1 emploie historiquement les noms `HUSB` et `WIFE`. Leur présence ne
 doit pas écraser le genre déjà enregistré sur une personne ni empêcher de

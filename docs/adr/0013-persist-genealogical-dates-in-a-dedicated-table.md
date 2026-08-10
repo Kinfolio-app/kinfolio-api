@@ -19,7 +19,7 @@ chaque table métier.
 
 ## Décision
 
-Kinfolio persiste les dates généalogiques dans une table dédiée
+Genealaine persiste les dates généalogiques dans une table dédiée
 `genealogical_dates`. Ses colonnes représentent explicitement le type de date,
 les composantes du premier et du second point, la phrase et le texte d'origine.
 Des contraintes PostgreSQL garantissent la cohérence de la forme choisie et

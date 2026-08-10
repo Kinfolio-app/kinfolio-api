@@ -5,7 +5,7 @@
 
 ## Contexte
 
-Kinfolio API doit retourner des erreurs compréhensibles par les clients tout en
+Genealaine API doit retourner des erreurs compréhensibles par les clients tout en
 conservant un format cohérent entre les erreurs de validation, les erreurs
 métier, les routes inexistantes et les erreurs internes.
 
@@ -13,7 +13,7 @@ Le format d'erreur fourni par défaut par Fastify contient les champs
 `statusCode`, `error` et `message`. Utiliser directement ce format exposerait le
 contrat de l'API aux choix internes de la bibliothèque backend. Définir un
 format entièrement personnalisé rendrait également son interprétation et sa
-documentation spécifiques à Kinfolio.
+documentation spécifiques à Genealaine.
 
 Les erreurs internes peuvent contenir des informations techniques ou sensibles,
 notamment des requêtes, des contraintes PostgreSQL et des traces d'exécution.
@@ -24,7 +24,7 @@ clients.
 
 J'utilise la
 [RFC 9457 — Problem Details for HTTP APIs](https://www.rfc-editor.org/rfc/rfc9457.html)
-pour représenter les erreurs HTTP de Kinfolio API. Cette RFC remplace la
+pour représenter les erreurs HTTP de Genealaine API. Cette RFC remplace la
 RFC 7807.
 
 Les réponses d'erreur utilisent le type de contenu
@@ -37,7 +37,7 @@ Les réponses d'erreur utilisent le type de contenu
 - `instance` pourra identifier une occurrence particulière lorsqu'un mécanisme
   adapté sera défini.
 
-Kinfolio ajoute le membre d'extension `requestId`. Il permet de relier une
+Genealaine ajoute le membre d'extension `requestId`. Il permet de relier une
 réponse reçue par un client aux journaux du serveur sans exposer les détails
 internes de l'erreur.
 
@@ -91,7 +91,7 @@ directement les garanties de stabilité recherchées.
 
 ### Format personnalisé
 
-Un format propre à Kinfolio, par exemple composé de `statusCode`, `code` et
+Un format propre à Genealaine, par exemple composé de `statusCode`, `code` et
 `message`, a été envisagé. Il n'a pas été retenu, car il reproduirait une
 solution déjà standardisée et demanderait aux clients une intégration
 spécifique.

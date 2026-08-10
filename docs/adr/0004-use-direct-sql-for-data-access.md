@@ -5,7 +5,7 @@
 
 ## Contexte
 
-Kinfolio API utilise PostgreSQL comme base de données principale,
+Genealaine API utilise PostgreSQL comme base de données principale,
 `node-pg-migrate` pour faire évoluer son schéma et `@fastify/postgres` pour
 partager un pool de connexions dans l'application Fastify.
 
@@ -22,7 +22,7 @@ et TypeORM.
 
 ## Décision
 
-Dans un premier temps, Kinfolio API utilise du **SQL direct** au sein de
+Dans un premier temps, Genealaine API utilise du **SQL direct** au sein de
 repositories propres à chaque module métier.
 
 Par exemple, le module `persons` contiendra un repository responsable des

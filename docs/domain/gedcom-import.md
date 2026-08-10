@@ -1,6 +1,6 @@
 # Import GEDCOM
 
-Ce document définit les versions de GEDCOM ciblées par Kinfolio, le périmètre
+Ce document définit les versions de GEDCOM ciblées par Genealaine, le périmètre
 fonctionnel du premier import et les principes d'architecture qui permettront
 de faire évoluer leur prise en charge.
 
@@ -88,9 +88,9 @@ Le contrat et les diagnostics sont détaillés dans la
 
 | Catégorie           | Prise en charge initiale                                                                                           |
 | ------------------- | ------------------------------------------------------------------------------------------------------------------ |
-| Personnes           | Importées : noms, genre, naissance, décès et lieux associés, dans la limite du modèle Kinfolio                     |
+| Personnes           | Importées : noms, genre, naissance, décès et lieux associés, dans la limite du modèle Genealaine                   |
 | Filiations          | Importées sous forme de relations parent-enfant, avec une correspondance prudente de `PEDI`                        |
-| Relations de couple | Importées après la conception du modèle métier Kinfolio correspondant                                              |
+| Relations de couple | Importées après la conception du modèle métier Genealaine correspondant                                            |
 | Événements          | Naissance, décès, mariage et divorce importés ; les autres événements sont reconnus et signalés comme non importés |
 | Sources             | Analysées et comptabilisées, mais non persistées tant que leur modèle métier n'existe pas                          |
 | Médias              | Références analysées et comptabilisées, mais fichiers et références non persistés dans la première version         |
@@ -105,8 +105,8 @@ Le contrat HTTP, les compteurs et les règles de classement actuellement
 appliquées sont détaillés dans la
 [note technique sur l'analyse](../technical/gedcom-import-analysis.md).
 Les choix qui transforment ensuite le document normalisé en personnes,
-filiations, relations et événements Kinfolio sont définis dans la
-[note technique sur les correspondances](../technical/gedcom-to-kinfolio-mapping.md).
+filiations, relations et événements Genealaine sont définis dans la
+[note technique sur les correspondances](../technical/gedcom-to-genealaine-mapping.md).
 
 ## Architecture de parsing
 
@@ -123,7 +123,7 @@ GedcomVersionDetector
                                       |
                                       +--> validation métier
                                       +--> analyse
-                                      +--> correspondances Kinfolio
+                                      +--> correspondances Genealaine
                                       +--> import transactionnel
 ```
 
@@ -157,7 +157,7 @@ la [note sur le parseur GEDCOM 7](../technical/gedcom-7-parser.md).
 Le contrat commun exposé après la sélection du parseur est détaillé dans la
 [note sur l'analyse d'un import](../technical/gedcom-import-analysis.md).
 La projection métier commune aux deux versions est détaillée dans la
-[note sur les correspondances GEDCOM vers Kinfolio](../technical/gedcom-to-kinfolio-mapping.md).
+[note sur les correspondances GEDCOM vers Genealaine](../technical/gedcom-to-genealaine-mapping.md).
 La prévisualisation, la détection des doublons et le réimport sont régis par
 l'[ADR 0012](../adr/0012-preview-and-reimport-gedcom-from-persistent-sources.md).
 Leur modèle de persistance, leur cycle de confirmation et leur stratégie de

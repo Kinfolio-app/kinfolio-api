@@ -1,7 +1,7 @@
-# Roadmap de Kinfolio API
+# Roadmap de Genealaine API
 
 Cette roadmap présente l'ordre de développement actuellement envisagé pour
-Kinfolio API. Elle sert de guide et pourra évoluer à mesure que les besoins
+Genealaine API. Elle sert de guide et pourra évoluer à mesure que les besoins
 métier seront précisés.
 
 ## Phase 1 — Stabiliser le socle technique
@@ -27,7 +27,7 @@ Avant d'implémenter les fonctionnalités de généalogie, le socle de l'API doi
 - [ ] Décrire correctement les paramètres de collection, les réponses sans contenu et le transfert des fichiers GEDCOM.
 - [ ] Ajouter une commande produisant un `openapi.json` déterministe.
 - [ ] Valider en CI que `openapi.json` est valide et à jour.
-- [ ] Publier le contrat avec les tags ou releases de Kinfolio API afin que les clients puissent sélectionner une version immuable.
+- [ ] Publier le contrat avec les tags ou releases de Genealaine API afin que les clients puissent sélectionner une version immuable.
 - [ ] Vérifier la génération des types du client web avec `openapi-typescript`.
 
 ## Phase 2 — Première tranche métier : les personnes
@@ -132,7 +132,7 @@ qu'une prise en charge silencieuse et partielle du format.
 - [x] Parser et valider un fichier GEDCOM 5.5.1 sans modifier la base de données, conformément à la [note technique du parseur](technical/gedcom-551-parser.md).
 - [x] Parser et valider un fichier GEDCOM 7.0.x sans modifier la base de données, conformément à la [note technique du parseur](technical/gedcom-7-parser.md).
 - [x] Fournir une [analyse commune aux deux versions](technical/gedcom-import-analysis.md) avec les éléments reconnus, ignorés, ambigus ou invalides.
-- [x] Définir les correspondances entre les individus et familles GEDCOM et les personnes et relations Kinfolio.
+- [x] Définir les correspondances entre les individus et familles GEDCOM et les personnes et relations Genealaine.
 - [x] Définir la stratégie de détection des doublons, de réimport et d'idempotence conformément à l'[ADR 0012](adr/0012-preview-and-reimport-gedcom-from-persistent-sources.md).
 - [x] Persister les dates généalogiques structurées des personnes conformément aux ADR [0009](adr/0009-represent-genealogical-dates-as-structured-values.md) et [0013](adr/0013-persist-genealogical-dates-in-a-dedicated-table.md).
 - [x] Persister les [relations et événements de couple](domain/couple-relationships.md).
@@ -157,7 +157,7 @@ ou anonymisées.
 ## Phase 7 — Sécurité et accès
 
 L'authentification et les autorisations devront être en place avant d'utiliser
-Kinfolio avec de véritables données familiales privées.
+Genealaine avec de véritables données familiales privées.
 
 - [ ] Définir les comptes utilisateurs et le mécanisme d'authentification.
 - [ ] Définir la notion de famille ou d'espace familial.

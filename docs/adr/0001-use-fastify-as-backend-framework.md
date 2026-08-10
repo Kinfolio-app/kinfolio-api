@@ -5,7 +5,7 @@
 
 ## Contexte
 
-Le projet Kinfolio API a notamment pour objectif de me permettre d'apprendre Node.js et de mieux comprendre le fonctionnement d'une application backend.
+Le projet Genealaine API a notamment pour objectif de me permettre d'apprendre Node.js et de mieux comprendre le fonctionnement d'une application backend.
 
 NestJS fournit un cadre très structuré et de nombreuses abstractions prêtes à l'emploi, notamment pour l'injection de dépendances, les contrôleurs, les modules, les gardes et les intercepteurs. Ces abstractions facilitent le développement d'une application, mais elles masquent aussi une partie des mécanismes sous-jacents de Node.js et du traitement d'une requête HTTP.
 
@@ -13,7 +13,7 @@ Pour ce projet d'apprentissage, je souhaite manipuler plus directement ces méca
 
 ## Décision
 
-J'utilise **Fastify** comme bibliothèque backend pour développer Kinfolio API.
+J'utilise **Fastify** comme bibliothèque backend pour développer Genealaine API.
 
 Fastify fournit les éléments essentiels pour construire une API HTTP tout en restant moins prescriptif que NestJS. Ce choix me permet de définir moi-même l'architecture de l'application et d'implémenter explicitement ses différents composants. L'objectif est de comprendre leur rôle et leurs interactions plutôt que de les utiliser principalement au travers des abstractions d'un framework plus complet.
 

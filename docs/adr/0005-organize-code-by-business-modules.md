@@ -6,7 +6,7 @@
 ## Contexte
 
 Fastify laisse volontairement à l'application le choix de son organisation.
-La structure initiale de Kinfolio API regroupait les fichiers par rôle
+La structure initiale de Genealaine API regroupait les fichiers par rôle
 technique dans des dossiers globaux tels que `models`, `services`,
 `repositories` et `controllers`.
 
@@ -16,7 +16,7 @@ Une évolution concernant les personnes, par exemple, oblige à naviguer entre
 les types, les règles métier, l'accès aux données et les routes HTTP situés à
 des endroits différents.
 
-Kinfolio doit accueillir plusieurs domaines liés mais distincts, notamment les
+Genealaine doit accueillir plusieurs domaines liés mais distincts, notamment les
 personnes, les relations familiales, les souvenirs, les événements et les
 médias. L'organisation du code doit rendre les frontières entre ces domaines
 visibles, limiter les dépendances implicites et rester suffisamment simple pour
@@ -24,7 +24,7 @@ le stade actuel du projet.
 
 ## Décision
 
-Le code applicatif de Kinfolio API est organisé en priorité par **modules
+Le code applicatif de Genealaine API est organisé en priorité par **modules
 métier** sous `src/modules`.
 
 Chaque module regroupe les éléments qui lui appartiennent, selon ses besoins :
@@ -135,6 +135,6 @@ principes pourront être appliqués localement lorsqu'un module en bénéficiera
 ### Structure limitée à `plugins` et `routes`
 
 Cette organisation suit un modèle courant dans les applications Fastify
-simples. Elle n'est pas suffisante comme seule convention pour Kinfolio, car les
+simples. Elle n'est pas suffisante comme seule convention pour Genealaine, car les
 modules métier contiendront également des types, des règles métier et un accès
 aux données qui ne doivent pas être assimilés aux routes HTTP.

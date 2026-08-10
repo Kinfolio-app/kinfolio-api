@@ -8,7 +8,7 @@
 La consultation d'une branche familiale doit permettre de parcourir les liens
 parent-enfant à partir d'une personne racine. Bien que le résultat soit
 généralement présenté visuellement comme un arbre, le modèle métier de
-Kinfolio n'est pas un arbre strict.
+Genealaine n'est pas un arbre strict.
 
 Une personne peut avoir plusieurs parents et plusieurs types de filiation. Une
 même personne peut également être atteinte par plusieurs chemins lorsque deux

@@ -5,7 +5,7 @@ doublons, du réimport et de l'écriture transactionnelle d'un plan GEDCOM. Elle
 applique les décisions de
 l'[ADR 0012](../adr/0012-preview-and-reimport-gedcom-from-persistent-sources.md)
 au document normalisé et au
-[plan d'import Kinfolio](gedcom-to-kinfolio-mapping.md) communs à GEDCOM 5.5.1
+[plan d'import Genealaine](gedcom-to-genealaine-mapping.md) communs à GEDCOM 5.5.1
 et GEDCOM 7.0.x.
 
 ## Objectifs
@@ -22,7 +22,7 @@ La première implémentation doit garantir que :
   annulation ou expiration ;
 - le résultat final reste explicable par un rapport déterministe.
 
-Cette étape n'ajoute pas de fusion générale entre personnes Kinfolio. Elle
+Cette étape n'ajoute pas de fusion générale entre personnes Genealaine. Elle
 résout uniquement les correspondances nécessaires à une source GEDCOM donnée.
 
 ## Prérequis métier et techniques
@@ -43,7 +43,7 @@ transactionnelle.
 fichier
   |
   v
-détection -> parsing -> document normalisé -> plan Kinfolio
+détection -> parsing -> document normalisé -> plan Genealaine
                                                 |
                                                 v
                               recherche des correspondances
@@ -177,7 +177,7 @@ les snapshots nécessaires au prochain réimport subsistent.
 | -------------------- | ------------------------------------------------ |
 | `source_id`          | Source de l'identifiant GEDCOM.                  |
 | `gedcom_id`          | Identifiant tel que `@I42@`.                     |
-| `person_id`          | Personne Kinfolio associée.                      |
+| `person_id`          | Personne Genealaine associée.                    |
 | `identifiers`        | Derniers `UID`, `EXID` et `REFN` observés.       |
 | `last_imported_data` | Snapshot des dernières valeurs importées.        |
 | `last_seen_run_id`   | Dernière exécution contenant cet enregistrement. |
@@ -191,7 +191,7 @@ fichier ; aucune contrainte unique n'est donc ajoutée sur
 
 `last_imported_data` contient uniquement les champs couverts par l'import. Il
 est mis à jour avec les dernières valeurs observées et confirmées dans le
-fichier, y compris lorsqu'une valeur Kinfolio modifiée manuellement a été
+fichier, y compris lorsqu'une valeur Genealaine modifiée manuellement a été
 conservée. Ce snapshot représente l'état de la source, pas une copie de l'état
 courant de la personne.
 
@@ -214,7 +214,7 @@ contenir les mêmes partenaires sans partager la même relation de couple.
 
 Une table de provenance des filiations relie la source, la famille, les
 identifiants GEDCOM du parent et de l'enfant, et la relation parent-enfant
-Kinfolio. Plusieurs provenances peuvent désigner la même relation lorsque le
+Genealaine. Plusieurs provenances peuvent désigner la même relation lorsque le
 fichier répète le lien dans plusieurs familles.
 
 Les événements familiaux n'ont généralement pas d'identifiant GEDCOM propre.
@@ -272,7 +272,7 @@ biographique en correspondance automatique.
 
 Une personne ambiguë accepte trois décisions :
 
-- `link`, avec l'identifiant de la personne Kinfolio choisie ;
+- `link`, avec l'identifiant de la personne Genealaine choisie ;
 - `create` ;
 - `ignore`.
 
@@ -308,7 +308,7 @@ enregistrée dans une autre session.
 Pour un champ, les symboles suivants sont utilisés :
 
 - `P` : valeur du snapshot importé précédemment ;
-- `C` : valeur courante dans Kinfolio ;
+- `C` : valeur courante dans Genealaine ;
 - `I` : valeur proposée par le nouveau fichier.
 
 | Situation                 | Résultat                                                 |
@@ -360,7 +360,7 @@ commandes à partir du plan immuable et des règles métier.
 
 Si une entité a changé depuis la prévisualisation, la transaction est annulée.
 Le brouillon repasse par le calcul des correspondances et des fusions avant une
-nouvelle confirmation. Kinfolio ne tente pas de fusionner avec un état que
+nouvelle confirmation. Genealaine ne tente pas de fusionner avec un état que
 l'utilisateur n'a pas prévisualisé.
 
 La contrainte unique de l'exécution rend deux confirmations concurrentes du
@@ -379,20 +379,20 @@ apparaît dans le rapport.
 La prévisualisation et l'exécution finale partagent des codes stables. Leur
 enveloppe distingue au minimum :
 
-| Catégorie                | Signification                                                   |
-| ------------------------ | --------------------------------------------------------------- |
-| `created`                | Nouvelle entité Kinfolio.                                       |
-| `updated`                | Entité existante modifiée par le fichier.                       |
-| `unchanged`              | Entité reconnue sans changement.                                |
-| `linked`                 | Nouvelle correspondance vers une entité existante.              |
-| `ignored`                | Élément volontairement exclu ou hors périmètre.                 |
-| `conflicted`             | Choix nécessaire avant confirmation.                            |
-| `missing_from_reimport`  | Entité précédemment importée, absente du nouveau fichier.       |
-| `retained_manual_change` | Valeur Kinfolio conservée face à une ancienne valeur importée.  |
-| `retained_missing_value` | Valeur conservée parce que le nouvel export ne la fournit plus. |
+| Catégorie                | Signification                                                    |
+| ------------------------ | ---------------------------------------------------------------- |
+| `created`                | Nouvelle entité Genealaine.                                      |
+| `updated`                | Entité existante modifiée par le fichier.                        |
+| `unchanged`              | Entité reconnue sans changement.                                 |
+| `linked`                 | Nouvelle correspondance vers une entité existante.               |
+| `ignored`                | Élément volontairement exclu ou hors périmètre.                  |
+| `conflicted`             | Choix nécessaire avant confirmation.                             |
+| `missing_from_reimport`  | Entité précédemment importée, absente du nouveau fichier.        |
+| `retained_manual_change` | Valeur Genealaine conservée face à une ancienne valeur importée. |
+| `retained_missing_value` | Valeur conservée parce que le nouvel export ne la fournit plus.  |
 
 Chaque entrée détaillée possède une provenance GEDCOM, la clé du plan, l'action
-proposée ou réalisée et, lorsqu'elle existe, l'entité Kinfolio concernée. Les
+proposée ou réalisée et, lorsqu'elle existe, l'entité Genealaine concernée. Les
 compteurs agrégés sont calculés à partir de ces entrées afin d'éviter deux
 sources de vérité.
 

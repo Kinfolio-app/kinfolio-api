@@ -6,7 +6,7 @@
 ## Contexte
 
 Un même arbre généalogique peut être exporté et importé plusieurs fois à mesure
-qu'il évolue dans son logiciel d'origine. Kinfolio doit reconnaître les entités
+qu'il évolue dans son logiciel d'origine. Genealaine doit reconnaître les entités
 déjà importées, préserver les modifications réalisées dans l'application et
 éviter qu'un nouvel envoi du même fichier crée des doublons.
 
@@ -32,7 +32,7 @@ requêtes du client.
 
 ### Identifier une lignée d'imports par une source persistante
 
-Kinfolio représente chaque lignée d'exports par une source d'import persistante.
+Genealaine représente chaque lignée d'exports par une source d'import persistante.
 Le premier import crée une source. Un réimport cible explicitement cette source.
 Un fichier envoyé sans source crée une nouvelle lignée et ne fusionne pas
 automatiquement ses entités avec celles déjà présentes.
@@ -42,7 +42,7 @@ Une correspondance persistante associe au minimum :
 - la source d'import ;
 - le type d'enregistrement GEDCOM ;
 - son identifiant dans la source, par exemple `@I42@` ou `@F7@` ;
-- l'entité Kinfolio correspondante ;
+- l'entité Genealaine correspondante ;
 - les dernières valeurs importées nécessaires à la comparaison d'un réimport.
 
 Une source appartiendra à l'espace familial qui sera introduit avec le modèle
@@ -72,7 +72,7 @@ définis dans la
 
 ### Résoudre les correspondances par niveau de confiance
 
-Kinfolio applique l'ordre suivant pour une personne planifiée :
+Genealaine applique l'ordre suivant pour une personne planifiée :
 
 1. une correspondance déjà enregistrée pour la source et l'identifiant GEDCOM
    est réutilisée automatiquement ;
@@ -93,16 +93,16 @@ les ambiguïtés bloquantes doivent être résolues avant la confirmation.
 
 ### Protéger les modifications manuelles par une fusion à trois versions
 
-Pour chaque champ réimporté, Kinfolio compare :
+Pour chaque champ réimporté, Genealaine compare :
 
 - la dernière valeur importée depuis cette source ;
-- la valeur actuelle dans Kinfolio ;
+- la valeur actuelle dans Genealaine ;
 - la nouvelle valeur du fichier GEDCOM.
 
 La nouvelle valeur est appliquée lorsque la valeur actuelle correspond encore
 à la dernière valeur importée. Une modification réalisée uniquement dans
-Kinfolio est conservée. Une modification réalisée uniquement dans le fichier
-est appliquée. Lorsque Kinfolio et le fichier ont modifié différemment la même
+Genealaine est conservée. Une modification réalisée uniquement dans le fichier
+est appliquée. Lorsque Genealaine et le fichier ont modifié différemment la même
 valeur, le brouillon contient un conflit à résoudre avant confirmation.
 
 La stratégie détaillée pour les valeurs absentes, structurées ou non encore
@@ -123,7 +123,7 @@ proposition de rapprochement.
 ### Confirmer avant toute écriture métier
 
 La confirmation explicite du brouillon est le seul événement qui modifie
-l'arbre familial. Avant de commencer, Kinfolio vérifie que le brouillon est
+l'arbre familial. Avant de commencer, Genealaine vérifie que le brouillon est
 complet, non expiré et fondé sur des entités qui n'ont pas changé depuis sa
 prévisualisation.
 
@@ -197,11 +197,11 @@ rend les résolutions en plusieurs sessions plus fragiles.
 
 Les entités certaines pourraient être enregistrées avant la résolution des
 ambiguïtés. L'arbre deviendrait toutefois partiellement importé et chaque
-annulation demanderait une compensation complexe. Kinfolio attend une
+annulation demanderait une compensation complexe. Genealaine attend une
 confirmation unique et écrit le résultat atomiquement.
 
 ### Écraser systématiquement les valeurs lors d'un réimport
 
 Cette solution refléterait toujours le dernier fichier, mais supprimerait des
-corrections et enrichissements effectués directement dans Kinfolio. La fusion à
+corrections et enrichissements effectués directement dans Genealaine. La fusion à
 trois versions protège ces modifications et rend les conflits visibles.

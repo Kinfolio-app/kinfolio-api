@@ -7,26 +7,26 @@ Ce modèle permet de séparer trois responsabilités :
 
 - comprendre la syntaxe et les règles propres à chaque version de GEDCOM ;
 - conserver les informations reconnues sans les adapter prématurément à
-  Kinfolio ;
+  Genealaine ;
 - préparer la validation, l'analyse et les correspondances vers le
-  domaine Kinfolio.
+  domaine Genealaine.
 
 Le modèle est temporaire. Il existe pendant l'analyse et l'import d'un fichier,
 mais ne constitue pas un schéma de base de données.
 
 Les règles qui sélectionnent et transforment ensuite ces données sont décrites
 séparément dans la
-[note sur les correspondances GEDCOM vers Kinfolio](gedcom-to-kinfolio-mapping.md).
+[note sur les correspondances GEDCOM vers Genealaine](gedcom-to-genealaine-mapping.md).
 
 ## Principes
 
 Le modèle intermédiaire :
 
 - est indépendant de GEDCOM 5.5.1 et GEDCOM 7.0.x ;
-- ne contient aucun UUID ou identifiant de base de données Kinfolio ;
+- ne contient aucun UUID ou identifiant de base de données Genealaine ;
 - conserve les identifiants GEDCOM dans la portée du document ;
 - préserve les structures et extensions non interprétées ;
-- ne choisit pas les informations qui remplaceront les champs Kinfolio ;
+- ne choisit pas les informations qui remplaceront les champs Genealaine ;
 - ne détecte ni ne fusionne les doublons ;
 - ne modifie jamais la base de données ;
 - produit un ordre déterministe pour faciliter les tests et les rapports.
@@ -151,7 +151,7 @@ type NormalizedIndividual = {
 ```
 
 `id` contient l'identifiant GEDCOM dans sa forme originale, par exemple `@I1@`,
-sans lui donner la sémantique d'un identifiant Kinfolio. Il peut être `null`
+sans lui donner la sémantique d'un identifiant Genealaine. Il peut être `null`
 pour un enregistrement GEDCOM 7 non référencé, car cette version n'impose pas
 d'identifiant dans ce cas. Le parseur n'en invente jamais un.
 
@@ -179,7 +179,7 @@ type NormalizedName = {
 Tous les noms reconnus sont conservés. Le premier nom conforme est marqué
 comme principal lorsque le fichier ne fournit pas une indication plus précise.
 Le choix du nom qui alimentera `firstName`, `lastName` ou `birthName` appartient
-à la correspondance vers Kinfolio.
+à la correspondance vers Genealaine.
 
 ### Sexe déclaré
 
@@ -192,7 +192,7 @@ type NormalizedSex = {
 
 La valeur normalisée facilite la comparaison entre versions, tandis que
 `originalValue` préserve la valeur réellement rencontrée. La conversion vers
-le genre Kinfolio reste une décision de correspondance séparée.
+le genre Genealaine reste une décision de correspondance séparée.
 
 ### Liens familiaux d'un individu
 
@@ -296,14 +296,14 @@ type NormalizedPlace = {
 };
 ```
 
-La première correspondance Kinfolio peut n'utiliser que `value`, mais les
+La première correspondance Genealaine peut n'utiliser que `value`, mais les
 autres composantes restent disponibles dans l'analyse et pour les
 évolutions futures.
 
 ## Sources, dépôts, notes et médias
 
 Ces éléments sont normalisés même lorsqu'ils ne sont pas encore persistés dans
-Kinfolio. Cette représentation permet de les compter, de vérifier leurs
+Genealaine. Cette représentation permet de les compter, de vérifier leurs
 références et d'expliquer leur traitement dans l'analyse.
 
 ```ts
@@ -490,7 +490,7 @@ arbre syntaxique brut
 document GEDCOM normalisé + diagnostics
     |
     +--> analyse
-    +--> correspondances Kinfolio
+    +--> correspondances Genealaine
     +--> détection des doublons
     +--> import transactionnel
 ```
@@ -510,12 +510,12 @@ fichier. La normalisation se déroule donc en plusieurs passes :
 Une référence absente n'est jamais remplacée par une personne, une famille ou
 une ressource fictive.
 
-## Frontière avec Kinfolio
+## Frontière avec Genealaine
 
 Le document normalisé décrit ce que contient le fichier. Il ne décide pas :
 
-- quel nom devient le nom principal Kinfolio ;
-- comment une valeur GEDCOM de sexe devient un genre Kinfolio ;
+- quel nom devient le nom principal Genealaine ;
+- comment une valeur GEDCOM de sexe devient un genre Genealaine ;
 - si deux individus représentent la même personne ;
 - si une famille représente une relation déjà existante ;
 - si une source ou un média peut être persisté ;

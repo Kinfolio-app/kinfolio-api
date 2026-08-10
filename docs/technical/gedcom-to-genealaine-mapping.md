@@ -1,7 +1,7 @@
-# Correspondances GEDCOM vers Kinfolio
+# Correspondances GEDCOM vers Genealaine
 
 Cette note définit la projection du document GEDCOM normalisé vers un plan
-d'import Kinfolio. Elle s'applique de manière identique aux documents produits
+d'import Genealaine. Elle s'applique de manière identique aux documents produits
 par les parseurs GEDCOM 5.5.1 et GEDCOM 7.0.x.
 
 Le mapper est une fonction pure. Il ne recherche pas de doublon, ne consulte
@@ -39,7 +39,7 @@ type GedcomMappingProvenance = {
 ```
 
 L'identifiant GEDCOM reste une information de provenance. Il ne devient ni une
-clé de plan, ni un identifiant métier Kinfolio.
+clé de plan, ni un identifiant métier Genealaine.
 
 ## Rapport de correspondance
 
@@ -64,7 +64,7 @@ Le premier nom marqué comme principal est utilisé, avec repli sur le premier
 nom disponible. Les sous-champs structurés sont prioritaires sur la valeur
 brute `NAME`.
 
-| GEDCOM normalisé                      | Kinfolio                                 |
+| GEDCOM normalisé                      | Genealaine                               |
 | ------------------------------------- | ---------------------------------------- |
 | `givenNames`                          | `firstName` complet                      |
 | `surnamePrefix` suivi de `surname`    | `lastName`                               |
@@ -81,13 +81,13 @@ patronyme importé.
 
 ### Genre et statut de vie
 
-| Valeur normalisée | Genre Kinfolio | Rapport                         |
-| ----------------- | -------------- | ------------------------------- |
-| `male`            | `male`         | aucun                           |
-| `female`          | `female`       | aucun                           |
-| `unknown`         | `unspecified`  | aucun                           |
-| valeur absente    | `unspecified`  | aucun                           |
-| `other`           | `unspecified`  | `unsupported_sex`, non bloquant |
+| Valeur normalisée | Genre Genealaine | Rapport                         |
+| ----------------- | ---------------- | ------------------------------- |
+| `male`            | `male`           | aucun                           |
+| `female`          | `female`         | aucun                           |
+| `unknown`         | `unspecified`    | aucun                           |
+| valeur absente    | `unspecified`    | aucun                           |
+| `other`           | `unspecified`    | `unsupported_sex`, non bloquant |
 
 Le mapper ne déduit jamais `non_binary`. La présence d'un événement `DEAT`
 produit `deceased`, même sans date. Son absence produit `unknown` et jamais
@@ -116,7 +116,7 @@ crée jamais de parent fictif.
 
 ### Nature de la filiation
 
-| `PEDI`               | Type Kinfolio                            |
+| `PEDI`               | Type Genealaine                          |
 | -------------------- | ---------------------------------------- |
 | absent ou `BIRTH`    | `unspecified`                            |
 | `ADOPTED`            | `adoptive`                               |
@@ -165,13 +165,13 @@ traités dans le prochain ticket.
 Les événements restent dans l'ordre GEDCOM ; ils ne sont pas triés par date.
 Leur date structurée, leur lieu textuel et leur description sont conservés.
 
-| GEDCOM                                 | Type Kinfolio |
-| -------------------------------------- | ------------- |
-| `ENGA`                                 | `engagement`  |
-| `MARR`                                 | `marriage`    |
-| `DIV`                                  | `divorce`     |
-| `ANUL`                                 | `annulment`   |
-| `MARB`, `MARC`, `MARL`, `MARS`, `DIVF` | `other`       |
+| GEDCOM                                 | Type Genealaine |
+| -------------------------------------- | --------------- |
+| `ENGA`                                 | `engagement`    |
+| `MARR`                                 | `marriage`      |
+| `DIV`                                  | `divorce`       |
+| `ANUL`                                 | `annulment`     |
+| `MARB`, `MARC`, `MARL`, `MARS`, `DIVF` | `other`         |
 
 Pour `EVEN`, la valeur `type` est comparée sans tenir compte de la casse ni des
 espaces superflus.

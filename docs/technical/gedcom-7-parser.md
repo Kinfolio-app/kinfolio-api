@@ -101,7 +101,7 @@ Le classement des extensions conservées est réalisé par la
 suivantes restent hors du parseur GEDCOM 7 :
 
 - GEDZIP et l'extraction des fichiers médias ;
-- la correspondance avec les entités Kinfolio ;
+- la correspondance avec les entités Genealaine ;
 - la détection des doublons et le réimport ;
 - la persistance transactionnelle.
 

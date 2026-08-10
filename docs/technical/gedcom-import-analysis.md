@@ -14,12 +14,12 @@ Elle permet au client de connaître :
 - les extensions ignorées ou ambiguës ;
 - les erreurs, avertissements et informations produits pendant l'analyse.
 
-L'analyse ne réalise ni correspondance avec les entités Kinfolio, ni
+L'analyse ne réalise ni correspondance avec les entités Genealaine, ni
 détection de doublons, ni écriture en base de données.
 
 Lorsque l'analyse et le parsing ont produit un document normalisé valide, la
 projection vers un plan d'import est décrite par la
-[note sur les correspondances GEDCOM vers Kinfolio](gedcom-to-kinfolio-mapping.md).
+[note sur les correspondances GEDCOM vers Genealaine](gedcom-to-genealaine-mapping.md).
 
 ## Contrat HTTP
 
@@ -97,10 +97,10 @@ Les parseurs conservent toute structure qu'ils ne projettent pas dans un champ
 normalisé dédié sous forme de `NormalizedExtension`. Le service d'analyse les
 classe de manière prudente :
 
-| Résultat    | Règle actuelle                                                                                              |
-| ----------- | ----------------------------------------------------------------------------------------------------------- |
-| `ignored`   | L'extension possède un URI résolu, notamment grâce à `HEAD.SCHMA`, mais Kinfolio ne la prend pas en charge. |
-| `ambiguous` | Aucun URI unique n'a pu être associé à l'extension.                                                         |
+| Résultat    | Règle actuelle                                                                                                |
+| ----------- | ------------------------------------------------------------------------------------------------------------- |
+| `ignored`   | L'extension possède un URI résolu, notamment grâce à `HEAD.SCHMA`, mais Genealaine ne la prend pas en charge. |
+| `ambiguous` | Aucun URI unique n'a pu être associé à l'extension.                                                           |
 
 Chaque élément expose son tag, son URI éventuel, son chemin normalisé, sa
 position dans le fichier et la raison du classement. Une extension enfant
@@ -147,7 +147,7 @@ L'analyse ne couvre pas encore :
 
 - GEDZIP et les fichiers médias embarqués ;
 - ANSEL ou les encodages propriétaires ;
-- la correspondance entre le document normalisé et les entités Kinfolio ;
+- la correspondance entre le document normalisé et les entités Genealaine ;
 - la détection des doublons et le réimport ;
 - l'import transactionnel et son rapport final ;
 - les tests avec des exports réels anonymisés et les mesures sur de grands

@@ -5,11 +5,11 @@
 
 ## Contexte
 
-Kinfolio API expose ses entrées et ses réponses au moyen de schémas TypeBox
+Genealaine API expose ses entrées et ses réponses au moyen de schémas TypeBox
 associés aux routes Fastify. Ces schémas assurent la validation à l’exécution et
 servent à produire les types TypeScript utilisés dans l’API.
 
-Kinfolio Web est développé dans un dépôt séparé. Il doit connaître les chemins,
+Genealaine Web est développé dans un dépôt séparé. Il doit connaître les chemins,
 paramètres, corps, réponses et erreurs de l’API sans recopier manuellement les
 DTO ni dépendre des détails d’implémentation du backend. De futurs clients
 pourraient par ailleurs utiliser un autre langage que TypeScript.
@@ -19,7 +19,7 @@ versionnable et généré depuis la source déjà utilisée pour valider les rou
 
 ## Décision
 
-Kinfolio API publie son contrat HTTP au format **OpenAPI 3** dans un document
+Genealaine API publie son contrat HTTP au format **OpenAPI 3** dans un document
 `openapi.json`.
 
 Les schémas TypeBox enregistrés sur les routes Fastify restent la source de
@@ -99,5 +99,5 @@ service disponible.
 ### Générer un SDK pour chaque client dans le dépôt API
 
 Cette approche centraliserait davantage les intégrations, mais imposerait à
-Kinfolio API les langages, outils et cycles de publication propres à chaque
+Genealaine API les langages, outils et cycles de publication propres à chaque
 client. L’API publie plutôt un contrat neutre que chaque client peut consommer.

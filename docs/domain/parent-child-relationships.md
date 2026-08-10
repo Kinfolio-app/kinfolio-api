@@ -1,6 +1,6 @@
 # Liens parent-enfant
 
-Ce document décrit le modèle métier des liens parent-enfant de Kinfolio. Il
+Ce document décrit le modèle métier des liens parent-enfant de Genealaine. Il
 évoluera avec les besoins du produit, notamment lorsque les contraintes
 d'intégrité et les opérations de l'API seront précisées.
 
@@ -74,7 +74,7 @@ Un index sur `child_id` complète l'index créé par l'unicité de
 
 ## Compatibilité avec GEDCOM
 
-Le modèle métier de Kinfolio ne reprend pas directement les valeurs de
+Le modèle métier de Genealaine ne reprend pas directement les valeurs de
 `PEDI` définies par GEDCOM 7. La valeur GEDCOM `BIRTH` est ambiguë : elle peut
 désigner une filiation génétique ou une relation sociale au moment de la
 naissance. Elle ne doit donc pas être automatiquement interprétée comme une
@@ -82,7 +82,7 @@ filiation biologique.
 
 L'import GEDCOM applique les correspondances prudentes suivantes :
 
-| GEDCOM                | Kinfolio      |
+| GEDCOM                | Genealaine    |
 | --------------------- | ------------- |
 | `ADOPTED`             | `adoptive`    |
 | `FOSTER`              | `foster`      |
@@ -98,7 +98,7 @@ Le champ GEDCOM `STAT` est projeté séparément : absence vers `unassessed`,
 `PROVEN` vers `proven` et `CHALLENGED` vers `challenged`. Un lien `DISPROVEN`
 n'est pas planifié. Une valeur inconnue reste `unassessed` et produit une
 ambiguïté à résoudre. Les règles complètes et les diagnostics sont décrits dans
-la [note technique de correspondance](../technical/gedcom-to-kinfolio-mapping.md).
+la [note technique de correspondance](../technical/gedcom-to-genealaine-mapping.md).
 
 La définition officielle de `PEDI` est disponible dans la
 [spécification FamilySearch GEDCOM 7](https://gedcom.io/specifications/FamilySearchGEDCOMv7.html).

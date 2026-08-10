@@ -10,7 +10,7 @@ logiciel ou un service existant. La version actuelle du standard est GEDCOM 7,
 mais les formats réellement exportés par l'écosystème ne sont pas homogènes.
 
 Heredis exporte notamment en GEDCOM 5.5.1, comme plusieurs autres logiciels
-largement utilisés. Limiter Kinfolio à GEDCOM 7 empêcherait donc l'import de
+largement utilisés. Limiter Genealaine à GEDCOM 7 empêcherait donc l'import de
 fichiers qui constituent une cible prioritaire du produit.
 
 GEDCOM 7 apporte une spécification plus claire, un encodage UTF-8 obligatoire,
@@ -29,7 +29,7 @@ dans le [document de cadrage de l'import](../domain/gedcom-import.md).
 
 ## Décision
 
-Kinfolio prend en charge :
+Genealaine prend en charge :
 
 - GEDCOM 5.5.1 ;
 - GEDCOM 7.0 et ses révisions correctives 7.0.x.
@@ -50,7 +50,7 @@ GedcomParser
 
 Le détecteur de version sélectionne l'implémentation avant le parsing. Une
 version absente, invalide ou non prise en charge produit une erreur explicite ;
-Kinfolio ne tente pas de la deviner à partir du contenu généalogique.
+Genealaine ne tente pas de la deviner à partir du contenu généalogique.
 
 Les parseurs peuvent partager des composants de bas niveau, par exemple la
 lecture des lignes, la construction de l'arbre hiérarchique, la gestion des
@@ -61,7 +61,7 @@ deux spécifications est établie et testée.
 Les deux implémentations produisent le même document GEDCOM intermédiaire. Son
 contrat est défini dans la
 [note technique sur le modèle normalisé](../technical/gedcom-normalized-model.md).
-L'analyse, les correspondances vers Kinfolio, la détection des
+L'analyse, les correspondances vers Genealaine, la détection des
 doublons et l'import transactionnel ne dépendent ainsi d'aucune version GEDCOM.
 
 GEDCOM 5.5 et les versions antérieures ne font pas partie du contrat initial.
@@ -73,7 +73,7 @@ représentatifs et ne devra pas affaiblir la validation de GEDCOM 5.5.1.
 ### Conséquences positives
 
 - Les exports Heredis 5.5.1 peuvent être importés sans conversion préalable.
-- Kinfolio reste compatible avec la version moderne du standard.
+- Genealaine reste compatible avec la version moderne du standard.
 - Chaque parseur applique clairement les règles de sa propre spécification.
 - Le reste du pipeline ne contient pas de conditions dispersées sur la version.
 - Une révision corrective GEDCOM 7 ne nécessite pas un nouveau parseur.

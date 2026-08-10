@@ -17,7 +17,7 @@ JSON:API définit une structure plus complète avec `data`, `meta` et `links`,
 mais son adoption impliquerait également de suivre ses autres conventions de
 représentation des ressources.
 
-Kinfolio n'a pas besoin de l'ensemble de JSON:API à ce stade. Le contrat doit
+Genealaine n'a pas besoin de l'ensemble de JSON:API à ce stade. Le contrat doit
 rester simple tout en pouvant accueillir ultérieurement des liens de
 navigation.
 
@@ -80,7 +80,7 @@ collection à partir du schéma de ses ressources.
 
 - Chaque liste demande une requête de comptage afin de calculer `totalItems` et
   `totalPages`.
-- L'enveloppe est une convention propre à Kinfolio et non un format défini par
+- L'enveloppe est une convention propre à Genealaine et non un format défini par
   une RFC.
 - Les requêtes de comptage pourront devenir coûteuses sur de grandes
   collections ou avec des filtres complexes.
@@ -104,5 +104,5 @@ pagination directement accessibles dans le corps JSON.
 ### JSON:API
 
 JSON:API définit une convention complète pour les collections, les métadonnées
-et les liens. Cette solution n'est pas retenue, car Kinfolio ne souhaite pas
+et les liens. Cette solution n'est pas retenue, car Genealaine ne souhaite pas
 adopter à ce stade l'ensemble de ses contraintes de représentation.

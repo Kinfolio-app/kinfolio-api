@@ -5,7 +5,7 @@
 
 ## Contexte
 
-Kinfolio a pour objectif de centraliser les personnes, les liens de parenté, les événements, les souvenirs et les documents d'une famille. Ces données doivent pouvoir être consultées et modifiées par plusieurs utilisateurs, depuis plusieurs appareils, tout en respectant les droits d'accès propres à chaque espace familial.
+Genealaine a pour objectif de centraliser les personnes, les liens de parenté, les événements, les souvenirs et les documents d'une famille. Ces données doivent pouvoir être consultées et modifiées par plusieurs utilisateurs, depuis plusieurs appareils, tout en respectant les droits d'accès propres à chaque espace familial.
 
 Le domaine contient de nombreuses relations structurées : une personne appartient à un arbre familial, peut être liée à plusieurs autres personnes, participer à des événements et être associée à des souvenirs ou à des médias. Certaines opérations devront modifier plusieurs éléments de manière atomique et garantir que les références entre eux restent cohérentes.
 
@@ -13,7 +13,7 @@ Un stockage uniquement local chez l'utilisateur offrirait davantage de contrôle
 
 ## Décision
 
-J'utilise **PostgreSQL** comme base de données principale de Kinfolio API.
+J'utilise **PostgreSQL** comme base de données principale de Genealaine API.
 
 PostgreSQL stockera les données structurées et les métadonnées de l'application, notamment :
 
@@ -55,7 +55,7 @@ Le choix d'un outil de migration, d'un pilote PostgreSQL ou d'une bibliothèque 
 - La centralisation de données familiales privées impose de mettre en place l'authentification, les autorisations, le chiffrement, les sauvegardes et des mécanismes d'export.
 - Le stockage des fichiers devra être géré par un composant distinct et coordonné avec les enregistrements conservés dans PostgreSQL.
 
-Ces compromis sont acceptés, car ils apportent les garanties de cohérence et les capacités de collaboration attendues pour Kinfolio.
+Ces compromis sont acceptés, car ils apportent les garanties de cohérence et les capacités de collaboration attendues pour Genealaine.
 
 ## Alternatives envisagées
 
@@ -73,11 +73,11 @@ SQLite a été envisagé pour sa simplicité et son absence de serveur dédié. 
 
 ### MongoDB
 
-MongoDB a été envisagé pour la flexibilité de son modèle documentaire. Il n'a pas été retenu, car les données principales de Kinfolio possèdent de nombreuses relations et contraintes de cohérence. Les représenter par des documents imbriqués ou des références applicatives augmenterait la complexité du modèle sans apporter de bénéfice déterminant pour le projet.
+MongoDB a été envisagé pour la flexibilité de son modèle documentaire. Il n'a pas été retenu, car les données principales de Genealaine possèdent de nombreuses relations et contraintes de cohérence. Les représenter par des documents imbriqués ou des références applicatives augmenterait la complexité du modèle sans apporter de bénéfice déterminant pour le projet.
 
 ### Neo4j
 
-Neo4j a été envisagé, car un arbre familial peut naturellement être représenté sous la forme d'un graphe. Il n'a pas été retenu comme base principale, car une grande partie des données de Kinfolio reste relationnelle et les parcours généalogiques prévus peuvent être réalisés avec les requêtes récursives de PostgreSQL. Ce choix pourra être réévalué si l'analyse de graphes devient un besoin central et difficile à satisfaire avec PostgreSQL.
+Neo4j a été envisagé, car un arbre familial peut naturellement être représenté sous la forme d'un graphe. Il n'a pas été retenu comme base principale, car une grande partie des données de Genealaine reste relationnelle et les parcours généalogiques prévus peuvent être réalisés avec les requêtes récursives de PostgreSQL. Ce choix pourra être réévalué si l'analyse de graphes devient un besoin central et difficile à satisfaire avec PostgreSQL.
 
 ### MySQL
 

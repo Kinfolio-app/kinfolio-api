@@ -6,9 +6,9 @@
 similarités et du dépôt de la marque.
 
 Cette décision est commune aux applications web et API. Le nom de travail
-précédent, **Kinfolio**, ne doit plus être utilisé pour les nouveaux contenus
-publics. Il peut subsister temporairement dans les noms de dépôts, les URL et
-les identifiants internes jusqu'à leur migration.
+précédent ne doit plus être utilisé pour les nouveaux contenus publics. Il peut
+subsister temporairement dans les noms de dépôts, les URL et les identifiants
+internes jusqu'à leur migration.
 
 ## Nom retenu
 
@@ -61,6 +61,6 @@ communication publique importante ou un dépôt, il reste nécessaire de :
 ## Règle de transition
 
 Les nouvelles interfaces, documentations et métadonnées utilisent
-**Genealaine**. Les anciennes références à **Kinfolio** sont remplacées au fil
-des modifications, sans renommer précipitamment les ressources externes ou les
-identifiants persistants qui nécessitent une migration coordonnée.
+**Genealaine**. Les anciennes références au nom précédent sont remplacées au
+fil des modifications, sans renommer précipitamment les ressources externes ou
+les identifiants persistants qui nécessitent une migration coordonnée.

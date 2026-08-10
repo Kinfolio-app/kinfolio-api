@@ -34,7 +34,7 @@ notes et autres données personnelles ne sont ni extraits ni reportés.
 | Références parent ou enfant manquantes         |                                 0 |
 
 Les personnes isolées peuvent notamment appartenir à des familles sans enfant.
-Les relations de couple ne sont pas incluses dans ce graphe, car Kinfolio ne les
+Les relations de couple ne sont pas incluses dans ce graphe, car Genealaine ne les
 modélise pas encore.
 
 ## Densité
