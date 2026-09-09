@@ -225,6 +225,9 @@ npm run migrate:test
 npm run test:integration
 ```
 
+La stratégie, le choix des différents niveaux et les règles propres à
+PostgreSQL sont détaillés dans la [documentation des tests](docs/testing.md).
+
 Vérifiez ensuite la compilation, le lint et le formatage :
 
 ```bash
