@@ -88,13 +88,13 @@ describe('ParentChildRelationshipRoute integration', () => {
 
     beforeEach(async () => {
         await app.pg.query(
-            'TRUNCATE TABLE gedcom_couple_event_links, gedcom_parent_child_links, gedcom_family_links, gedcom_individual_links, gedcom_import_runs, gedcom_import_sources, couple_relationship_events, couple_relationships, parent_child_relationships, persons, genealogical_dates',
+            'TRUNCATE TABLE gedcom_import_drafts, gedcom_couple_event_links, gedcom_parent_child_links, gedcom_family_links, gedcom_individual_links, gedcom_import_runs, gedcom_import_sources, couple_relationship_events, couple_relationships, parent_child_relationships, persons, genealogical_dates',
         );
     });
 
     afterAll(async () => {
         await app.pg.query(
-            'TRUNCATE TABLE gedcom_couple_event_links, gedcom_parent_child_links, gedcom_family_links, gedcom_individual_links, gedcom_import_runs, gedcom_import_sources, couple_relationship_events, couple_relationships, parent_child_relationships, persons, genealogical_dates',
+            'TRUNCATE TABLE gedcom_import_drafts, gedcom_couple_event_links, gedcom_parent_child_links, gedcom_family_links, gedcom_individual_links, gedcom_import_runs, gedcom_import_sources, couple_relationship_events, couple_relationships, parent_child_relationships, persons, genealogical_dates',
         );
         await app.close();
     });

@@ -1,6 +1,8 @@
 import type { Database } from '../../shared/database/transaction.js';
 import type { NormalizedIdentifier } from './common/gedcom-parser.types.js';
 import type { SupportedGedcomVersion } from './gedcom-file.types.js';
+import { GedcomImportSourceRepository } from './gedcom-import-source.repository.js';
+import { decodeSha256, encodeSha256 } from './gedcom-sha256.js';
 import type {
     GedcomCoupleEventLink,
     GedcomFamilyLink,
@@ -118,21 +120,6 @@ export type SaveGedcomCoupleEventLinkInput = {
     lastSeenRunId: string;
 };
 
-// Matches exactly 32 bytes encoded as 64 lowercase or uppercase hexadecimal characters; it has no capture groups.
-const SHA256_HEX_PATTERN = /^[0-9a-f]{64}$/i;
-
-function decodeSha256(value: string): Buffer {
-    if (!SHA256_HEX_PATTERN.test(value)) {
-        throw new Error('A SHA-256 fingerprint must contain exactly 64 hexadecimal characters.');
-    }
-
-    return Buffer.from(value, 'hex');
-}
-
-function encodeSha256(value: Uint8Array): string {
-    return Buffer.from(value).toString('hex');
-}
-
 function mapSource(row: GedcomImportSourceRow): GedcomImportSource {
     return {
         id: row.id,
@@ -237,23 +224,7 @@ export class GedcomImportRepository {
     }
 
     async deleteSourceIfUnused(id: string): Promise<boolean> {
-        const { rows } = await this.database.query<{ id: string }>(
-            `DELETE FROM gedcom_import_sources AS source
-            WHERE source.id = $1
-                AND NOT EXISTS (
-                    SELECT 1 FROM gedcom_import_runs WHERE source_id = source.id
-                )
-                AND NOT EXISTS (
-                    SELECT 1 FROM gedcom_individual_links WHERE source_id = source.id
-                )
-                AND NOT EXISTS (
-                    SELECT 1 FROM gedcom_family_links WHERE source_id = source.id
-                )
-            RETURNING source.id`,
-            [id],
-        );
-
-        return rows[0] !== undefined;
+        return new GedcomImportSourceRepository(this.database).deleteIfUnused(id);
     }
 
     async createOrFindRun(input: CreateGedcomImportRunInput): Promise<{

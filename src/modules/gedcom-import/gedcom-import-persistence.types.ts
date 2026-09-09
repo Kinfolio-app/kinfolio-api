@@ -3,6 +3,31 @@ import type { SupportedGedcomVersion } from './gedcom-file.types.js';
 
 export type StoredGedcomImportData = Record<string, unknown>;
 
+export const GedcomImportDraftStatus = {
+    Blocked: 'blocked',
+    NeedsResolution: 'needs_resolution',
+    Ready: 'ready',
+} as const;
+
+export type GedcomImportDraftStatus =
+    (typeof GedcomImportDraftStatus)[keyof typeof GedcomImportDraftStatus];
+
+export type GedcomImportDraft = {
+    id: string;
+    sourceId: string;
+    status: GedcomImportDraftStatus;
+    fileSha256: string;
+    fileContent: Uint8Array;
+    gedcomVersion: SupportedGedcomVersion;
+    plan: StoredGedcomImportData;
+    resolutions: StoredGedcomImportData;
+    baseVersions: StoredGedcomImportData;
+    revision: number;
+    expiresAt: Date;
+    createdAt: Date;
+    updatedAt: Date;
+};
+
 export type GedcomImportSource = {
     id: string;
     name: string;
