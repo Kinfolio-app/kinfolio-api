@@ -503,7 +503,7 @@ Les fichiers de ces tests restent synthétiques ou préalablement anonymisés.
 
 ## Ordre d'implémentation recommandé
 
-1. créer les sources, exécutions et correspondances ;
+1. **Terminé —** créer les sources, exécutions et correspondances ;
 2. créer les brouillons et leur nettoyage ;
 3. construire la recherche de correspondances et la fusion à trois versions ;
 4. adapter les limites multipart et exposer les routes de prévisualisation et
