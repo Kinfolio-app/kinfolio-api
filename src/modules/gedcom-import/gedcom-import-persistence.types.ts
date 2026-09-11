@@ -1,5 +1,6 @@
 import type { NormalizedIdentifier } from './common/gedcom-parser.types.js';
 import type { SupportedGedcomVersion } from './gedcom-file.types.js';
+import type { GedcomImportPlan } from './gedcom-import-plan.types.js';
 
 export type StoredGedcomImportData = Record<string, unknown>;
 
@@ -19,7 +20,7 @@ export type GedcomImportDraft = {
     fileSha256: string;
     fileContent: Uint8Array;
     gedcomVersion: SupportedGedcomVersion;
-    plan: StoredGedcomImportData;
+    plan: GedcomImportPlan;
     resolutions: StoredGedcomImportData;
     baseVersions: StoredGedcomImportData;
     revision: number;

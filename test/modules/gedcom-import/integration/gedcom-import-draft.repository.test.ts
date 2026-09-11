@@ -43,6 +43,15 @@ describe('GedcomImportDraftRepository integration', () => {
     beforeAll(async () => {
         pool = new Pool({ connectionString: getTestDatabaseUrl() });
         await pool.query('SELECT 1');
+        await pool.query(`
+            DELETE FROM gedcom_couple_event_links;
+            DELETE FROM gedcom_parent_child_links;
+            DELETE FROM gedcom_family_links;
+            DELETE FROM gedcom_individual_links;
+            DELETE FROM gedcom_import_drafts;
+            DELETE FROM gedcom_import_runs;
+            DELETE FROM gedcom_import_sources;
+        `);
     });
 
     beforeEach(async () => {
@@ -72,7 +81,13 @@ describe('GedcomImportDraftRepository integration', () => {
             fileSha256: sha256('synthetic draft contents'),
             fileContent: new TextEncoder().encode('0 HEAD\n0 TRLR'),
             gedcomVersion: '7.0',
-            plan: { people: [], relationships: [], issues: [] },
+            plan: {
+                people: [],
+                parentChildRelationships: [],
+                coupleRelationships: [],
+                coupleRelationshipEvents: [],
+                issues: [],
+            },
             expiresAt,
         });
     }
@@ -88,6 +103,34 @@ describe('GedcomImportDraftRepository integration', () => {
         expect(draft.resolutions).toEqual({});
         expect(draft.baseVersions).toEqual({});
         expect(draft.revision).toBe(0);
+    });
+
+    it('rolls back a new source when its draft cannot be created', async () => {
+        const transactionalRepository = new GedcomImportDraftRepository(pool);
+        const sourceName = 'Rolled back synthetic source';
+
+        await expect(
+            transactionalRepository.createForNewSource(sourceName, {
+                status: GedcomImportDraftStatus.Ready,
+                fileSha256: sha256('invalid empty draft'),
+                fileContent: new Uint8Array(),
+                gedcomVersion: '7.0',
+                plan: {
+                    people: [],
+                    parentChildRelationships: [],
+                    coupleRelationships: [],
+                    coupleRelationshipEvents: [],
+                    issues: [],
+                },
+                expiresAt: new Date('2100-01-01T00:00:00.000Z'),
+            }),
+        ).rejects.toMatchObject({ constraint: 'gedcom_import_drafts_file_not_empty' });
+
+        const { rows } = await pool.query<{ count: number }>(
+            'SELECT COUNT(*)::integer AS count FROM gedcom_import_sources WHERE name = $1',
+            [sourceName],
+        );
+        expect(rows[0]?.count).toBe(0);
     });
 
     it('updates resolutions only at the expected revision', async () => {

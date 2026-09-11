@@ -41,8 +41,8 @@ export function buildApp({
         attachFieldsToBody: 'keyValues',
         limits: {
             files: 1,
-            fields: 0,
-            parts: 1,
+            fields: 2,
+            parts: 3,
             fileSize: FILE_SIZE,
         },
     });

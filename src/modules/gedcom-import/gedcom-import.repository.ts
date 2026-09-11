@@ -13,13 +13,6 @@ import type {
     StoredGedcomImportData,
 } from './gedcom-import-persistence.types.js';
 
-type GedcomImportSourceRow = {
-    id: string;
-    name: string;
-    created_at: Date;
-    updated_at: Date;
-};
-
 type GedcomImportRunRow = {
     id: string;
     source_id: string;
@@ -120,15 +113,6 @@ export type SaveGedcomCoupleEventLinkInput = {
     lastSeenRunId: string;
 };
 
-function mapSource(row: GedcomImportSourceRow): GedcomImportSource {
-    return {
-        id: row.id,
-        name: row.name,
-        createdAt: row.created_at,
-        updatedAt: row.updated_at,
-    };
-}
-
 function mapRun(row: GedcomImportRunRow): GedcomImportRun {
     return {
         id: row.id,
@@ -198,29 +182,11 @@ export class GedcomImportRepository {
     constructor(private readonly database: Database) {}
 
     async createSource(name: string): Promise<GedcomImportSource> {
-        const { rows } = await this.database.query<GedcomImportSourceRow>(
-            `INSERT INTO gedcom_import_sources (name)
-            VALUES ($1)
-            RETURNING *`,
-            [name.trim()],
-        );
-        const row = rows[0];
-
-        if (row === undefined) {
-            throw new Error('PostgreSQL did not return the created GEDCOM import source.');
-        }
-
-        return mapSource(row);
+        return new GedcomImportSourceRepository(this.database).create(name);
     }
 
     async findSourceById(id: string): Promise<GedcomImportSource | null> {
-        const { rows } = await this.database.query<GedcomImportSourceRow>(
-            'SELECT * FROM gedcom_import_sources WHERE id = $1',
-            [id],
-        );
-        const row = rows[0];
-
-        return row === undefined ? null : mapSource(row);
+        return new GedcomImportSourceRepository(this.database).findById(id);
     }
 
     async deleteSourceIfUnused(id: string): Promise<boolean> {

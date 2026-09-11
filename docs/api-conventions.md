@@ -354,6 +354,9 @@ supposées par les nouvelles routes :
 - liens de navigation des collections ;
 - versionnement de l'API ;
 - en-tête `Location` après une création ;
+- abstraction Fastify légère pour construire en une seule instruction les
+  réponses qui nécessitent un statut, un type de contenu et un corps explicites,
+  notamment les réponses Problem Details enrichies ;
 - représentation des relations et branches familiales.
 
 Ces sujets seront ajoutés à ce document lorsqu'une décision aura été prise.

@@ -22,6 +22,7 @@ Avant d'implémenter les fonctionnalités de généalogie, le socle de l'API doi
 ### Publication du contrat HTTP
 
 - [x] Publier le choix d'OpenAPI conformément à l'[ADR 0011](adr/0011-publish-the-http-contract-as-openapi.md).
+- [ ] Centraliser les schémas TypeBox des énumérations métier partagées (`Gender`, `LivingStatus`, `ParentChildRelationshipType`, `ParentChildRelationshipEvidenceStatus` et `CoupleRelationshipEventType`) afin que les routes métier et les plans d'import reposent sur une seule définition.
 - [ ] Générer le contrat OpenAPI depuis les schémas TypeBox avec `@fastify/swagger`.
 - [ ] Compléter les routes avec des `operationId`, des tags et leurs réponses d'erreur RFC 9457.
 - [ ] Décrire correctement les paramètres de collection, les réponses sans contenu et le transfert des fichiers GEDCOM.

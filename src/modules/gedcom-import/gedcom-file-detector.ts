@@ -1,9 +1,9 @@
 import { isAsciiDigits } from './common/gedcom-character-utils.js';
 import {
     GedcomDetectionDiagnosticCode,
+    parseSupportedGedcomVersion,
     type GedcomDetectionDiagnostic,
     type GedcomDetectionResult,
-    type SupportedGedcomVersion,
 } from './gedcom-file.types.js';
 
 export const MAX_GEDCOM_HEADER_BYTES = 64 * 1024;
@@ -227,31 +227,6 @@ function probeHeader(input: Uint8Array, byteOffset: number): GedcomHeaderProbe {
     };
 }
 
-function parseSupportedVersion(value: string): SupportedGedcomVersion | null {
-    if (value === '5.5.1' || value === '7.0') {
-        return value;
-    }
-
-    const parts = value.split('.');
-
-    if (
-        parts.length !== 3 ||
-        parts[0] !== '7' ||
-        parts[1] !== '0' ||
-        !isAsciiDigits(parts[2] ?? '')
-    ) {
-        return null;
-    }
-
-    const patchVersion = parts[2] ?? '';
-
-    if (patchVersion.length > 1 && patchVersion.startsWith('0')) {
-        return null;
-    }
-
-    return value as `7.0.${number}`;
-}
-
 function decodeUtf8(input: Uint8Array): string | null {
     try {
         return new TextDecoder('utf-8', { fatal: true }).decode(input);
@@ -309,7 +284,7 @@ export class GedcomFileDetector {
             );
         }
 
-        const version = parseSupportedVersion(header.version.value);
+        const version = parseSupportedGedcomVersion(header.version.value);
 
         if (version === null) {
             return error(

@@ -48,6 +48,20 @@ export class ConflictError extends AppError {
     }
 }
 
+export class GoneError extends AppError {
+    constructor({ detail, cause }: HttpError) {
+        super({
+            type: 'about:blank',
+            title: 'Gone',
+            status: HttpStatus.Gone,
+            detail,
+            cause,
+        });
+
+        this.name = 'GoneError';
+    }
+}
+
 export class PayloadTooLargeError extends AppError {
     constructor({ detail, cause }: HttpError) {
         super({

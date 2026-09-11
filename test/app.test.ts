@@ -18,6 +18,7 @@ describe('app', () => {
             config: TEST_CONFIG,
             databasePlugin: async () => {},
             familyTreePlugin: async () => {},
+            gedcomImportPlugin: async () => {},
             peoplePlugin: async () => {},
             relationshipPlugin: async () => {},
         });

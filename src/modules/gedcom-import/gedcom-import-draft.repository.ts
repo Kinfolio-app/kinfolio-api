@@ -1,5 +1,10 @@
-import { runInTransaction, type Database } from '../../shared/database/transaction.js';
+import {
+    runInTransaction,
+    type Database,
+    type QueryableDatabase,
+} from '../../shared/database/transaction.js';
 import type { SupportedGedcomVersion } from './gedcom-file.types.js';
+import type { GedcomImportPlan } from './gedcom-import-plan.types.js';
 import type {
     GedcomImportDraft,
     GedcomImportDraftStatus,
@@ -15,7 +20,7 @@ type GedcomImportDraftRow = {
     file_sha256: Uint8Array;
     file_content: Uint8Array;
     gedcom_version: SupportedGedcomVersion;
-    plan: StoredGedcomImportData;
+    plan: GedcomImportPlan;
     resolutions: StoredGedcomImportData;
     base_versions: StoredGedcomImportData;
     revision: number;
@@ -30,7 +35,7 @@ export type CreateGedcomImportDraftInput = {
     fileSha256: string;
     fileContent: Uint8Array;
     gedcomVersion: SupportedGedcomVersion;
-    plan: StoredGedcomImportData;
+    plan: GedcomImportPlan;
     resolutions?: StoredGedcomImportData;
     baseVersions?: StoredGedcomImportData;
     expiresAt: Date;
@@ -47,6 +52,11 @@ export type GedcomImportDraftCleanupResult = {
     deletedDrafts: number;
     deletedSources: number;
 };
+
+export type CreateGedcomImportDraftForNewSourceInput = Omit<
+    CreateGedcomImportDraftInput,
+    'sourceId'
+>;
 
 function mapDraft(row: GedcomImportDraftRow): GedcomImportDraft {
     return {
@@ -70,38 +80,21 @@ export class GedcomImportDraftRepository {
     constructor(private readonly database: Database) {}
 
     async create(input: CreateGedcomImportDraftInput): Promise<GedcomImportDraft> {
-        const { rows } = await this.database.query<GedcomImportDraftRow>(
-            `INSERT INTO gedcom_import_drafts (
-                source_id,
-                status,
-                file_sha256,
-                file_content,
-                gedcom_version,
-                plan,
-                resolutions,
-                base_versions,
-                expires_at
-            ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
-            RETURNING *`,
-            [
-                input.sourceId,
-                input.status,
-                decodeSha256(input.fileSha256),
-                input.fileContent,
-                input.gedcomVersion,
-                input.plan,
-                input.resolutions ?? {},
-                input.baseVersions ?? {},
-                input.expiresAt,
-            ],
-        );
-        const row = rows[0];
+        return this.insertDraft(this.database, input);
+    }
 
-        if (row === undefined) {
-            throw new Error('PostgreSQL did not return the created GEDCOM import draft.');
-        }
+    async createForNewSource(
+        sourceName: string,
+        input: CreateGedcomImportDraftForNewSourceInput,
+    ): Promise<GedcomImportDraft> {
+        return runInTransaction(this.database, async (database) => {
+            const source = await new GedcomImportSourceRepository(database).create(sourceName);
 
-        return mapDraft(row);
+            return this.insertDraft(database, {
+                ...input,
+                sourceId: source.id,
+            });
+        });
     }
 
     async findById(id: string): Promise<GedcomImportDraft | null> {
@@ -178,5 +171,43 @@ export class GedcomImportDraftRepository {
                 deletedSources,
             };
         });
+    }
+
+    private async insertDraft(
+        database: QueryableDatabase,
+        input: CreateGedcomImportDraftInput,
+    ): Promise<GedcomImportDraft> {
+        const { rows } = await database.query<GedcomImportDraftRow>(
+            `INSERT INTO gedcom_import_drafts (
+                source_id,
+                status,
+                file_sha256,
+                file_content,
+                gedcom_version,
+                plan,
+                resolutions,
+                base_versions,
+                expires_at
+            ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
+            RETURNING *`,
+            [
+                input.sourceId,
+                input.status,
+                decodeSha256(input.fileSha256),
+                input.fileContent,
+                input.gedcomVersion,
+                input.plan,
+                input.resolutions ?? {},
+                input.baseVersions ?? {},
+                input.expiresAt,
+            ],
+        );
+        const row = rows[0];
+
+        if (row === undefined) {
+            throw new Error('PostgreSQL did not return the created GEDCOM import draft.');
+        }
+
+        return mapDraft(row);
     }
 }

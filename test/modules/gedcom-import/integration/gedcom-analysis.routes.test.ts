@@ -1,9 +1,13 @@
-import type { FastifyInstance } from 'fastify';
+import type { FastifyInstance, FastifyPluginAsync } from 'fastify';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import { buildApp } from '../../../../src/app.js';
 import type { AppConfig } from '../../../../src/config/env.js';
 import { HttpStatus } from '../../../../src/shared/http/http-status.js';
 import { MediaType } from '../../../../src/shared/http/media-type.js';
+import gedcomAnalysisRoutes from '../../../../src/modules/gedcom-import/gedcom-analysis.routes.js';
+import { GedcomFileDetector } from '../../../../src/modules/gedcom-import/gedcom-file-detector.js';
+import { GedcomImportService } from '../../../../src/modules/gedcom-import/gedcom-import.service.js';
+import { GedcomParserSelector } from '../../../../src/modules/gedcom-import/gedcom-parser-selector.js';
 
 const TEST_CONFIG: AppConfig = {
     host: '127.0.0.1',
@@ -13,6 +17,18 @@ const TEST_CONFIG: AppConfig = {
 
 const MULTIPART_BOUNDARY = 'gedcom-analysis-test-boundary';
 const MAX_GEDCOM_FILE_SIZE = 10 * 1024 * 1024;
+
+const gedcomAnalysisTestModule: FastifyPluginAsync = async (app) => {
+    const importService = new GedcomImportService(
+        new GedcomFileDetector(),
+        new GedcomParserSelector(),
+    );
+
+    await app.register(gedcomAnalysisRoutes, {
+        prefix: '/gedcom-imports',
+        importService,
+    });
+};
 
 function createMultipartFilePayload(content: Uint8Array): Buffer {
     return Buffer.concat([
@@ -30,6 +46,37 @@ function createMultipartFilePayload(content: Uint8Array): Buffer {
     ]);
 }
 
+function createMultipartFileAndFieldPayload(
+    content: Uint8Array,
+    fieldName: string,
+    fieldValue: string,
+): Buffer {
+    return Buffer.concat([
+        Buffer.from(
+            [
+                `--${MULTIPART_BOUNDARY}`,
+                'Content-Disposition: form-data; name="file"; filename="family.ged"',
+                'Content-Type: application/octet-stream',
+                '',
+            ].join('\r\n') + '\r\n',
+            'utf8',
+        ),
+        content,
+        Buffer.from(
+            [
+                '',
+                `--${MULTIPART_BOUNDARY}`,
+                `Content-Disposition: form-data; name="${fieldName}"`,
+                '',
+                fieldValue,
+                `--${MULTIPART_BOUNDARY}--`,
+                '',
+            ].join('\r\n'),
+            'utf8',
+        ),
+    ]);
+}
+
 function multipartHeaders(): Record<string, string> {
     return {
         'content-type': `multipart/form-data; boundary=${MULTIPART_BOUNDARY}`,
@@ -44,6 +91,7 @@ describe('GEDCOM analysis route integration', () => {
             config: TEST_CONFIG,
             databasePlugin: async () => {},
             familyTreePlugin: async () => {},
+            gedcomImportPlugin: gedcomAnalysisTestModule,
             peoplePlugin: async () => {},
             relationshipPlugin: async () => {},
         });
@@ -196,6 +244,22 @@ describe('GEDCOM analysis route integration', () => {
             status: HttpStatus.BadRequest,
             detail: 'The request is invalid.',
         });
+    });
+
+    it('continues to reject text fields after the global multipart limits are expanded', async () => {
+        const response = await app.inject({
+            method: 'POST',
+            url: '/gedcom-imports/analysis',
+            headers: multipartHeaders(),
+            payload: createMultipartFileAndFieldPayload(
+                Buffer.from(['0 HEAD', '1 GEDC', '2 VERS 7.0.18', '0 TRLR'].join('\n'), 'utf8'),
+                'sourceName',
+                'Unexpected source',
+            ),
+        });
+
+        expect(response.statusCode).toBe(HttpStatus.BadRequest);
+        expect(response.headers['content-type']).toContain(MediaType.ProblemJson);
     });
 
     it('returns detection diagnostics for an invalid GEDCOM file', async () => {
